@@ -1,0 +1,36 @@
+{
+  "name": "protect-ya-neck",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "babel src -d dist/",
+    "start": "npm run build && node dist",
+    "restart": "rimraf dist && npm run start",
+    "dev": "nodemon --exec npm run restart"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/scotthhso/protect-ya-neck.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/scotthhso/protect-ya-neck/issues"
+  },
+  "homepage": "https://github.com/scotthhso/protect-ya-neck#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "nodemon": "^2.0.6",
+    "rimraff": "0.0.1-security",
+    "socket.io": "^3.0.3"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.12.8",
+    "@babel/core": "^7.12.9",
+    "@babel/preset-env": "^7.12.7",
+    "rimraf": "^3.0.2"
+  }
+}
