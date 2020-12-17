@@ -10,6 +10,7 @@ let app = express();
 app.use(cors());
 app.use(express.json());
 
+let roomMap = new Map();
 
 let server = http.createServer(app);
 
@@ -30,14 +31,32 @@ app.post('/create-room', (req, res) => {
   });
 });
 
+app.post('/start-game', (req, res) => {
+  return res.status(200).json({
+    success: true,
+    redirectUrl: `/${req.body.roomID}/game`
+  });
+});
+
 io.on('connection', (socket) => {
   socket.on('joinRoom', (data) => {
+    //data is an object with the roomID and the user that joined the room
     socket.join(data.roomID);
-    io.in(data.roomID).emit('newUser', data.userID);
+    if (!roomMap.has(data.roomID)) {
+      roomMap.set(data.roomID, [(data.userID)]);
+    } else {
+      let users = roomMap.get(data.roomID);
+      users.push(data.userID);
+      roomMap.set(data.roomID, users)
+    }
+    io.in(data.roomID).emit('newUser', roomMap.get(data.roomID));
   });
 
   socket.on('message', (data) => {
+    //gives data as an object {message: what message was sent, roomId: has the given room id}
     socket.nsp.in(data.roomID).emit('newMessage', data.message);
+    console.log('data', data.roomID);
+    console.log(io.sockets.adapter.clients);
   });
 
   socket.on("disconnect", () => {
