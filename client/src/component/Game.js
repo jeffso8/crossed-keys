@@ -6,7 +6,24 @@ import Card from './Card';
     // socket.on('newMessage', (msg) => {
     //   setMessages((messages) => [...messages, msg]);
     // });
-function Game() {
+function Game(props) {
+  const [redTeam, setRedTeam] = useState([]);
+  const [blueTeam, setBlueTeam] = useState([]);
+
+  const organizeUsers = users => {
+    const emptyRedTeam = [];
+    const emptyBlueTeam = [];
+    Object.keys(users).forEach((userID) => {
+        if(users[userID].team === "RED") {
+          emptyRedTeam.push(userID);
+        } else {
+          emptyBlueTeam.push(userID);
+        }
+    });
+    setRedTeam(emptyRedTeam);
+    setBlueTeam(emptyBlueTeam);
+  };
+
   const colors = ["red", "red", "red", "red", "red", "red", "red", "red", "blue", "blue", "blue", "blue",
   "blue", "blue", "blue", "blue", "white", "white", "white", "white", "white", "white", "white", "white", "white", "white", "white", "black"];
   const colorSorted = colors.sort(() => Math.random() - 0.5)
@@ -16,7 +33,7 @@ function Game() {
   const rowColor4 = colorSorted.slice(15,20);
   const rowColor5 = colorSorted.slice(20,25);
   console.log("rowColor", rowColor5);
-
+  const [users, setUsers] = useState({});
   // const blackCardIndex = Math.random() * 25;
   // const handleMessageChange = event => setMessage(event.target.value);
 
@@ -34,6 +51,11 @@ function Game() {
       margin:"45px",
     }
   }
+
+  useEffect(() => {
+    setUsers(props.location.state.users);
+    organizeUsers(props.location.state.users);
+  }, [])
 
   //   const sendMessage = () => {
   //   socket.emit('message', {message, roomID});
@@ -71,6 +93,13 @@ function Game() {
     <div className="gameScore">
 
     </div>
+
+    <div className="Column1">
+      <h1>Red Team</h1>
+      {redTeam.map((user, i) => {
+        return (<li key={i}>{user}</li>);
+      })}
+    </div>
     <div style={cardStyle.container}>
       <div className="Column1" style={cardStyle.columns}>
       {rowColor1.map((color) => <Card color={color} />)}
@@ -88,7 +117,12 @@ function Game() {
       {rowColor5.map((color) => <Card color={color} />)}
       </div>
     </div>
-
+    <div classname="Column5">
+      <h1>Blue Team</h1>
+      {blueTeam.map((user, i) => {
+        return (<li key={i}>{user}</li>);
+      })}
+    </div>
           {/* <div>
         {messages.map((msg, i) => {
           return (<li key={i}>{msg}</li>);

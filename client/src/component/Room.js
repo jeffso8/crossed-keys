@@ -8,6 +8,7 @@ const socket = socketIOClient(ENDPOINT);
 
 function Room(props) {
   const [roomID, setRoomID] = useState('');
+  const [user, setUser] = useState({});
   const [redTeam, setRedTeam] = useState([]);
   const [blueTeam, setBlueTeam] = useState([]);
   const [nullTeam, setNullTeam] = useState([]);
@@ -40,12 +41,7 @@ function Room(props) {
   };
 
   const startGame = () => {
-    axios.post('/start-game', {roomID}).then(
-      (response) => {
-        history.push(response.data.redirectUrl)},
-      (error) => {
-        console.log(error);
-      })
+    socket.emit('hostStartGame', {roomID});
   };
 
   const style = {
@@ -76,6 +72,10 @@ function Room(props) {
     setRoomID(props.match.params.roomID);
     socket.emit('joinRoom', {roomID: props.match.params.roomID, userID: props.location.state.userID });
 
+    socket.on('startGame', (data) => {
+      history.push(`/${data.roomID}/game`, {users: data.users});
+    });
+
     return () => {
       socket.disconnect();
     };
@@ -84,6 +84,10 @@ function Room(props) {
   useEffect(() => {
     socket.on('updateTeams', (users) => {
       organizeUsers(users);
+      setUser(() => {
+        console.log('users[props.location.state.userID]', users[props.location.state.userID]);
+        return users[props.location.state.userID]
+      });
     });
   }, [nullTeam, redTeam, blueTeam]);
 
@@ -112,7 +116,10 @@ function Room(props) {
       </div>
       <div className="pickTeamButtons" style={style.teamButton}>
       <button value="red" onClick={handleSetRedTeamClick}>Red Team</button>
-      <button onClick={startGame}>Start Game</button>
+      {user.host ?
+        <button onClick={startGame}>Start Game</button>
+        : null
+      }
       <button value="blue" onClick={handleSetBlueTeamClick}>Blue Team</button>
       </div>
     </>

@@ -12,11 +12,12 @@ app.use(express.json());
 
 let roomMap = {};
 
-const newUser = (userID) => {
+const newUser = (userID, isHost = false) => {
   return {
     [userID]: {
       team: null,
       role: null,
+      host: isHost,
     }
   };
 }
@@ -40,33 +41,24 @@ app.post('/create-room', (req, res) => {
   });
 });
 
-app.post('/start-game', (req, res) => {
-  return res.status(200).json({
-    success: true,
-    redirectUrl: `/${req.body.roomID}/game`
-  });
-});
-
 io.on('connection', (socket) => {
   socket.on('joinRoom', (data) => {
     //data is an object with the roomID and the user that joined the room
     socket.join(data.roomID);
     if (!roomMap[data.roomID]) {
       // Create new room with new user
-      roomMap[data.roomID] = newUser(data.userID);
-      console.log('roommap', roomMap);
+      roomMap[data.roomID] = newUser(data.userID, true);
     } else {
       // adding new users to the room
       let users = roomMap[data.roomID];
-      console.log('users', users);
-      const newUserObj = newUser(data.userID);
-      let updatedUsers = {
-        ...users,
-        ...newUserObj,
-      };
-      roomMap[data.roomID] = updatedUsers;
-      // users.push({userID: data.userID, team: null});
-      // roomMap.set(data.roomID, users)
+      if (!users[data.userID]) {
+        const newUserObj = newUser(data.userID);
+        let updatedUsers = {
+          ...users,
+          ...newUserObj,
+        };
+        roomMap[data.roomID] = updatedUsers;
+      }
     }
     io.in(data.roomID).emit('updateTeams', roomMap[data.roomID]);
   });
@@ -86,6 +78,10 @@ io.on('connection', (socket) => {
    socket.on('setBlueTeam', (data) => {
     roomMap[data.roomID][data.userID]["team"] = "BLUE";
     socket.nsp.in(data.roomID).emit('updateTeams', roomMap[data.roomID]);
+  });
+
+  socket.on('hostStartGame', (data) => {
+    socket.nsp.in(data.roomID).emit('startGame', {roomID: data.roomID, users: roomMap[data.roomID]});
   });
 
   socket.on("disconnect", () => {

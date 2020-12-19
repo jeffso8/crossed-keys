@@ -11,7 +11,6 @@ function App() {
       <Route exact path='/' component={Home} />
       <Route exact path='/:roomID' component={Room} />
       <Route path='/:roomID/game' component={Game} />
-
     </BrowserRouter>
   );
 }
