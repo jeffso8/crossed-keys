@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Card from './Card';
+import axios from 'axios';
 
   // const [messages, setMessages] = useState([]);
   // const [message, setMessage] = useState('');
@@ -17,6 +18,7 @@ function Game() {
   const rowColor5 = colorSorted.slice(20,25);
   console.log("rowColor", rowColor5);
 
+  const [words, setWords] = useState([]);
   // const blackCardIndex = Math.random() * 25;
   // const handleMessageChange = event => setMessage(event.target.value);
 
@@ -66,13 +68,29 @@ function Game() {
   //   );
   // };
 
+  useEffect(() => {
+    axios.get('/words').then(
+      (response) => {
+        console.log('RESPONSE', response);
+        setWords(response.data);
+      },
+      (error) => {
+        console.log(error);
+      })
+  }, []);
+
+  console.log('words', words);
+
   return (
     <>
     <div className="gameScore">
 
     </div>
     <div style={cardStyle.container}>
-      <div className="Column1" style={cardStyle.columns}>
+      {words.map(word => {
+        return <Card color="white" word={word} />
+      })}
+      {/* <div className="Column1" style={cardStyle.columns}>
       {rowColor1.map((color) => <Card color={color} />)}
       </div>
       <div className="Column2" style={cardStyle.columns}>
@@ -86,7 +104,7 @@ function Game() {
       </div>
       <div className="Column5" style={cardStyle.columns}>
       {rowColor5.map((color) => <Card color={color} />)}
-      </div>
+      </div> */}
     </div>
 
           {/* <div>

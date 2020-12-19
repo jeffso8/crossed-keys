@@ -34,7 +34,7 @@ function Card(props) {
   return (
     <div className="card-container" style={cardStyle} onClick={handleClick}>
       <h1>
-        Word
+        {props.word}
       </h1>
     </div>
   );
