@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from "react";
 import Card from './Card';
 
-
+  // const [messages, setMessages] = useState([]);
+  // const [message, setMessage] = useState('');
+    // socket.on('newMessage', (msg) => {
+    //   setMessages((messages) => [...messages, msg]);
+    // });
 function Game() {
-  const colors = ["red", "red", "red", "red", "red", "red", "red", "red", "blue", "blue", "blue", "blue", 
-  "blue", "blue", "blue", "blue", "white", "white", "white", "white", "white", "white", "white", "white", "white", "white", "white", "black"];  
-  const colorSorted = colors.sort(() => Math.random() - 0.5)  
+  const colors = ["red", "red", "red", "red", "red", "red", "red", "red", "blue", "blue", "blue", "blue",
+  "blue", "blue", "blue", "blue", "white", "white", "white", "white", "white", "white", "white", "white", "white", "white", "white", "black"];
+  const colorSorted = colors.sort(() => Math.random() - 0.5)
   const rowColor1 = colorSorted.slice(0,5);
   const rowColor2 = colorSorted.slice(5,10);
   const rowColor3 = colorSorted.slice(10,15);
@@ -14,6 +18,7 @@ function Game() {
   console.log("rowColor", rowColor5);
 
   // const blackCardIndex = Math.random() * 25;
+  // const handleMessageChange = event => setMessage(event.target.value);
 
 
   const cardStyle = {
@@ -25,28 +30,33 @@ function Game() {
       gridGap: "10px",
       gridTemplateColumns:"1fr 1fr 1fr 1fr 1fr"
     },
-    columns : { 
+    columns : {
       margin:"45px",
     }
   }
+
+  //   const sendMessage = () => {
+  //   socket.emit('message', {message, roomID});
+  //   setMessage("");
+  // };
 
   // const onCardsClicked={}
   // renderCards() {
   //   return (
   //     words.map((word, index) => {
-    
+
 
   //       const color = colors[Math.random() * 3];
   //       if(color === red) redCount++;
   //       if(color === blue) blueCount++;
-    
-    
+
+
   //       if (index === blackCardIndex) {
   //         color = black;
   //       }
-    
+
   //       return (
-  //         <Card 
+  //         <Card
   //          text={word}
   //          color={color}
   //          onClick=
@@ -59,7 +69,7 @@ function Game() {
   return (
     <>
     <div className="gameScore">
-      
+
     </div>
     <div style={cardStyle.container}>
       <div className="Column1" style={cardStyle.columns}>
@@ -78,6 +88,14 @@ function Game() {
       {rowColor5.map((color) => <Card color={color} />)}
       </div>
     </div>
+
+          {/* <div>
+        {messages.map((msg, i) => {
+          return (<li key={i}>{msg}</li>);
+        })}
+      </div>
+      <input value={message} onChange={handleMessageChange}/>
+      <button onClick={sendMessage}>Submit</button> */}
     </>
   );
 };
