@@ -8,30 +8,41 @@ const socket = socketIOClient(ENDPOINT);
 
 function Room(props) {
   const [roomID, setRoomID] = useState('');
-  const [messages, setMessages] = useState([]);
-  const [message, setMessage] = useState('');
-  const [team, setTeam] = useState("");
-  const [users, setUsers] = useState([]);
-  const usersRef = useRef([]);
+  const [redTeam, setRedTeam] = useState([]);
+  const [blueTeam, setBlueTeam] = useState([]);
+  const [nullTeam, setNullTeam] = useState([]);
   const history = useHistory();
-  usersRef.current = users;
 
-  const handleMessageChange = event => setMessage(event.target.value);
+  const organizeUsers = users => {
+    const emptyRedTeam = [];
+    const emptyBlueTeam = [];
+    const emptyNullTeam = [];
+    Object.keys(users).forEach((userID) => {
+        if(users[userID].team === "RED") {
+          emptyRedTeam.push(userID);
+        } else if (users[userID].team === "BLUE") {
+          emptyBlueTeam.push(userID);
+        } else {
+          emptyNullTeam.push(userID);
+        }
+    });
+    setRedTeam(emptyRedTeam);
+    setBlueTeam(emptyBlueTeam);
+    setNullTeam(emptyNullTeam);
+  };
 
-  const handleClick = event => {
-    setTeam(event.target.value);
-    
-  }
+  const handleSetRedTeamClick = event => {
+    socket.emit('setRedTeam', {roomID, userID: props.location.state.userID});
+  };
 
-  const sendMessage = () => {
-    socket.emit('message', {message, roomID});
-    setMessage("");
+  const handleSetBlueTeamClick = event => {
+    socket.emit('setBlueTeam', {roomID, userID: props.location.state.userID});
   };
 
   const startGame = () => {
     axios.post('/start-game', {roomID}).then(
-      (response) => { 
-        history.push(response.data.redirectUrl)}, 
+      (response) => {
+        history.push(response.data.redirectUrl)},
       (error) => {
         console.log(error);
       })
@@ -65,52 +76,45 @@ function Room(props) {
     setRoomID(props.match.params.roomID);
     socket.emit('joinRoom', {roomID: props.match.params.roomID, userID: props.location.state.userID });
 
-    socket.on('newMessage', (msg) => {
-      setMessages((messages) => [...messages, msg]);
-    });
-
-    socket.on('newUser', (users) => {
-      console.log('newuser', users);
-      setUsers(users);
-    });
-
     return () => {
       socket.disconnect();
     };
-
   }, "");
+
+  useEffect(() => {
+    socket.on('updateTeams', (users) => {
+      organizeUsers(users);
+    });
+  }, [nullTeam, redTeam, blueTeam]);
 
   return (
     <>
       <h1>Current Room: {roomID}</h1>
       <div className="teamChooseContainer" style={style.containerStyle}>
         <div className="redColumn" style={style.columnStyle}>
-          <h1>Red Column</h1>
+          <h1>Red Team</h1>
+          {redTeam.map((user, i) => {
+            return (<li key={i}>{user}</li>);
+          })}
         </div>
       <div className="mainColumn" style={style.columnStyle}>
         <h1>Pick Team</h1>
-        {users.map((user, i) => {
+        {nullTeam.map((user, i) => {
           return (<li key={i}>{user}</li>);
         })}
       </div>
       <div className="blueColumn" style={style.columnStyle}>
-        <h1>Blue Column</h1>
+        <h1>Blue Team</h1>
+        {blueTeam.map((user, i) => {
+          return (<li key={i}>{user}</li>);
+        })}
       </div>
       </div>
       <div className="pickTeamButtons" style={style.teamButton}>
-      <button value="red" onClick={handleClick}>Red Team</button>
-      <button value="white" onClick={handleClick}>Default</button>
-      <button value="blue" onClick={handleClick}>Blue Team</button>
-      </div>
+      <button value="red" onClick={handleSetRedTeamClick}>Red Team</button>
       <button onClick={startGame}>Start Game</button>
-
-      {/* <div>
-        {messages.map((msg, i) => {
-          return (<li key={i}>{msg}</li>);
-        })}
+      <button value="blue" onClick={handleSetBlueTeamClick}>Blue Team</button>
       </div>
-      <input value={message} onChange={handleMessageChange}/>
-      <button onClick={sendMessage}>Submit</button> */}
     </>
   );
 }
