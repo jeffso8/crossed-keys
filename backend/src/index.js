@@ -27,10 +27,12 @@ app.all('*', function(req, res, next) {
 /*
  roomMap: {
   roomID: {
+    colors: String[],
     words: String[],
-    userID: {
+    userID[]: {
       team: String,
-      role: String
+      role: String,
+      isHost: Boolean,
     }
   }
  }
@@ -46,6 +48,10 @@ const newUser = (userID, isHost = false) => {
     }
   };
 }
+
+const colors = ["red", "red", "red", "red", "red", "red", "red", "red", "blue", "blue", "blue", "blue",
+"blue", "blue", "blue", "blue", "white", "white", "white", "white", "white", "white", "white", "white", "black"];
+
 
 let server = http.createServer(app);
 
@@ -145,8 +151,10 @@ io.on('connection', (socket) => {
     socket.nsp.in(data.roomID).emit('updateTeams', roomMap[data.roomID]);
   });
 
-  socket.on('hostStartGame', (data) => {
-    socket.nsp.in(data.roomID).emit('startGame', {roomID: data.roomID, users: roomMap[data.roomID]});
+  socket.on('hostStartGame', async (data) => {
+    const colorSorted = colors.sort(() => Math.random() - 0.5);
+    const words = await getWords();
+    socket.nsp.in(data.roomID).emit('startGame', {roomID: data.roomID, users: roomMap[data.roomID], colors: colorSorted, words: words});
   });
 
   socket.on("disconnect", () => {

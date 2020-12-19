@@ -10,6 +10,9 @@ import axios from 'axios';
 function Game(props) {
   const [redTeam, setRedTeam] = useState([]);
   const [blueTeam, setBlueTeam] = useState([]);
+  const [colors, setColor] = useState([]);
+  const [words, setWords] = useState([]);
+  const [users, setUsers] = useState({});
 
   const organizeUsers = users => {
     const emptyRedTeam = [];
@@ -25,30 +28,20 @@ function Game(props) {
     setBlueTeam(emptyBlueTeam);
   };
 
-  const colors = ["red", "red", "red", "red", "red", "red", "red", "red", "blue", "blue", "blue", "blue",
-  "blue", "blue", "blue", "blue", "white", "white", "white", "white", "white", "white", "white", "white", "black"];
-  const colorSorted = colors.sort(() => Math.random() - 0.5);
-  console.log('colorSorted', colorSorted);
-  const rowColor1 = colorSorted.slice(0,5);
-  const rowColor2 = colorSorted.slice(5,10);
-  const rowColor3 = colorSorted.slice(10,15);
-  const rowColor4 = colorSorted.slice(15,20);
-  const rowColor5 = colorSorted.slice(20,25);
-  const [users, setUsers] = useState({});
-  // const blackCardIndex = Math.random() * 25;
-  const [words, setWords] = useState([]);
-  // const handleMessageChange = event => setMessage(event.target.value);
-
   useEffect(() => {
-    axios.get('/words').then(
-      (response) => {
-        console.log('RESPONSE', response);
-        setWords(response.data);
-      },
-      (error) => {
-        console.log(error);
-      })
-  }, []);
+    setUsers(props.location.state.data.users);
+    organizeUsers(props.location.state.data.users);
+    setWords(props.location.state.data.words);
+    setColor(props.location.state.data.colors)
+  }, [])
+
+  const rowColor1 = colors.slice(0,5);
+  const rowColor2 = colors.slice(5,10);
+  const rowColor3 = colors.slice(10,15);
+  const rowColor4 = colors.slice(15,20);
+  const rowColor5 = colors.slice(20,25);
+  // const blackCardIndex = Math.random() * 25;
+  // const handleMessageChange = event => setMessage(event.target.value);
 
   const wordsColumn1 = words.slice(0,5);
   const wordsColumn2 = words.slice(5,10);
@@ -76,10 +69,6 @@ function Game(props) {
     }
   }
 
-  useEffect(() => {
-    setUsers(props.location.state.users);
-    organizeUsers(props.location.state.users);
-  }, [])
 
   //   const sendMessage = () => {
   //   socket.emit('message', {message, roomID});
@@ -126,7 +115,7 @@ function Game(props) {
     </div>
     <div style={cardStyle.container}>
       <div className="Column1" style={cardStyle.columns}>
-      {rowColor1.map((color, index) => <Card word={wordsColumn1[index]} color={color} />)}
+      {rowColor1.map((color, index) => <Card word={wordsColumn1[index]} color={color}/>)}
       </div>
       <div className="Column2" style={cardStyle.columns}>
       {rowColor2.map((color, index) => <Card word={wordsColumn2[index]} color={color} />)}
