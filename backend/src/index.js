@@ -3,6 +3,8 @@ import http from 'http';
 import socketIO from 'socket.io';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import puppeteer from 'puppeteer';
+import "regenerator-runtime/runtime.js";
 
 const port = process.env.PORT || 3001;
 
@@ -10,6 +12,29 @@ let app = express();
 app.use(cors());
 app.use(express.json());
 
+app.options("/*", function(req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
+  res.sendStatus(200);
+});
+
+app.all('*', function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  next();
+});
+
+/*
+ roomMap: {
+  roomID: {
+    words: String[],
+    userID: {
+      team: String,
+      role: String
+    }
+  }
+ }
+*/
 let roomMap = {};
 
 const newUser = (userID, isHost = false) => {
@@ -30,8 +55,41 @@ let io = socketIO(server, {
 });
 let interval;
 
+async function getWords() {
+  console.log('GET VISUAL');
+
+	try {
+		const URL = 'https://www.randomlists.com/nouns?dup=false&qty=25';
+		const browser = await puppeteer.launch();
+		const page = await browser.newPage();
+
+    await page.goto(URL);
+    // const bodyHandle = await page.$('ol');
+    // const html = await page.evaluate(body => body.innerHTML, bodyHandle);
+    // console.log('bodyhandle', html);
+
+    return await page.evaluate(() => {
+      const words = Array.from(document.querySelectorAll('span.rand_large'));
+      return words.map(word => {
+        return word.innerText;
+      })
+    });
+    // console.log('data', data);
+		//await page.screenshot({ path: 'screenshot.png' })
+		await browser.close()
+	} catch (error) {
+		console.error(error)
+	}
+}
+
+
 app.get('/', (req, res) => {
   res.send('Hello World!');
+});
+
+app.get('/words', async (req, res) => {
+  const words = await getWords();
+  return res.send(words);
 });
 
 app.post('/create-room', (req, res) => {
@@ -68,6 +126,13 @@ io.on('connection', (socket) => {
     socket.nsp.in(data.roomID).emit('newMessage', data.message);
     console.log('data', data.roomID);
     console.log(io.sockets.adapter.clients);
+  });
+
+  socket.on('getWords', (data) => {
+    if (!roomMap[data.roomID].words) {
+      roomMap[data.roomID].words = getWords();
+    };
+    socket.nsp.in(data.roomID).emit('sendWords', roomMap[data.roomID].words);
   });
 
   socket.on('setRedTeam', (data) => {

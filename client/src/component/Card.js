@@ -21,7 +21,9 @@ function Card(props) {
 
   const cardStyle = {
     backgroundColor: visible ? props.color : "white",
-    width:"90px"
+    width:"auto",
+    textAlign:"center",
+    fontSize:"15px"
   }
 
   const handleClick = () => {
@@ -34,7 +36,7 @@ function Card(props) {
   return (
     <div className="card-container" style={cardStyle} onClick={handleClick}>
       <h1>
-        Word
+        {props.word}
       </h1>
     </div>
   );
