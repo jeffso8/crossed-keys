@@ -1,7 +1,7 @@
 import React from "react";
 import Game from '../component/Game';
-import Home from './Home';
-import Room from './Room';
+import Home from '../component/Home';
+import Room from '../component/Room';
 import {BrowserRouter, Route} from 'react-router-dom';
 
 function App() {
