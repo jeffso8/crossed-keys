@@ -8,7 +8,6 @@ function Room(props) {
   const [roomID, setRoomID] = useState('');
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState('');
-
   const [users, setUsers] = useState([]);
 
   const handleMessageChange = event => setMessage(event.target.value);

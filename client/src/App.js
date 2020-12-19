@@ -1,8 +1,7 @@
 import React from "react";
-import socketIOClient from "socket.io-client";
 import Home from './Home';
 import Room from './Room';
-import {BrowserRouter, Switch, Route} from 'react-router-dom';
+import {BrowserRouter, Route} from 'react-router-dom';
 
 function App() {
 
