@@ -18,7 +18,10 @@ function Room(props) {
 
   const handleMessageChange = event => setMessage(event.target.value);
 
-  const handleClick = event => setTeam(event.target.value);
+  const handleClick = event => {
+    setTeam(event.target.value);
+    
+  }
 
   const sendMessage = () => {
     socket.emit('message', {message, roomID});

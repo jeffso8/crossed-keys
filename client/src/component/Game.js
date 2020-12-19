@@ -30,6 +30,20 @@ function Game() {
     }
   }
 
+  useEffect(() => {
+    socket.emit('gameStart', {roomID: props.match.params.roomID, userID: props.location.state.userID });
+    
+    socket.on('newUser', (users) => {
+      console.log('newuser', users);
+      setUsers(users);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, "");
+
+
   // const onCardsClicked={}
   // renderCards() {
   //   return (
@@ -59,7 +73,7 @@ function Game() {
   return (
     <>
     <div className="gameScore">
-      
+
     </div>
     <div style={cardStyle.container}>
       <div className="Column1" style={cardStyle.columns}>
