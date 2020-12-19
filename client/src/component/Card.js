@@ -21,7 +21,9 @@ function Card(props) {
 
   const cardStyle = {
     backgroundColor: visible ? props.color : "white",
-    width:"90px"
+    width:"auto",
+    textAlign:"center",
+    fontSize:"15px"
   }
 
   const handleClick = () => {
