@@ -12,7 +12,7 @@ function Card(props) {
 
   useEffect(() => {
     console.log("props.user", user);
-    if (user.role == "codemaster") {
+    if (user.role === "MASTER") {
       setVisible(true);
     }
   })
