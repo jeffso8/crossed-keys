@@ -118,7 +118,7 @@ function Room(props) {
             return (
             <li key={i}>
               {user}
-              {user.role === "MASTER" && <div>spymaster</div>}
+              {roomData.redSpy === user && <div>spymaster</div>}
             </li>);
           })}
         </div>
@@ -138,7 +138,7 @@ function Room(props) {
           return (
             <li key={i}>
               {user}
-              {user.role === "master" && <div>spymaster</div>}
+              {roomData.redSpy === user && <div>spymaster</div>}
             </li>);
           })}
       </div>
