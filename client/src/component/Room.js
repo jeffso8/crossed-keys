@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import socketIOClient from "socket.io-client";
-import axios from 'axios';
 import { useHistory } from 'react-router-dom';
 const ENDPOINT = "http://127.0.0.1:3001";
 export const socket = socketIOClient(ENDPOINT);
@@ -79,6 +78,7 @@ function Room(props) {
   }
 
   useEffect(() => {
+    console.log("roomSockerrr", socket);
     setRoomID(props.match.params.roomID);
     socket.emit('joinRoom', {roomID: props.match.params.roomID, userID: props.location.state.userID });
 

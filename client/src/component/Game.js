@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Card from './Card';
 import axios from 'axios';
-import { Socket } from "socket.io-client";
 import {socket} from './Room';
 
   // const [messages, setMessages] = useState([]);
@@ -37,15 +36,18 @@ function Game(props) {
     setBlueTeam(emptyBlueTeam);
   };
 
+
   useEffect(() => {
+    socket.emit('joinGame', {roomID: props.location.state.data.roomID});
+  
     socket.on('updateRedScore', (data) => {
-      console.log("dataaaaa", data);
+      console.log("scoreUpdated", data);
       setRedScore(data.redScore);
     });
     socket.on('updateBlueScore', (data) => {
+      console.log("scoreUpdated");
       setBlueScore(data.blueScore);
     });
-    console.log('props.location.state.data', props.location.state.data);
     setRoomID(props.location.state.data.roomID);
     setUsers(props.location.state.data.users);
     organizeUsers(props.location.state.data.users);
@@ -57,12 +59,12 @@ function Game(props) {
 
   const handleRedScoreChange = (event) => {
     setRedScore(event);
-    socket.emit('redScoreChange', {roomID, gameScore: redScore});
+    socket.emit('redScoreChange', {roomID, gameScore: redScore + 1})
   }
 
   const handleBlueScoreChange = (event) => {
-    setBlueScore(event);
-    socket.emit('blueScoreChange', {roomID, gameScore: blueScore});
+    setBlueScore(event)
+    socket.emit('blueScoreChange', {roomID, gameScore: blueScore + 1})
   }
 
   const rowColor1 = colors.slice(0,5);

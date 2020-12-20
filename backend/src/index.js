@@ -66,8 +66,6 @@ let io = socketIO(server, {
 let interval;
 
 async function getWords() {
-  console.log('GET VISUAL');
-
 	try {
 		const URL = 'https://www.randomlists.com/nouns?dup=false&qty=25';
 		const browser = await puppeteer.launch();
@@ -147,6 +145,7 @@ io.on('connection', (socket) => {
     if(roomMap[data.roomID]['blueSpy'] === data.userID) {
       delete roomMap[data.roomID]['blueSpy'];
     }
+    console.log('sET', socket.nsp.in(data.roomID));
     socket.nsp.in(data.roomID).emit('updateTeams', roomMap[data.roomID]);
   });
 
@@ -169,8 +168,11 @@ io.on('connection', (socket) => {
     socket.nsp.in(data.roomID).emit('updateTeams', roomMap[data.roomID]);
   });
 
+  socket.on('joinGame', (data) => {
+    socket.join(data.roomID);
+  });
+
   socket.on('redScoreChange', (data) => {
-    console.log('redscore', data);
     socket.nsp.in(data.roomID).emit('updateRedScore', {redScore: data.gameScore})
   });
 
@@ -183,6 +185,7 @@ io.on('connection', (socket) => {
     const words = await getWords();
     socket.nsp.in(data.roomID).emit('startGame', {roomID: data.roomID, users: roomMap[data.roomID]['users'], colors: colorSorted, words: words,
     redSpy: roomMap[data.roomID]['redSpy'], blueSpy: roomMap[data.roomID]['blueSpy']});
+
   });
 
   socket.on("disconnect", () => {

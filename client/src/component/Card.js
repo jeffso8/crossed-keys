@@ -11,7 +11,6 @@ function Card(props) {
   const [disabled, setDisabled] = useState(false);
 
   useEffect(() => {
-    console.log("props.user", user);
     if (user.role === "MASTER") {
       setVisible(true);
     }
@@ -21,8 +20,6 @@ function Card(props) {
     backgroundColor: visible ? props.color : "white",
     width:"auto"
   }
-
-  console.log("color", props.color.toUpperCase());
 
   const handleClick = () => {
     setVisible(true);
