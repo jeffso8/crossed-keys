@@ -73,7 +73,7 @@ function Room(props) {
     socket.emit('joinRoom', {roomID: props.match.params.roomID, userID: props.location.state.userID });
 
     socket.on('startGame', (data) => {
-      history.push(`/${data.roomID}/game`, {data, userID:  props.location.state.userID });
+      history.push(`/${data.roomID}/game`, {data, userID:props.location.state.userID });
     });
 
     return () => {

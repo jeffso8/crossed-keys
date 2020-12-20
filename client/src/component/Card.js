@@ -5,15 +5,12 @@ function Card(props) {
   const [visible, setVisible] = useState(false);
   const [score, setScore] = useState(0);
 
-  const user = {
-    name: "",
-    role: "",
-    teamColor: "red"
-  };
+  const user = props.user;
   const colors = ["red", "blue", "white", "black"];
   const random = Math.floor(Math.random() * colors.length);
   
   useEffect(() => {
+    console.log("props.user", props.user);
     if (user.role == "codemaster") {
       setVisible(true);
     }
@@ -21,14 +18,12 @@ function Card(props) {
 
   const cardStyle = {
     backgroundColor: visible ? props.color : "white",
-    width:"auto",
-    textAlign:"center",
-    fontSize:"15px"
+    width:"90px"
   }
 
   const handleClick = () => {
     setVisible(true);
-    if (user.teamColor == cardColor) {
+    if (user.team == cardColor) {
       setScore(score + 1);
     }
   }
