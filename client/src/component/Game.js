@@ -39,7 +39,7 @@ function Game(props) {
     setColor(props.location.state.data.colors)
     setUser(props.location.state.data.users[props.location.state.userID])
   }, []);
-  
+
   const rowColor1 = colors.slice(0,5);
   const rowColor2 = colors.slice(5,10);
   const rowColor3 = colors.slice(10,15);

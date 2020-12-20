@@ -12,12 +12,16 @@ function Room(props) {
   const [redTeam, setRedTeam] = useState([]);
   const [blueTeam, setBlueTeam] = useState([]);
   const [nullTeam, setNullTeam] = useState([]);
+  const [onTeam, setOnTeam] = useState(false);
+  const [roomData, setRoomData] = useState({});
+
   const history = useHistory();
 
   const organizeUsers = users => {
     const emptyRedTeam = [];
     const emptyBlueTeam = [];
     const emptyNullTeam = [];
+    console.log('organize', users);
     Object.keys(users).forEach((userID) => {
         if(users[userID].team === "RED") {
           emptyRedTeam.push(userID);
@@ -33,11 +37,17 @@ function Room(props) {
   };
 
   const handleSetRedTeamClick = event => {
+    setOnTeam(true);
     socket.emit('setRedTeam', {roomID, userID: props.location.state.userID});
   };
 
   const handleSetBlueTeamClick = event => {
+    setOnTeam(true);
     socket.emit('setBlueTeam', {roomID, userID: props.location.state.userID});
+  };
+
+  const handleClaimSpyMasterClick = event => {
+    socket.emit('claimSpyMaster', {roomID, userID: props.location.state.userID});
   };
 
   const startGame = () => {
@@ -82,14 +92,21 @@ function Room(props) {
   }, "");
 
   useEffect(() => {
-    socket.on('updateTeams', (users) => {
-      organizeUsers(users);
-      setUser(() => {
-        console.log('users[props.location.state.userID]', users[props.location.state.userID]);
-        return users[props.location.state.userID]
-      });
+    socket.on('updateTeams', (data) => {
+      organizeUsers(data.users);
+      setUser(data.users[props.location.state.userID]);
+      setRoomData(data);
     });
-  }, [nullTeam, redTeam, blueTeam]);
+  }, []);
+
+  const showClaimSpyMaster = () => {
+    if(user.team === "RED" && roomData.redSpy) {
+      return false;
+    } else if (user.team === "BLUE" && roomData.blueSpy) {
+      return false;
+    }
+    return true;
+  };
 
   return (
     <>
@@ -98,20 +115,32 @@ function Room(props) {
         <div className="redColumn" style={style.columnStyle}>
           <h1>Red Team</h1>
           {redTeam.map((user, i) => {
-            return (<li key={i}>{user}</li>);
+            return (
+            <li key={i}>
+              {user}
+              {user.role === "MASTER" && <div>spymaster</div>}
+            </li>);
           })}
         </div>
       <div className="mainColumn" style={style.columnStyle}>
         <h1>Pick Team</h1>
         {nullTeam.map((user, i) => {
-          return (<li key={i}>{user}</li>);
+          return (
+          <li key={i}>
+            {user}
+          </li>
+          );
         })}
       </div>
       <div className="blueColumn" style={style.columnStyle}>
         <h1>Blue Team</h1>
         {blueTeam.map((user, i) => {
-          return (<li key={i}>{user}</li>);
-        })}
+          return (
+            <li key={i}>
+              {user}
+              {user.role === "master" && <div>spymaster</div>}
+            </li>);
+          })}
       </div>
       </div>
       <div className="pickTeamButtons" style={style.teamButton}>
@@ -121,6 +150,10 @@ function Room(props) {
         : null
       }
       <button value="blue" onClick={handleSetBlueTeamClick}>Blue Team</button>
+      {showClaimSpyMaster() ?
+        <button onClick={handleClaimSpyMasterClick}>Claim Spy</button>
+        : null
+      }
       </div>
     </>
   );

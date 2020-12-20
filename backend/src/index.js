@@ -29,10 +29,14 @@ app.all('*', function(req, res, next) {
   roomID: {
     colors: String[],
     words: String[],
-    userID[]: {
+    redSpy: String,
+    blueSpy: String,
+    users: {
+      userID[]: {
       team: String,
       role: String,
       isHost: Boolean,
+      }
     }
   }
  }
@@ -111,17 +115,19 @@ io.on('connection', (socket) => {
     socket.join(data.roomID);
     if (!roomMap[data.roomID]) {
       // Create new room with new user
-      roomMap[data.roomID] = newUser(data.userID, true);
+      roomMap[data.roomID] = {users:
+        newUser(data.userID, true)
+      };
     } else {
       // adding new users to the room
-      let users = roomMap[data.roomID];
+      let users = roomMap[data.roomID]['users'];
       if (!users[data.userID]) {
         const newUserObj = newUser(data.userID);
         let updatedUsers = {
           ...users,
           ...newUserObj,
         };
-        roomMap[data.roomID] = updatedUsers;
+        roomMap[data.roomID]['users'] = updatedUsers;
       }
     }
     io.in(data.roomID).emit('updateTeams', roomMap[data.roomID]);
@@ -142,19 +148,37 @@ io.on('connection', (socket) => {
   });
 
   socket.on('setRedTeam', (data) => {
-    roomMap[data.roomID][data.userID]["team"] = "RED";
+    roomMap[data.roomID]["users"][data.userID]["team"] = "RED";
+    roomMap[data.roomID]["users"][data.userID]["role"] = null;
+    if(roomMap[data.roomID]['blueSpy'] === data.userID) {
+      delete roomMap[data.roomID]['blueSpy'];
+    }
     socket.nsp.in(data.roomID).emit('updateTeams', roomMap[data.roomID]);
   });
 
-   socket.on('setBlueTeam', (data) => {
-    roomMap[data.roomID][data.userID]["team"] = "BLUE";
+  socket.on('setBlueTeam', (data) => {
+    roomMap[data.roomID]["users"][data.userID]["team"] = "BLUE";
+    roomMap[data.roomID]["users"][data.userID]["role"] = null;
+    if(roomMap[data.roomID]['redSpy'] === data.userID) {
+      delete roomMap[data.roomID]['redSpy'];
+    }
+    socket.nsp.in(data.roomID).emit('updateTeams', roomMap[data.roomID]);
+  });
+
+  socket.on('claimSpyMaster', (data) => {
+    roomMap[data.roomID]['users'][data.userID]["role"] = "MASTER";
+    if (roomMap[data.roomID]['users'][data.userID]["team"] === "RED") {
+      roomMap[data.roomID]["redSpy"] = data.userID;
+    } else if (roomMap[data.roomID]['users'][data.userID]["team"] === "BLUE"){
+      roomMap[data.roomID]["blueSpy"] = data.userID;
+    }
     socket.nsp.in(data.roomID).emit('updateTeams', roomMap[data.roomID]);
   });
 
   socket.on('hostStartGame', async (data) => {
     const colorSorted = colors.sort(() => Math.random() - 0.5);
     const words = await getWords();
-    socket.nsp.in(data.roomID).emit('startGame', {roomID: data.roomID, users: roomMap[data.roomID], colors: colorSorted, words: words});
+    socket.nsp.in(data.roomID).emit('startGame', {roomID: data.roomID, users: roomMap[data.roomID]['users'], colors: colorSorted, words: words});
   });
 
   socket.on("disconnect", () => {
