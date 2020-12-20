@@ -74,18 +74,12 @@ async function getWords() {
 		const page = await browser.newPage();
 
     await page.goto(URL);
-    // const bodyHandle = await page.$('ol');
-    // const html = await page.evaluate(body => body.innerHTML, bodyHandle);
-    // console.log('bodyhandle', html);
-
     return await page.evaluate(() => {
       const words = Array.from(document.querySelectorAll('span.rand_large'));
       return words.map(word => {
         return word.innerText;
       })
     });
-    // console.log('data', data);
-		//await page.screenshot({ path: 'screenshot.png' })
 		await browser.close()
 	} catch (error) {
 		console.error(error)

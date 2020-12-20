@@ -22,9 +22,9 @@ function Game(props) {
     const emptyBlueTeam = [];
     Object.keys(users).forEach((userID) => {
         if(users[userID].team === "RED") {
-          emptyRedTeam.push(userID);
+          emptyRedTeam.push(users[userID]);
         } else {
-          emptyBlueTeam.push(userID);
+          emptyBlueTeam.push(users[userID]);
         }
     });
     setRedTeam(emptyRedTeam);
@@ -115,7 +115,7 @@ function Game(props) {
     <div className="Column1">
       <h1>Red Team</h1>
       {redTeam.map((user, i) => {
-        return (<li key={i}>{user}</li>);
+        return (<li key={i}>{user.userID}</li>);
       })}
     </div>
     <div style={cardStyle.container}>
@@ -138,7 +138,7 @@ function Game(props) {
     <div classname="Column5">
       <h1>Blue Team</h1>
       {blueTeam.map((user, i) => {
-        return (<li key={i}>{user}</li>);
+        return (<li key={i}>{user.userID}</li>);
       })}
     </div>
           {/* <div>
