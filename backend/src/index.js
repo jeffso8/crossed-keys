@@ -172,7 +172,8 @@ io.on('connection', (socket) => {
   socket.on('hostStartGame', async (data) => {
     const colorSorted = colors.sort(() => Math.random() - 0.5);
     const words = await getWords();
-    socket.nsp.in(data.roomID).emit('startGame', {roomID: data.roomID, users: roomMap[data.roomID]['users'], colors: colorSorted, words: words});
+    socket.nsp.in(data.roomID).emit('startGame', {roomID: data.roomID, users: roomMap[data.roomID]['users'], colors: colorSorted, words: words,
+    redSpy: roomMap[data.roomID]['redSpy'], blueSpy: roomMap[data.roomID]['blueSpy']});
   });
 
   socket.on("disconnect", () => {

@@ -138,7 +138,7 @@ function Room(props) {
           return (
             <li key={i}>
               {user}
-              {roomData.redSpy === user && <div>spymaster</div>}
+              {roomData.blueSpy === user && <div>spymaster</div>}
             </li>);
           })}
       </div>
