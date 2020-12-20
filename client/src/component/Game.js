@@ -33,7 +33,7 @@ function Game(props) {
     organizeUsers(props.location.state.data.users);
     setWords(props.location.state.data.words);
     setColor(props.location.state.data.colors)
-  }, [])
+  }, []);
 
   const rowColor1 = colors.slice(0,5);
   const rowColor2 = colors.slice(5,10);
