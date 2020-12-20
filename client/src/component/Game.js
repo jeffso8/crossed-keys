@@ -14,6 +14,8 @@ function Game(props) {
   const [words, setWords] = useState([]);
   const [users, setUsers] = useState([]);
   const [user, setUser] = useState({});
+  const [score, setScore] = useState(0);
+
 
   const organizeUsers = users => {
     const emptyRedTeam = [];
@@ -35,17 +37,9 @@ function Game(props) {
     organizeUsers(props.location.state.data.users);
     setWords(props.location.state.data.words);
     setColor(props.location.state.data.colors)
-  }, [])
-
-  console.log("userssss", users);
-
-  useEffect(()=>{
-    setUser(()=>{
-      console.log("userByID", props.location.state.userID);
-      return users[props.location.state.userID]
-    })
-  })
-
+    setUser(props.location.state.data.users[props.location.state.userID])
+  }, []);
+  
   const rowColor1 = colors.slice(0,5);
   const rowColor2 = colors.slice(5,10);
   const rowColor3 = colors.slice(10,15);
@@ -126,19 +120,19 @@ function Game(props) {
     </div>
     <div style={cardStyle.container}>
       <div className="Column1" style={cardStyle.columns}>
-      {rowColor1.map((color, index) => <Card word={wordsColumn1[index]} color={color} user={user}/>)}
+      {rowColor1.map((color, index) => <Card word={wordsColumn1[index]} color={color} user={user} score={score} setScore={setScore}/>)}
       </div>
       <div className="Column2" style={cardStyle.columns}>
-      {rowColor2.map((color, index) => <Card word={wordsColumn2[index]} color={color} user={user}/>)}
+      {rowColor2.map((color, index) => <Card word={wordsColumn2[index]} color={color} user={user} score={score} setScore={setScore}/>)}
       </div>
       <div className="Column3" style={cardStyle.columns}>
-      {rowColor3.map((color, index) => <Card word={wordsColumn3[index]} color={color} user={user}/>)}
+      {rowColor3.map((color, index) => <Card word={wordsColumn3[index]} color={color} user={user} score={score} setScore={setScore}/>)}
       </div>
       <div className="Column4" style={cardStyle.columns}>
-      {rowColor4.map((color, index) => <Card word={wordsColumn4[index]} color={color} user={user}/>)}
+      {rowColor4.map((color, index) => <Card word={wordsColumn4[index]} color={color} user={user} score={score} setScore={setScore}/>)}
       </div>
       <div className="Column5" style={cardStyle.columns}>
-      {rowColor5.map((color, index) => <Card word={wordsColumn5[index]} color={color} user={user}/>)}
+      {rowColor5.map((color, index) => <Card word={wordsColumn5[index]} color={color} user={user} score={score} setScore={setScore}/>)}
       </div>
     </div>
     <div classname="Column5">
