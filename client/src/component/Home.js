@@ -26,7 +26,7 @@ function Home() {
       padding: 10,
     },
     boxinner: {
-      border: `4  px solid ${MUD_BROWN}`,
+      border: `4px solid ${MUD_BROWN}`,
       padding: 120,
     },
     by: {
