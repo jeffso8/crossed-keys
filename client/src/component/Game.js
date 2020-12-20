@@ -14,7 +14,9 @@ function Game(props) {
   const [words, setWords] = useState([]);
   const [users, setUsers] = useState([]);
   const [user, setUser] = useState({});
-  const [score, setScore] = useState(0);
+  const [redScore, setRedScore] = useState(0);
+  const [blueScore, setBlueScore] = useState(0);
+
 
 
   const organizeUsers = users => {
@@ -39,7 +41,15 @@ function Game(props) {
     setColor(props.location.state.data.colors)
     setUser(props.location.state.data.users[props.location.state.userID])
   }, []);
-  
+
+  const handleRedScoreChange = (event) => {
+    setRedScore(event);
+  }
+
+  const handleBlueScoreChange = (event) => {
+    setBlueScore(event);
+  }
+
   const rowColor1 = colors.slice(0,5);
   const rowColor2 = colors.slice(5,10);
   const rowColor3 = colors.slice(10,15);
@@ -120,19 +130,25 @@ function Game(props) {
     </div>
     <div style={cardStyle.container}>
       <div className="Column1" style={cardStyle.columns}>
-      {rowColor1.map((color, index) => <Card word={wordsColumn1[index]} color={color} user={user} score={score} setScore={setScore}/>)}
+      {rowColor1.map((color, index) => 
+      <Card word={wordsColumn1[index]} color={color} user={user} redScore={redScore} setRedScore={handleRedScoreChange} 
+      blueScore={blueScore} setBlueScore={handleBlueScoreChange}/>)}
       </div>
       <div className="Column2" style={cardStyle.columns}>
-      {rowColor2.map((color, index) => <Card word={wordsColumn2[index]} color={color} user={user} score={score} setScore={setScore}/>)}
+      {rowColor2.map((color, index) => <Card word={wordsColumn2[index]} color={color} user={user} redScore={redScore} setRedScore={handleRedScoreChange}
+      blueScore={blueScore} setBlueScore={handleBlueScoreChange}/>)}
       </div>
       <div className="Column3" style={cardStyle.columns}>
-      {rowColor3.map((color, index) => <Card word={wordsColumn3[index]} color={color} user={user} score={score} setScore={setScore}/>)}
+      {rowColor3.map((color, index) => <Card word={wordsColumn3[index]} color={color} user={user} redScore={redScore} setRedScore={handleRedScoreChange}
+      blueScore={blueScore} setBlueScore={handleBlueScoreChange}/>)}
       </div>
       <div className="Column4" style={cardStyle.columns}>
-      {rowColor4.map((color, index) => <Card word={wordsColumn4[index]} color={color} user={user} score={score} setScore={setScore}/>)}
+      {rowColor4.map((color, index) => <Card word={wordsColumn4[index]} color={color} user={user} redScore={redScore} setRedScore={handleRedScoreChange}
+      blueScore={blueScore} setBlueScore={handleBlueScoreChange}/>)}
       </div>
       <div className="Column5" style={cardStyle.columns}>
-      {rowColor5.map((color, index) => <Card word={wordsColumn5[index]} color={color} user={user} score={score} setScore={setScore}/>)}
+      {rowColor5.map((color, index) => <Card word={wordsColumn5[index]} color={color} user={user} redScore={redScore} setRedScore={handleRedScoreChange}
+      blueScore={blueScore} setBlueScore={handleBlueScoreChange}/>)}
       </div>
     </div>
     <div classname="Column5">
@@ -140,6 +156,12 @@ function Game(props) {
       {blueTeam.map((user, i) => {
         return (<li key={i}>{user}</li>);
       })}
+    </div>
+    <div classname="Column5">
+      <h1>Red Score: {redScore} </h1>
+    </div>
+    <div classname="Column5">
+      <h1>Blue Score: {blueScore} </h1>
     </div>
           {/* <div>
         {messages.map((msg, i) => {
