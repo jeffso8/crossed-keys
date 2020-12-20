@@ -24,4 +24,54 @@ html, body, div#root {
 }
 
 
+.red-flag {
+  position: absolute;
+  top: 0px;
+  left: 90px;
+  z-index: 1;
+  background-color: #EF6351;
+  width: 90px;
+  height: 150px;
+}
+
+.red-flag:after {
+  position: absolute;
+  left: 14px;
+  top: 60px;
+  display: block;
+	  width: 0;
+	  height: 0;
+	  border-top: 60px solid transparent;
+	  border-bottom: 60px solid transparent;
+	  border-right: 60px solid #E8D2B9;
+  content:'';
+  transform: rotate(90deg);
+}
+
+.blue-flag {
+  position: absolute;
+  top: 0px;
+  right: 90px;
+  z-index: 1;
+  background-color: #6EA4BF;
+  width: 90px;
+  height: 150px;
+}
+
+.blue-flag:after {
+  position: absolute;
+  left: 14px;
+  top: 60px;
+  display: block;
+	  width: 0;
+	  height: 0;
+	  border-top: 60px solid transparent;
+	  border-bottom: 60px solid transparent;
+	  border-right: 60px solid #E8D2B9;
+  content:'';
+  transform: rotate(90deg);
+}
+
+
+
 

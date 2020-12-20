@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Card from './Card';
 import axios from 'axios';
 import {socket} from './Room';
-import {BEIGE} from '../constants';
+import {MUD_BROWN, NEUTRAL_CARD, BLUE_CARD, RED_CARD, BOMB_CARD} from '../constants';
 
   // const [messages, setMessages] = useState([]);
   // const [message, setMessage] = useState('');
@@ -40,7 +40,7 @@ function Game(props) {
 
   useEffect(() => {
     socket.emit('joinGame', {roomID: props.location.state.data.roomID});
-  
+
     socket.on('updateRedScore', (data) => {
       console.log("scoreUpdated", data);
       setRedScore(data.redScore);
@@ -100,7 +100,17 @@ function Game(props) {
     columns : {
       margin: 0,
     }
-  }
+  };
+
+  const style = {
+    score: {
+      color: MUD_BROWN,
+      fontSize: 40,
+      textAlign: 'center',
+      marginTop: 20,
+      fontWeight: 900,
+    }
+  };
 
 
   //   const sendMessage = () => {
@@ -138,9 +148,19 @@ function Game(props) {
     return (
     <div className={className} style={cardStyle.columns}>
       {rowColor.map((color, index) => {
+        let realColor = '';
+        if (color === 'blue') {
+          realColor = BLUE_CARD;
+        } else if (color === 'red') {
+          realColor = RED_CARD;
+        } else if (color === 'black') {
+          realColor = BOMB_CARD;
+        } else {
+          realColor = NEUTRAL_CARD;
+        }
 
-        const randDeg = (Math.random() + 0.2) * (Math.round(Math.random()) ? 1 : -1);
-       return  <Card word={wordColumn[index]} color={color} user={user} redScore={redScore} setRedScore={handleRedScoreChange}
+        const randDeg = (Math.random() + 0.1) * (Math.round(Math.random()) ? 1 : -1);
+       return  <Card word={wordColumn[index]} color={realColor} user={user} redScore={redScore} setRedScore={handleRedScoreChange}
         blueScore={blueScore} setBlueScore={handleBlueScoreChange} rotate={randDeg}/>
         }
       )}
@@ -164,8 +184,13 @@ function Game(props) {
         </li>);
       })}
     </div> */}
+    <div className="red-flag">
+      <div style={style.score}>{redScore}</div>
+    </div>
+    <div className="blue-flag">
+      <div style={style.score}>{blueScore}</div>
+    </div>
     <div style={cardStyle.container}>
-
       {renderColumns(rowColor1, wordsColumn1, 'Column1')}
       {renderColumns(rowColor2, wordsColumn2, 'Column2')}
       {renderColumns(rowColor3, wordsColumn3, 'Column3')}
@@ -182,12 +207,7 @@ function Game(props) {
         </li>);
       })}
     </div>
-    <div classname="Column5">
-      <h1>Red Score: {redScore} </h1>
-    </div>
-    <div classname="Column5">
-      <h1>Blue Score: {blueScore} </h1>
-    </div> */}
+  */}
           {/* <div>
         {messages.map((msg, i) => {
           return (<li key={i}>{msg}</li>);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {CAMEL, MAIZE} from '../constants';
+import {CAMEL, MAIZE, BLUE_CARD} from '../constants';
 
 function Card(props) {
   const [cardColor, setCardColor] = useState("");
@@ -18,15 +18,16 @@ function Card(props) {
 
   const style = {
     container: {
-      backgroundColor: visible ? props.color :  CAMEL,
-      width: 160,
+      backgroundColor: visible ? props.color : CAMEL,
+      opacity: props.isSelected ? 0.5 : 1,
+      width: 185,
       height: 90,
       marginTop: 20,
       marginBottom: 20,
       display: 'flex',
       justifyContent: 'center',
       transform: `rotate(${props.rotate}deg)`,
-      //boxShadow: `0 4px 8px 0 rgba(0,0,0,0.2)`,
+      boxShadow: `0 4px 8px 0 rgba(0,0,0,0.2)`,
     },
     word: {
       fontSize: 16,
