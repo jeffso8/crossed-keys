@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import Card from './Card';
 import axios from 'axios';
+import { Socket } from "socket.io-client";
+import {socket} from './Room';
 
   // const [messages, setMessages] = useState([]);
   // const [message, setMessage] = useState('');
@@ -8,6 +10,7 @@ import axios from 'axios';
     //   setMessages((messages) => [...messages, msg]);
     // });
 function Game(props) {
+  const [roomID, setRoomID] = useState("");
   const [redTeam, setRedTeam] = useState([]);
   const [blueTeam, setBlueTeam] = useState([]);
   const [colors, setColor] = useState([]);
@@ -35,7 +38,15 @@ function Game(props) {
   };
 
   useEffect(() => {
+    socket.on('updateRedScore', (data) => {
+      console.log("dataaaaa", data);
+      setRedScore(data.redScore);
+    });
+    socket.on('updateBlueScore', (data) => {
+      setBlueScore(data.blueScore);
+    });
     console.log('props.location.state.data', props.location.state.data);
+    setRoomID(props.location.state.data.roomID);
     setUsers(props.location.state.data.users);
     organizeUsers(props.location.state.data.users);
     setWords(props.location.state.data.words);
@@ -43,12 +54,15 @@ function Game(props) {
     setUser(props.location.state.data.users[props.location.state.userID])
   }, []);
 
+
   const handleRedScoreChange = (event) => {
     setRedScore(event);
+    socket.emit('redScoreChange', {roomID, gameScore: redScore});
   }
 
   const handleBlueScoreChange = (event) => {
     setBlueScore(event);
+    socket.emit('blueScoreChange', {roomID, gameScore: blueScore});
   }
 
   const rowColor1 = colors.slice(0,5);
@@ -84,38 +98,6 @@ function Game(props) {
       margin:"45px",
     }
   }
-
-
-  //   const sendMessage = () => {
-  //   socket.emit('message', {message, roomID});
-  //   setMessage("");
-  // };
-
-  // const onCardsClicked={}
-  // renderCards() {
-  //   return (
-  //     words.map((word, index) => {
-
-
-  //       const color = colors[Math.random() * 3];
-  //       if(color === red) redCount++;
-  //       if(color === blue) blueCount++;
-
-
-  //       if (index === blackCardIndex) {
-  //         color = black;
-  //       }
-
-  //       return (
-  //         <Card
-  //          text={word}
-  //          color={color}
-  //          onClick=
-  //         />
-  //       );
-  //     })
-  //   );
-  // };
 
   return (
     <>

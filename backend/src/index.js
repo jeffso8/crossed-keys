@@ -169,6 +169,15 @@ io.on('connection', (socket) => {
     socket.nsp.in(data.roomID).emit('updateTeams', roomMap[data.roomID]);
   });
 
+  socket.on('redScoreChange', (data) => {
+    console.log('redscore', data);
+    socket.nsp.in(data.roomID).emit('updateRedScore', {redScore: data.gameScore})
+  });
+
+  socket.on('blueScoreChange', (data) => {
+    socket.nsp.in(data.roomID).emit('updateBlueScore', {blueScore: data.gameScore})
+  });
+
   socket.on('hostStartGame', async (data) => {
     const colorSorted = colors.sort(() => Math.random() - 0.5);
     const words = await getWords();

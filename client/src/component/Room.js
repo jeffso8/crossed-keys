@@ -3,7 +3,7 @@ import socketIOClient from "socket.io-client";
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
 const ENDPOINT = "http://127.0.0.1:3001";
-const socket = socketIOClient(ENDPOINT);
+export const socket = socketIOClient(ENDPOINT);
 
 
 function Room(props) {
