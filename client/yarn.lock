@@ -2266,6 +2266,11 @@ aproba@^1.1.1:
   resolved "https://registry.npmjs.org/aproba/-/aproba-1.2.0.tgz#6802e6264efd18c790a1b0d517f0f2627bf2c94a"
   integrity sha512-Y9J6ZjXtoYh8RnXVCMOU/ttDmk1aBjunq9vO0ta5x85WDQiQfUF9sIPBITdbiiIVcBo03Hi3jMxigBtsddlXRw==
 
+arc-text@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.npmjs.org/arc-text/-/arc-text-1.0.1.tgz#8d7162a47a17365b8a3f5a9d2d42348c2f1ec7f2"
+  integrity sha512-cnK4gxPY2qm4PWdzA0PS2JkPEq1kSTgc04vLKuY0srOQNqfpSlFqJ4zalELeUPT+L5NXufHACCr8lsvgj4hnvQ==
+
 argparse@^1.0.7:
   version "1.0.10"
   resolved "https://registry.npmjs.org/argparse/-/argparse-1.0.10.tgz#bcd6791ea5ae09725e17e5ad988134cd40b3d911"
@@ -9038,6 +9043,13 @@ react-app-polyfill@^2.0.0:
     raf "^3.4.1"
     regenerator-runtime "^0.13.7"
     whatwg-fetch "^3.4.1"
+
+react-arc-text-fix@^0.0.0-development:
+  version "0.0.0-development"
+  resolved "https://registry.npmjs.org/react-arc-text-fix/-/react-arc-text-fix-0.0.0-development.tgz#b944d73fd1a6288db7565f0022926dd37b5cf6af"
+  integrity sha512-jDwrStzp9/fHeqIw9U91ODxNoGR54bwoxuIfEghJjadJowBjIG9LkGoax2oza4u/XVQ760i1bQVOZyEqMpAUSQ==
+  dependencies:
+    arc-text "^1.0.1"
 
 react-dev-utils@^11.0.1:
   version "11.0.1"

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Card from './Card';
 import axios from 'axios';
 import {socket} from './Room';
+import {BEIGE} from '../constants';
 
   // const [messages, setMessages] = useState([]);
   // const [message, setMessage] = useState('');
@@ -93,13 +94,59 @@ function Game(props) {
       left:"50%",
       top:"50%",
       transform:"translate(-50%, -50%)",
-      gridGap: "10px",
+      gridGap: 50,
       gridTemplateColumns:"1fr 1fr 1fr 1fr 1fr"
     },
     columns : {
-      margin:"45px",
+      margin: 0,
     }
   }
+
+
+  //   const sendMessage = () => {
+  //   socket.emit('message', {message, roomID});
+  //   setMessage("");
+  // };
+
+  // const onCardsClicked={}
+  // renderCards() {
+  //   return (
+  //     words.map((word, index) => {
+
+
+  //       const color = colors[Math.random() * 3];
+  //       if(color === red) redCount++;
+  //       if(color === blue) blueCount++;
+
+
+  //       if (index === blackCardIndex) {
+  //         color = black;
+  //       }
+
+  //       return (
+  //         <Card
+  //          text={word}
+  //          color={color}
+  //          onClick=
+  //         />
+  //       );
+  //     })
+  //   );
+  // };
+
+  const renderColumns = (rowColor, wordColumn, className) => {
+    return (
+    <div className={className} style={cardStyle.columns}>
+      {rowColor.map((color, index) => {
+
+        const randDeg = (Math.random() + 0.2) * (Math.round(Math.random()) ? 1 : -1);
+       return  <Card word={wordColumn[index]} color={color} user={user} redScore={redScore} setRedScore={handleRedScoreChange}
+        blueScore={blueScore} setBlueScore={handleBlueScoreChange} rotate={randDeg}/>
+        }
+      )}
+      </div>
+    )
+  };
 
   return (
     <>
@@ -107,7 +154,7 @@ function Game(props) {
 
     </div>
 
-    <div className="Column1">
+    {/* <div className="Column1">
       <h1>Red Team</h1>
       {redTeam.map((user, i) => {
         return (
@@ -116,31 +163,16 @@ function Game(props) {
           {props.location.state.data.redSpy === user && <div>spymaster</div>}
         </li>);
       })}
-    </div>
+    </div> */}
     <div style={cardStyle.container}>
-      <div className="Column1" style={cardStyle.columns}>
-      {rowColor1.map((color, index) => 
-      <Card word={wordsColumn1[index]} color={color} user={user} redScore={redScore} setRedScore={handleRedScoreChange} 
-      blueScore={blueScore} setBlueScore={handleBlueScoreChange}/>)}
-      </div>
-      <div className="Column2" style={cardStyle.columns}>
-      {rowColor2.map((color, index) => <Card word={wordsColumn2[index]} color={color} user={user} redScore={redScore} setRedScore={handleRedScoreChange}
-      blueScore={blueScore} setBlueScore={handleBlueScoreChange}/>)}
-      </div>
-      <div className="Column3" style={cardStyle.columns}>
-      {rowColor3.map((color, index) => <Card word={wordsColumn3[index]} color={color} user={user} redScore={redScore} setRedScore={handleRedScoreChange}
-      blueScore={blueScore} setBlueScore={handleBlueScoreChange}/>)}
-      </div>
-      <div className="Column4" style={cardStyle.columns}>
-      {rowColor4.map((color, index) => <Card word={wordsColumn4[index]} color={color} user={user} redScore={redScore} setRedScore={handleRedScoreChange}
-      blueScore={blueScore} setBlueScore={handleBlueScoreChange}/>)}
-      </div>
-      <div className="Column5" style={cardStyle.columns}>
-      {rowColor5.map((color, index) => <Card word={wordsColumn5[index]} color={color} user={user} redScore={redScore} setRedScore={handleRedScoreChange}
-      blueScore={blueScore} setBlueScore={handleBlueScoreChange}/>)}
-      </div>
+
+      {renderColumns(rowColor1, wordsColumn1, 'Column1')}
+      {renderColumns(rowColor2, wordsColumn2, 'Column2')}
+      {renderColumns(rowColor3, wordsColumn3, 'Column3')}
+      {renderColumns(rowColor4, wordsColumn4, 'Column4')}
+      {renderColumns(rowColor5, wordsColumn5, 'Column5')}
     </div>
-    <div classname="Column5">
+    {/* <div classname="Column5">
       <h1>Blue Team</h1>
       {blueTeam.map((user, i) => {
         return (
@@ -155,7 +187,7 @@ function Game(props) {
     </div>
     <div classname="Column5">
       <h1>Blue Score: {blueScore} </h1>
-    </div>
+    </div> */}
           {/* <div>
         {messages.map((msg, i) => {
           return (<li key={i}>{msg}</li>);
