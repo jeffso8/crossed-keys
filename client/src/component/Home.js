@@ -31,7 +31,6 @@ function Home() {
     },
     by: {
       color: MUD_BROWN,
-      fontFamily: 'Helvetica',
       fontSize: 20,
       fontWeight: 500,
       textAlign: 'center',
@@ -40,7 +39,6 @@ function Home() {
     },
     title: {
       color: MUD_BROWN,
-      fontFamily: 'Helvetica',
       fontSize: 62,
       fontWeight: 900,
       marginBottom: 20,
