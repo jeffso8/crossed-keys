@@ -39,6 +39,7 @@ function Game(props) {
 
 
   useEffect(() => {
+    console.log('socket', socket);
     socket.emit('joinGame', {roomID: props.location.state.data.roomID});
 
     socket.on('updateRedScore', (data) => {

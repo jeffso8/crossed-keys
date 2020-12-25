@@ -27,6 +27,7 @@ app.all('*', function(req, res, next) {
 /*
  roomMap: {
   roomID: {
+    spymasterHints: String[],
     colors: String[],
     words: String[],
     clicked: Boolean[],
@@ -186,7 +187,6 @@ io.on('connection', (socket) => {
   socket.on('flipCard', (data) => {
     roomMap[data.roomID]['clicked'][data.index] = true;
     roomMap[data.roomID]['isRedTurn'] = data.isRedTurn;
-    console.log(roomMap[data.roomID]['clicked']);
     socket.nsp.in(data.roomID).emit('updateFlipCard', {isRedTurn: roomMap[data.roomID]['isRedTurn'], clicked: roomMap[data.roomID]['clicked']})
   });
 
@@ -209,6 +209,9 @@ io.on('connection', (socket) => {
         redSpy: roomMap[data.roomID]['redSpy'],
         blueSpy: roomMap[data.roomID]['blueSpy']
       });
+    console.log(
+      'socket', socket
+    );
   });
 
   socket.on("disconnect", () => {

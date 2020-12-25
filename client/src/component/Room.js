@@ -85,10 +85,6 @@ function Room(props) {
     socket.on('startGame', (data) => {
       history.push(`/${data.roomID}/game`, {data, userID:props.location.state.userID });
     });
-
-    return () => {
-      socket.disconnect();
-    };
   }, "");
 
   useEffect(() => {
