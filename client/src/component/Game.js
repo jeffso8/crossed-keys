@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect } from "react";
 import Card from './Card';
 import axios from 'axios';
 import {socket} from './Room';
@@ -19,6 +19,7 @@ function Game(props) {
   const [user, setUser] = useState({});
   const [redScore, setRedScore] = useState(0);
   const [blueScore, setBlueScore] = useState(0);
+  const [redTurn, setRedTurn] = useState(true);
 
 
 
@@ -59,13 +60,20 @@ function Game(props) {
 
 
   const handleRedScoreChange = (event) => {
+    console.log("GameRedEvent", event);
     setRedScore(event);
     socket.emit('redScoreChange', {roomID, gameScore: redScore + 1})
   }
 
   const handleBlueScoreChange = (event) => {
+    console.log("GameBlueEvent", event);
     setBlueScore(event)
     socket.emit('blueScoreChange', {roomID, gameScore: blueScore + 1})
+  }
+
+  const handleRedTurn = (event) => {
+    setRedTurn(event)
+    socket.emit('updateTurn', {roomID, redTurn: redTurn})
   }
 
   const rowColor1 = colors.slice(0,5);
@@ -159,10 +167,11 @@ function Game(props) {
           realColor = NEUTRAL_CARD;
         }
 
+        //TODO: clicked and index, figure out a way to store these as states, and emitted to all clients
         const randDeg = (Math.random() + 0.1) * (Math.round(Math.random()) ? 1 : -1);
-       return  <Card word={wordColumn[index]} color={realColor} user={user} redScore={redScore} setRedScore={handleRedScoreChange}
-        blueScore={blueScore} setBlueScore={handleBlueScoreChange} rotate={randDeg}/>
-        }
+       return (<Card word={wordColumn[index]} idx={index} clicked={clicked[index]} color={realColor} user={user} redScore={redScore} setRedScore={handleRedScoreChange}
+        blueScore={blueScore} setBlueScore={handleBlueScoreChange} rotate={randDeg} redTurn={redTurn} setRedTurn={handleRedTurn}/>
+       )}
       )}
       </div>
     )
@@ -186,6 +195,9 @@ function Game(props) {
     </div> */}
     <div className="red-flag">
       <div style={style.score}>{redScore}</div>
+    </div>
+    <div>
+      <h2>{redTurn ? 'Red\'s Turn' : 'Blue\'s Turn'}</h2>
     </div>
     <div className="blue-flag">
       <div style={style.score}>{blueScore}</div>

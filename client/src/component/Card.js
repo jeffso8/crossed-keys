@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from "react";
-import {CAMEL, MAIZE, BLUE_CARD} from '../constants';
+import {CAMEL, MAIZE, BLUE_CARD, RED_CARD} from '../constants';
 
 function Card(props) {
   const [cardColor, setCardColor] = useState("");
   const [visible, setVisible] = useState(false);
   const user = props.user;
-  const redScore = props.redScore;
-  const blueScore = props.blueScore;
-  let redTurn = true;
+  const redTurn = props.redTurn;
   const [disabled, setDisabled] = useState(false);
 
   useEffect(() => {
@@ -41,22 +39,28 @@ function Card(props) {
   }
 
   const handleClick = () => {
-    setVisible(true);
+    console.log("redTurn", redTurn);
       if (user.team === "RED" && redTurn && !disabled) {
-        if (user.team === props.color.toUpperCase()) {
-          props.setRedScore(redScore + 1);
+        setVisible(true);
+        if (RED_CARD === props.color) {
+          props.setRedScore(props.redScore + 1);
+          console.log("props.redScore", props.redScore);
+          setDisabled(true);
+        } else {
+          props.setRedTurn(false);
+          console.log('redturn', redTurn);
           setDisabled(true);
         }
-        redTurn = false;
-      }
-      else if (user.team === "BLUE" && !redTurn && !disabled) {
-        if (user.team === props.color.toUpperCase()) {
-          props.setBlueScore(blueScore + 1);
-          setDisabled(true);
-        }
-        redTurn = true;
+      } else if (user.team === "BLUE" && !redTurn && !disabled) {
+          setVisible(true);
+          if (BLUE_CARD === props.color) {
+            props.setBlueScore(props.blueScore + 1);
+            setDisabled(true);
+          } else {
+            props.setRedTurn(true);
+          }
       } else {
-        setDisabled(true);
+        props.setRedTurn(false);
       }
     }
 

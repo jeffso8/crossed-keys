@@ -29,6 +29,11 @@ app.all('*', function(req, res, next) {
   roomID: {
     colors: String[],
     words: String[],
+    clicked: Boolean[],
+    isRedTurn: Boolean,
+    totalGameScore: [int, int],
+    redScore: int
+    blueScore: int,
     redSpy: String,
     blueSpy: String,
     users: {
@@ -178,6 +183,7 @@ io.on('connection', (socket) => {
 
   socket.on('blueScoreChange', (data) => {
     socket.nsp.in(data.roomID).emit('updateBlueScore', {blueScore: data.gameScore})
+
   });
 
   socket.on('hostStartGame', async (data) => {
