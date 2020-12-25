@@ -3,8 +3,8 @@ import http from 'http';
 import socketIO from 'socket.io';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import puppeteer from 'puppeteer';
 import "regenerator-runtime/runtime.js";
+import {getWords, newUser} from './utils';
 
 const port = process.env.PORT || 3001;
 
@@ -49,16 +49,6 @@ app.all('*', function(req, res, next) {
 */
 let roomMap = {};
 
-const newUser = (userID, isHost = false) => {
-  return {
-    [userID]: {
-      team: null,
-      role: null,
-      host: isHost,
-    }
-  };
-}
-
 const colors = ["red", "red", "red", "red", "red", "red", "red", "red", "blue", "blue", "blue", "blue",
 "blue", "blue", "blue", "blue", "white", "white", "white", "white", "white", "white", "white", "white", "black"];
 
@@ -71,25 +61,6 @@ let io = socketIO(server, {
   origins:['http://127.0.0.1:3000'],
 });
 let interval;
-
-async function getWords() {
-	try {
-		const URL = 'https://www.randomlists.com/nouns?dup=false&qty=25';
-		const browser = await puppeteer.launch();
-		const page = await browser.newPage();
-
-    await page.goto(URL);
-    return await page.evaluate(() => {
-      const words = Array.from(document.querySelectorAll('span.rand_large'));
-      return words.map(word => {
-        return word.innerText;
-      })
-    });
-		await browser.close()
-	} catch (error) {
-		console.error(error)
-	}
-}
 
 
 app.get('/', (req, res) => {
