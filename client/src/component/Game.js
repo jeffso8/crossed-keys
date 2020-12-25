@@ -19,14 +19,13 @@ function Game(props) {
   const [user, setUser] = useState({});
   const [redScore, setRedScore] = useState(0);
   const [blueScore, setBlueScore] = useState(0);
-  const [redTurn, setRedTurn] = useState(true);
-
+  const [redTurn, setRedTurn] = useState(props.location.state.data.isRedTurn);
+  const [clicked, setClicked] = useState([]);
 
 
   const organizeUsers = users => {
     const emptyRedTeam = [];
     const emptyBlueTeam = [];
-    console.log("usersGame", users);
     Object.keys(users).forEach((userID) => {
         if(users[userID].team === "RED") {
           emptyRedTeam.push(userID);
@@ -43,37 +42,44 @@ function Game(props) {
     socket.emit('joinGame', {roomID: props.location.state.data.roomID});
 
     socket.on('updateRedScore', (data) => {
-      console.log("scoreUpdated", data);
       setRedScore(data.redScore);
     });
     socket.on('updateBlueScore', (data) => {
-      console.log("scoreUpdated");
       setBlueScore(data.blueScore);
     });
+
+    socket.on('updateFlipCard', (data) => {
+      setClicked(data.clicked);
+      setRedTurn(data.isRedTurn);
+    });
+
     setRoomID(props.location.state.data.roomID);
     setUsers(props.location.state.data.users);
     organizeUsers(props.location.state.data.users);
     setWords(props.location.state.data.words);
-    setColor(props.location.state.data.colors)
-    setUser(props.location.state.data.users[props.location.state.userID])
+    setColor(props.location.state.data.colors);
+    setUser(props.location.state.data.users[props.location.state.userID]);
+    setClicked(props.location.state.data.clicked);
+    setRedTurn(props.location.state.data.isRedTurn);
   }, []);
 
 
   const handleRedScoreChange = (event) => {
-    console.log("GameRedEvent", event);
     setRedScore(event);
     socket.emit('redScoreChange', {roomID, gameScore: redScore + 1})
   }
 
   const handleBlueScoreChange = (event) => {
-    console.log("GameBlueEvent", event);
     setBlueScore(event)
     socket.emit('blueScoreChange', {roomID, gameScore: blueScore + 1})
   }
 
   const handleRedTurn = (event) => {
-    setRedTurn(event)
-    socket.emit('updateTurn', {roomID, redTurn: redTurn})
+    socket.emit('updateTurn', {roomID, redTurn: event})
+  }
+
+  const handleCardClick = (index, turn) => {
+    socket.emit('flipCard', {roomID, index, isRedTurn: turn})
   }
 
   const rowColor1 = colors.slice(0,5);
@@ -81,8 +87,6 @@ function Game(props) {
   const rowColor3 = colors.slice(10,15);
   const rowColor4 = colors.slice(15,20);
   const rowColor5 = colors.slice(20,25);
-  // const blackCardIndex = Math.random() * 25;
-  // const handleMessageChange = event => setMessage(event.target.value);
 
   const wordsColumn1 = words.slice(0,5);
   const wordsColumn2 = words.slice(5,10);
@@ -126,33 +130,7 @@ function Game(props) {
   //   setMessage("");
   // };
 
-  // const onCardsClicked={}
-  // renderCards() {
-  //   return (
-  //     words.map((word, index) => {
-
-
-  //       const color = colors[Math.random() * 3];
-  //       if(color === red) redCount++;
-  //       if(color === blue) blueCount++;
-
-
-  //       if (index === blackCardIndex) {
-  //         color = black;
-  //       }
-
-  //       return (
-  //         <Card
-  //          text={word}
-  //          color={color}
-  //          onClick=
-  //         />
-  //       );
-  //     })
-  //   );
-  // };
-
-  const renderColumns = (rowColor, wordColumn, className) => {
+  const renderColumns = (rowColor, wordColumn, clickedColumn, className) => {
     return (
     <div className={className} style={cardStyle.columns}>
       {rowColor.map((color, index) => {
@@ -169,9 +147,26 @@ function Game(props) {
 
         //TODO: clicked and index, figure out a way to store these as states, and emitted to all clients
         const randDeg = (Math.random() + 0.1) * (Math.round(Math.random()) ? 1 : -1);
-       return (<Card word={wordColumn[index]} idx={index} clicked={clicked[index]} color={realColor} user={user} redScore={redScore} setRedScore={handleRedScoreChange}
-        blueScore={blueScore} setBlueScore={handleBlueScoreChange} rotate={randDeg} redTurn={redTurn} setRedTurn={handleRedTurn}/>
-       )}
+        const isClicked = clicked[index + (clickedColumn * 5)];
+        return (
+          <Card
+            word={wordColumn[index]}
+            idx={index + (clickedColumn * 5)}
+            clicked={isClicked}
+            handleCardClick={handleCardClick}
+            color={realColor}
+            user={user}
+            isDisabled={(user.team === 'RED' && !redTurn) || (user.team === 'BLUE' && redTurn) || isClicked}
+            redScore={redScore}
+            setRedScore={handleRedScoreChange}
+            blueScore={blueScore}
+            setBlueScore={handleBlueScoreChange}
+            rotate={randDeg}
+            redTurn={redTurn}
+            handleRedTurn={handleRedTurn}
+          />
+        )
+      }
       )}
       </div>
     )
@@ -179,10 +174,6 @@ function Game(props) {
 
   return (
     <>
-    <div className="gameScore">
-
-    </div>
-
     {/* <div className="Column1">
       <h1>Red Team</h1>
       {redTeam.map((user, i) => {
@@ -203,11 +194,11 @@ function Game(props) {
       <div style={style.score}>{blueScore}</div>
     </div>
     <div style={cardStyle.container}>
-      {renderColumns(rowColor1, wordsColumn1, 'Column1')}
-      {renderColumns(rowColor2, wordsColumn2, 'Column2')}
-      {renderColumns(rowColor3, wordsColumn3, 'Column3')}
-      {renderColumns(rowColor4, wordsColumn4, 'Column4')}
-      {renderColumns(rowColor5, wordsColumn5, 'Column5')}
+      {renderColumns(rowColor1, wordsColumn1, 0, 'Column1')}
+      {renderColumns(rowColor2, wordsColumn2, 1, 'Column2')}
+      {renderColumns(rowColor3, wordsColumn3, 2, 'Column3')}
+      {renderColumns(rowColor4, wordsColumn4, 3, 'Column4')}
+      {renderColumns(rowColor5, wordsColumn5, 4, 'Column5')}
     </div>
     {/* <div classname="Column5">
       <h1>Blue Team</h1>

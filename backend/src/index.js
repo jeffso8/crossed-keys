@@ -61,6 +61,7 @@ const newUser = (userID, isHost = false) => {
 const colors = ["red", "red", "red", "red", "red", "red", "red", "red", "blue", "blue", "blue", "blue",
 "blue", "blue", "blue", "blue", "white", "white", "white", "white", "white", "white", "white", "white", "black"];
 
+const clicked = new Array(25).fill(false);
 
 let server = http.createServer(app);
 
@@ -133,8 +134,6 @@ io.on('connection', (socket) => {
   socket.on('message', (data) => {
     //gives data as an object {message: what message was sent, roomId: has the given room id}
     socket.nsp.in(data.roomID).emit('newMessage', data.message);
-    console.log('data', data.roomID);
-    console.log(io.sockets.adapter.clients);
   });
 
   socket.on('getWords', (data) => {
@@ -150,7 +149,6 @@ io.on('connection', (socket) => {
     if(roomMap[data.roomID]['blueSpy'] === data.userID) {
       delete roomMap[data.roomID]['blueSpy'];
     }
-    console.log('sET', socket.nsp.in(data.roomID));
     socket.nsp.in(data.roomID).emit('updateTeams', roomMap[data.roomID]);
   });
 
@@ -183,15 +181,34 @@ io.on('connection', (socket) => {
 
   socket.on('blueScoreChange', (data) => {
     socket.nsp.in(data.roomID).emit('updateBlueScore', {blueScore: data.gameScore})
+  });
 
+  socket.on('flipCard', (data) => {
+    roomMap[data.roomID]['clicked'][data.index] = true;
+    roomMap[data.roomID]['isRedTurn'] = data.isRedTurn;
+    console.log(roomMap[data.roomID]['clicked']);
+    socket.nsp.in(data.roomID).emit('updateFlipCard', {isRedTurn: roomMap[data.roomID]['isRedTurn'], clicked: roomMap[data.roomID]['clicked']})
   });
 
   socket.on('hostStartGame', async (data) => {
     const colorSorted = colors.sort(() => Math.random() - 0.5);
     const words = await getWords();
-    socket.nsp.in(data.roomID).emit('startGame', {roomID: data.roomID, users: roomMap[data.roomID]['users'], colors: colorSorted, words: words,
-    redSpy: roomMap[data.roomID]['redSpy'], blueSpy: roomMap[data.roomID]['blueSpy']});
+    const clicked = new Array(25).fill(false);
 
+    roomMap[data.roomID]['clicked'] = clicked;
+    roomMap[data.roomID]['isRedTurn'] = true;
+
+    socket.nsp.in(data.roomID).emit('startGame',
+      {
+        isRedTurn: roomMap[data.roomID]['isRedTurn'],
+        roomID: data.roomID,
+        users: roomMap[data.roomID]['users'],
+        clicked: roomMap[data.roomID]['clicked'],
+        colors: colorSorted,
+        words: words,
+        redSpy: roomMap[data.roomID]['redSpy'],
+        blueSpy: roomMap[data.roomID]['blueSpy']
+      });
   });
 
   socket.on("disconnect", () => {

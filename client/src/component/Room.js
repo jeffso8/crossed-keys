@@ -20,7 +20,7 @@ function Room(props) {
     const emptyRedTeam = [];
     const emptyBlueTeam = [];
     const emptyNullTeam = [];
-    console.log('organize', users);
+
     Object.keys(users).forEach((userID) => {
         if(users[userID].team === "RED") {
           emptyRedTeam.push(userID);

@@ -1,22 +1,23 @@
 import React, { useState, useEffect } from "react";
-import {CAMEL, MAIZE, BLUE_CARD, RED_CARD} from '../constants';
+import {BOMB_CARD, CAMEL, MAIZE, BLUE_CARD, RED_CARD} from '../constants';
 
 function Card(props) {
   const [cardColor, setCardColor] = useState("");
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(props.clicked);
+  const [isDisabled, setIsDisabled] = useState(props.isDisabled);
   const user = props.user;
   const redTurn = props.redTurn;
-  const [disabled, setDisabled] = useState(false);
 
   useEffect(() => {
     if (user.role === "MASTER") {
       setVisible(true);
+      setIsDisabled(true);
     }
   })
 
   const style = {
     container: {
-      backgroundColor: visible ? props.color : CAMEL,
+      backgroundColor: props.clicked || visible ? props.color : CAMEL,
       opacity: props.isSelected ? 0.5 : 1,
       width: 185,
       height: 90,
@@ -39,28 +40,34 @@ function Card(props) {
   }
 
   const handleClick = () => {
-    console.log("redTurn", redTurn);
-      if (user.team === "RED" && redTurn && !disabled) {
-        setVisible(true);
-        if (RED_CARD === props.color) {
+      if(isDisabled) {
+        return;
+      }
+
+      if(props.color === BOMB_CARD) {
+        console.log('GAME OVER');
+      }
+
+      if (redTurn) {
+        if (props.color === RED_CARD) {
           props.setRedScore(props.redScore + 1);
-          console.log("props.redScore", props.redScore);
-          setDisabled(true);
+          props.handleCardClick(props.idx, true);
         } else {
-          props.setRedTurn(false);
-          console.log('redturn', redTurn);
-          setDisabled(true);
-        }
-      } else if (user.team === "BLUE" && !redTurn && !disabled) {
-          setVisible(true);
-          if (BLUE_CARD === props.color) {
+          if (props.color === BLUE_CARD) {
             props.setBlueScore(props.blueScore + 1);
-            setDisabled(true);
-          } else {
-            props.setRedTurn(true);
           }
+          props.handleCardClick(props.idx, false);
+        }
       } else {
-        props.setRedTurn(false);
+        if (BLUE_CARD === props.color) {
+          props.setBlueScore(props.blueScore + 1);
+          props.handleCardClick(props.idx, false);
+        } else {
+          if (props.color === RED_CARD) {
+            props.setRedScore(props.redScore + 1);
+          }
+          props.handleCardClick(props.idx, true);
+        }
       }
     }
 
