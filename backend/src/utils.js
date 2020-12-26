@@ -1,7 +1,6 @@
 import puppeteer from 'puppeteer';
 
 export async function getWords() {
-  console.log('get words');
 	try {
 		const URL = 'https://www.randomlists.com/nouns?dup=false&qty=25';
 		const browser = await puppeteer.launch();

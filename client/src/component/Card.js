@@ -4,12 +4,14 @@ import {BOMB_CARD, CAMEL, MAIZE, BLUE_CARD, RED_CARD} from '../constants';
 function Card(props) {
   const [cardColor, setCardColor] = useState("");
   const [visible, setVisible] = useState(props.clicked);
-  const [isDisabled, setIsDisabled] = useState(props.isDisabled);
+  const [isDisabled, setIsDisabled] = useState(false);
   const user = props.user;
   const redTurn = props.redTurn;
 
   useEffect(() => {
+    setIsDisabled(props.isDisabled);
     if (user.role === "MASTER") {
+      console.log('setting?');
       setVisible(true);
       setIsDisabled(true);
     }
@@ -40,6 +42,9 @@ function Card(props) {
   }
 
   const handleClick = () => {
+      console.log('click props.isDisabled', props.isDisabled);
+
+      console.log('click isDisabled', isDisabled);
       if(isDisabled) {
         return;
       }

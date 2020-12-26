@@ -78,7 +78,6 @@ function Room(props) {
   }
 
   useEffect(() => {
-    console.log("roomSockerrr", socket);
     setRoomID(props.match.params.roomID);
     socket.emit('joinRoom', {roomID: props.match.params.roomID, userID: props.location.state.userID });
 

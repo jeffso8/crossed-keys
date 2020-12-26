@@ -39,9 +39,9 @@ app.all('*', function(req, res, next) {
     blueSpy: String,
     users: {
       userID[]: {
-      team: String,
-      role: String,
-      isHost: Boolean,
+        team: String,
+        role: String,
+        isHost: Boolean,
       }
     }
   }
@@ -145,6 +145,17 @@ io.on('connection', (socket) => {
 
   socket.on('joinGame', (data) => {
     socket.join(data.roomID);
+     socket.nsp.in(data.roomID).emit('refreshGame',
+      {
+        isRedTurn: roomMap[data.roomID]['isRedTurn'],
+        roomID: data.roomID,
+        users: roomMap[data.roomID]['users'],
+        clicked: roomMap[data.roomID]['clicked'],
+        colors: roomMap[data.roomID]['colors'],
+        words: roomMap[data.roomID]['words'],
+        redSpy: roomMap[data.roomID]['redSpy'],
+        blueSpy: roomMap[data.roomID]['blueSpy']
+      });
   });
 
   socket.on('redScoreChange', (data) => {
@@ -168,6 +179,8 @@ io.on('connection', (socket) => {
 
     roomMap[data.roomID]['clicked'] = clicked;
     roomMap[data.roomID]['isRedTurn'] = true;
+    roomMap[data.roomID]['colors'] = colorSorted;
+    roomMap[data.roomID]['words'] = words;
 
     socket.nsp.in(data.roomID).emit('startGame',
       {
@@ -175,14 +188,11 @@ io.on('connection', (socket) => {
         roomID: data.roomID,
         users: roomMap[data.roomID]['users'],
         clicked: roomMap[data.roomID]['clicked'],
-        colors: colorSorted,
-        words: words,
+        colors: roomMap[data.roomID]['colors'],
+        words: roomMap[data.roomID]['words'],
         redSpy: roomMap[data.roomID]['redSpy'],
         blueSpy: roomMap[data.roomID]['blueSpy']
       });
-    console.log(
-      'socket', socket
-    );
   });
 
   socket.on("disconnect", () => {
