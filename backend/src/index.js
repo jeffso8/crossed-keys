@@ -229,10 +229,13 @@ io.on('connection', (socket) => {
   });
 
   socket.on('flipCard', (data) => {
-
-    roomMap[data.roomID]['clicked'][data.index] = true;
-    roomMap[data.roomID]['isRedTurn'] = data.isRedTurn;
-    socket.nsp.in(data.roomID).emit('updateFlipCard', {isRedTurn: roomMap[data.roomID]['isRedTurn'], clicked: roomMap[data.roomID]['clicked']})
+    Rooms.findOne({roomID: data.roomID}, function(err, res) {
+      if (err) return;
+      res.cliked[data.index] = true;
+      res.isRedTurn = data.isRedTurn;
+      res.markModified('clicked', 'isRedTurn');
+      res.save()
+      socket.nsp.in(data.roomID).emit('updateFlipCard', {isRedTurn: res.isRedTurn, clicked: res.clicked})
   });
 
   socket.on('hostStartGame', async (data) => {
@@ -241,7 +244,7 @@ io.on('connection', (socket) => {
     const clicked = new Array(25).fill(false);
 
     Rooms.findOneAndUpdate({roomID: data.roomID}, {$set : {colors: colorSorted, words: words, clicked: clicked, isRedTurn: true}}, 
-      {upsert:true}, function(err, res) {
+      {upsert:true, new: true}, function(err, res) {
         if (err) return;
         console.log("hoststartres", res);
         socket.nsp.in(data.roomID).emit('startGame', res);
