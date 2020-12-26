@@ -198,28 +198,38 @@ io.on('connection', (socket) => {
 
   socket.on('joinGame', (data) => {
     socket.join(data.roomID);
-     socket.nsp.in(data.roomID).emit('refreshGame',
-      {
-        isRedTurn: roomMap[data.roomID]['isRedTurn'],
-        roomID: data.roomID,
-        users: roomMap[data.roomID]['users'],
-        clicked: roomMap[data.roomID]['clicked'],
-        colors: roomMap[data.roomID]['colors'],
-        words: roomMap[data.roomID]['words'],
-        redSpy: roomMap[data.roomID]['redSpy'],
-        blueSpy: roomMap[data.roomID]['blueSpy']
-      });
+    Rooms.findOne({roomID: data.roomID}, function(err, res) {
+      if (err) return;
+      socket.nsp.in(data.roomID).emit('refreshGame', res);
+    })
+      // {
+      //   isRedTurn: roomMap[data.roomID]['isRedTurn'],
+      //   roomID: data.roomID,
+      //   users: roomMap[data.roomID]['users'],
+      //   clicked: roomMap[data.roomID]['clicked'],
+      //   colors: roomMap[data.roomID]['colors'],
+      //   words: roomMap[data.roomID]['words'],
+      //   redSpy: roomMap[data.roomID]['redSpy'],
+      //   blueSpy: roomMap[data.roomID]['blueSpy']
+      // });
   });
 
   socket.on('redScoreChange', (data) => {
-    socket.nsp.in(data.roomID).emit('updateRedScore', {redScore: data.gameScore})
+    Rooms.findOneAndUpdate({roomID: data.roomID}, {$set : {redScore: data.gameScore}}, {upsert: true}, function(err, res) {
+      if (err) return;
+      socket.nsp.in(data.roomID).emit('updateRedScore', res.redScore)
+    });
   });
 
   socket.on('blueScoreChange', (data) => {
-    socket.nsp.in(data.roomID).emit('updateBlueScore', {blueScore: data.gameScore})
+    Rooms.findOneAndUpdate({roomID: data.roomID}, {$set : {blueScore: data.gameScore}}, {upsert: true}, function(err, res) {
+      if (err) return;
+      socket.nsp.in(data.roomID).emit('updateBlueScore', res.blueScore)
+    });
   });
 
   socket.on('flipCard', (data) => {
+
     roomMap[data.roomID]['clicked'][data.index] = true;
     roomMap[data.roomID]['isRedTurn'] = data.isRedTurn;
     socket.nsp.in(data.roomID).emit('updateFlipCard', {isRedTurn: roomMap[data.roomID]['isRedTurn'], clicked: roomMap[data.roomID]['clicked']})
