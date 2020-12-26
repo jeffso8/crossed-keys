@@ -1,4 +1,4 @@
-import {BEIGE, MUD_BROWN} from '../../constants';
+import {MUD_BROWN} from '../../constants';
 
 export default function TextInput (props) {
   const style = {

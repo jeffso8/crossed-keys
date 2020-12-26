@@ -1,14 +1,8 @@
-import React, { useState, useEffect, useLayoutEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Card from './Card';
-import axios from 'axios';
 import {socket} from './Room';
 import {MUD_BROWN, NEUTRAL_CARD, BLUE_CARD, RED_CARD, BOMB_CARD} from '../constants';
 
-  // const [messages, setMessages] = useState([]);
-  // const [message, setMessage] = useState('');
-    // socket.on('newMessage', (msg) => {
-    //   setMessages((messages) => [...messages, msg]);
-    // });
 function Game(props) {
   const [roomID, setRoomID] = useState("");
   const [redTeam, setRedTeam] = useState([]);
@@ -99,11 +93,6 @@ function Game(props) {
   const wordsColumn4 = words.slice(15,20);
   const wordsColumn5 = words.slice(20,25);
 
-   //   const sendMessage = () => {
-  //   socket.emit('message', {message, roomID});
-  //   setMessage("");
-  // };
-
   const cardStyle = {
     container : {
       display:"grid",
@@ -128,12 +117,6 @@ function Game(props) {
       fontWeight: 900,
     }
   };
-
-
-  //   const sendMessage = () => {
-  //   socket.emit('message', {message, roomID});
-  //   setMessage("");
-  // };
 
   const renderColumns = (rowColor, wordColumn, clickedColumn, className) => {
     return (
@@ -181,50 +164,22 @@ function Game(props) {
 
   return (
     <>
-    {/* <div className="Column1">
-      <h1>Red Team</h1>
-      {redTeam.map((user, i) => {
-        return (
-        <li key={i}>
-          {user}
-          {props.location.state.data.redSpy === user && <div>spymaster</div>}
-        </li>);
-      })}
-    </div> */}
-    <div className="red-flag">
-      <div style={style.score}>{redScore}</div>
-    </div>
-    <div>
-      <h2>{redTurn ? 'Red\'s Turn' : 'Blue\'s Turn'}</h2>
-    </div>
-    <div className="blue-flag">
-      <div style={style.score}>{blueScore}</div>
-    </div>
-    <div style={cardStyle.container}>
-      {renderColumns(rowColor1, wordsColumn1, 0, 'Column1')}
-      {renderColumns(rowColor2, wordsColumn2, 1, 'Column2')}
-      {renderColumns(rowColor3, wordsColumn3, 2, 'Column3')}
-      {renderColumns(rowColor4, wordsColumn4, 3, 'Column4')}
-      {renderColumns(rowColor5, wordsColumn5, 4, 'Column5')}
-    </div>
-    {/* <div classname="Column5">
-      <h1>Blue Team</h1>
-      {blueTeam.map((user, i) => {
-        return (
-        <li key={i}>
-          {user}
-          {props.location.state.data.blueSpy === user && <div>spymaster</div>}
-        </li>);
-      })}
-    </div>
-  */}
-          {/* <div>
-        {messages.map((msg, i) => {
-          return (<li key={i}>{msg}</li>);
-        })}
+      <div className="red-flag">
+        <div style={style.score}>{redScore}</div>
       </div>
-      <input value={message} onChange={handleMessageChange}/>
-      <button onClick={sendMessage}>Submit</button> */}
+      <div>
+        <h2>{redTurn ? 'Red\'s Turn' : 'Blue\'s Turn'}</h2>
+      </div>
+      <div className="blue-flag">
+        <div style={style.score}>{blueScore}</div>
+      </div>
+      <div style={cardStyle.container}>
+        {renderColumns(rowColor1, wordsColumn1, 0, 'Column1')}
+        {renderColumns(rowColor2, wordsColumn2, 1, 'Column2')}
+        {renderColumns(rowColor3, wordsColumn3, 2, 'Column3')}
+        {renderColumns(rowColor4, wordsColumn4, 3, 'Column4')}
+        {renderColumns(rowColor5, wordsColumn5, 4, 'Column5')}
+      </div>
     </>
   );
 };

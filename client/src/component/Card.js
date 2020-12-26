@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import {BOMB_CARD, CAMEL, MAIZE, BLUE_CARD, RED_CARD} from '../constants';
 
 function Card(props) {
-  const [cardColor, setCardColor] = useState("");
   const [visible, setVisible] = useState(props.clicked);
   const [isDisabled, setIsDisabled] = useState(false);
   const user = props.user;
@@ -15,7 +14,7 @@ function Card(props) {
       setVisible(true);
       setIsDisabled(true);
     }
-  })
+  });
 
   const style = {
     container: {
