@@ -241,10 +241,11 @@ io.on('connection', (socket) => {
   socket.on('hostStartGame', async (data) => {
     const colorSorted = colors.sort(() => Math.random() - 0.5);
     const words = await getWords();
+    console.log('words', words);
     const clicked = new Array(25).fill(false);
 
-    Rooms.findOneAndUpdate({roomID: data.roomID}, {$set : {colors: colorSorted, words: words, clicked: clicked, isRedTurn: true}}, 
-      {upsert:true, new: true}, function(err, res) {
+    Rooms.findOneAndUpdate({roomID: data.roomID}, {$set : {colors: colorSorted, words: words, clicked: clicked, isRedTurn: true}},
+      {upsert:true, new:true}, function(err, res) {
         if (err) return;
         console.log("hoststartres", res);
         socket.nsp.in(data.roomID).emit('startGame', res);

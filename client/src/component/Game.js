@@ -39,6 +39,7 @@ function Game(props) {
 
 
   useEffect(() => {
+    console.log('props', props.location.state);
     socket.emit('joinGame', {roomID: props.location.state.data.roomID});
 
     socket.on('refreshGame', (data) => {
@@ -63,7 +64,7 @@ function Game(props) {
     setUsers(props.location.state.data.users);
     organizeUsers(props.location.state.data.users);
     setWords(props.location.state.data.words);
-    setUser(props.location.state.data.users[props.location.state.userID]);
+    setUser(props.location.state.data.users.find(user => user.userID === props.location.state.userID));
     setRedTurn(props.location.state.data.isRedTurn);
   }, []);
 
