@@ -99,9 +99,10 @@ io.on('connection', (socket) => {
             }]
           }
         )
+        if (err) return;
         newRoom.save();
         io.in(data.roomID).emit('updateTeams', newRoom);
-      }
+      } else {
       const foundUser = res.users.find(user => user.userID === data.userID);
       if (!foundUser) {
       res.users.push({
@@ -111,9 +112,10 @@ io.on('connection', (socket) => {
         isHost: false
       })}
       if (err) return;
-      res.markModified('users')
+      res.markModified('users');
       res.save();
       io.in(data.roomID).emit('updateTeams', res);
+    }
     });
   });
 
