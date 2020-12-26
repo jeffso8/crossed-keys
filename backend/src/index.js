@@ -92,9 +92,9 @@ io.on('connection', (socket) => {
           {
             roomID: data.roomID,
             users: [{
-              userID: data.userID,  
-              team: null, 
-              role: null, 
+              userID: data.userID,
+              team: null,
+              role: null,
               isHost: true
             }]
           }
@@ -105,9 +105,9 @@ io.on('connection', (socket) => {
       const foundUser = res.users.find(user => user.userID === data.userID);
       if (!foundUser) {
       res.users.push({
-        userID: data.userID,  
-        team: null, 
-        role: null, 
+        userID: data.userID,
+        team: null,
+        role: null,
         isHost: false
       })}
       if (err) return;
@@ -154,32 +154,30 @@ io.on('connection', (socket) => {
 
   socket.on('setRedTeam', (data) => {
     Rooms.findOne({roomID: data.roomID}, function(err, res) {
-      console.log("setred", res);
       const foundUser = res.users.find(user => user.userID === data.userID);
       foundUser.team = 'RED';
+      foundUser.role = null;
       if (res.blueSpy == data.userID) {
         res.blueSpy = null;
       }
       res.markModified('users', 'blueSpy');
       res.save();
-      console.log("postred", res);
       socket.nsp.in(data.roomID).emit('updateTeams', res);
     })
-    // roomMap[data.roomID]["users"][data.userID]["team"] = "RED";
-    // roomMap[data.roomID]["users"][data.userID]["role"] = null;
-    // if(roomMap[data.roomID]['blueSpy'] === data.userID) {
-    //   delete roomMap[data.roomID]['blueSpy'];
-    // }
-    // socket.nsp.in(data.roomID).emit('updateTeams', roomMap[data.roomID]);
   });
 
   socket.on('setBlueTeam', (data) => {
-    roomMap[data.roomID]["users"][data.userID]["team"] = "BLUE";
-    roomMap[data.roomID]["users"][data.userID]["role"] = null;
-    if(roomMap[data.roomID]['redSpy'] === data.userID) {
-      delete roomMap[data.roomID]['redSpy'];
-    }
-    socket.nsp.in(data.roomID).emit('updateTeams', roomMap[data.roomID]);
+    Rooms.findOne({roomID: data.roomID}, function(err, res) {
+      const foundUser = res.users.find(user => user.userID === data.userID);
+      foundUser.team = 'BLUE';
+      foundUser.role = null;
+      if (res.redSpy == data.userID) {
+        res.redSpy = null;
+      }
+      res.markModified('users', 'redSpy');
+      res.save();
+      socket.nsp.in(data.roomID).emit('updateTeams', res);
+    })
   });
 
   socket.on('claimSpyMaster', (data) => {
