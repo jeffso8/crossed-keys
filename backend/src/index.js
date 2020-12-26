@@ -7,7 +7,7 @@ import puppeteer from 'puppeteer';
 import Rooms from '../models/Rooms';
 import database from '../database/index';
 import "regenerator-runtime/runtime.js";
-import e from 'express';
+import {getWords, newUser} from './utils';
 
 const port = process.env.PORT || 3001;
 
@@ -30,6 +30,7 @@ app.all('*', function(req, res, next) {
 /*
  roomMap: {
   roomID: {
+    spymasterHints: String[],
     colors: String[],
     words: String[],
     clicked: Boolean[],
@@ -41,25 +42,15 @@ app.all('*', function(req, res, next) {
     blueSpy: String,
     users: {
       userID[]: {
-      team: String,
-      role: String,
-      isHost: Boolean,
+        team: String,
+        role: String,
+        isHost: Boolean,
       }
     }
   }
  }
 */
 let roomMap = {};
-
-const newUser = (userID, isHost = false) => {
-  return {
-    [userID]: {
-      team: null,
-      role: null,
-      host: isHost,
-    }
-  };
-}
 
 const colors = ["red", "red", "red", "red", "red", "red", "red", "red", "blue", "blue", "blue", "blue",
 "blue", "blue", "blue", "blue", "white", "white", "white", "white", "white", "white", "white", "white", "black"];
@@ -73,25 +64,6 @@ let io = socketIO(server, {
   origins:['http://127.0.0.1:3000'],
 });
 let interval;
-
-async function getWords() {
-	try {
-		const URL = 'https://www.randomlists.com/nouns?dup=false&qty=25';
-		const browser = await puppeteer.launch();
-		const page = await browser.newPage();
-
-    await page.goto(URL);
-    return await page.evaluate(() => {
-      const words = Array.from(document.querySelectorAll('span.rand_large'));
-      return words.map(word => {
-        return word.innerText;
-      })
-    });
-		await browser.close()
-	} catch (error) {
-		console.error(error)
-	}
-}
 
 
 app.get('/', (req, res) => {
@@ -188,6 +160,17 @@ io.on('connection', (socket) => {
 
   socket.on('joinGame', (data) => {
     socket.join(data.roomID);
+     socket.nsp.in(data.roomID).emit('refreshGame',
+      {
+        isRedTurn: roomMap[data.roomID]['isRedTurn'],
+        roomID: data.roomID,
+        users: roomMap[data.roomID]['users'],
+        clicked: roomMap[data.roomID]['clicked'],
+        colors: roomMap[data.roomID]['colors'],
+        words: roomMap[data.roomID]['words'],
+        redSpy: roomMap[data.roomID]['redSpy'],
+        blueSpy: roomMap[data.roomID]['blueSpy']
+      });
   });
 
   socket.on('redScoreChange', (data) => {
@@ -201,7 +184,6 @@ io.on('connection', (socket) => {
   socket.on('flipCard', (data) => {
     roomMap[data.roomID]['clicked'][data.index] = true;
     roomMap[data.roomID]['isRedTurn'] = data.isRedTurn;
-    console.log(roomMap[data.roomID]['clicked']);
     socket.nsp.in(data.roomID).emit('updateFlipCard', {isRedTurn: roomMap[data.roomID]['isRedTurn'], clicked: roomMap[data.roomID]['clicked']})
   });
 
@@ -212,6 +194,8 @@ io.on('connection', (socket) => {
 
     roomMap[data.roomID]['clicked'] = clicked;
     roomMap[data.roomID]['isRedTurn'] = true;
+    roomMap[data.roomID]['colors'] = colorSorted;
+    roomMap[data.roomID]['words'] = words;
 
     socket.nsp.in(data.roomID).emit('startGame',
       {
@@ -219,8 +203,8 @@ io.on('connection', (socket) => {
         roomID: data.roomID,
         users: roomMap[data.roomID]['users'],
         clicked: roomMap[data.roomID]['clicked'],
-        colors: colorSorted,
-        words: words,
+        colors: roomMap[data.roomID]['colors'],
+        words: roomMap[data.roomID]['words'],
         redSpy: roomMap[data.roomID]['redSpy'],
         blueSpy: roomMap[data.roomID]['blueSpy']
       });

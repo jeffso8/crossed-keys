@@ -41,9 +41,15 @@ function Game(props) {
   useEffect(() => {
     socket.emit('joinGame', {roomID: props.location.state.data.roomID});
 
+    socket.on('refreshGame', (data) => {
+      setClicked(data.clicked);
+      setColor(data.colors);
+    });
+
     socket.on('updateRedScore', (data) => {
       setRedScore(data.redScore);
     });
+
     socket.on('updateBlueScore', (data) => {
       setBlueScore(data.blueScore);
     });
@@ -57,9 +63,7 @@ function Game(props) {
     setUsers(props.location.state.data.users);
     organizeUsers(props.location.state.data.users);
     setWords(props.location.state.data.words);
-    setColor(props.location.state.data.colors);
     setUser(props.location.state.data.users[props.location.state.userID]);
-    setClicked(props.location.state.data.clicked);
     setRedTurn(props.location.state.data.isRedTurn);
   }, []);
 
@@ -148,6 +152,8 @@ function Game(props) {
         //TODO: clicked and index, figure out a way to store these as states, and emitted to all clients
         const randDeg = (Math.random() + 0.1) * (Math.round(Math.random()) ? 1 : -1);
         const isClicked = clicked[index + (clickedColumn * 5)];
+
+        const isDisabled = ((user.team === 'RED' && !redTurn) || (user.team === 'BLUE' && redTurn) || isClicked);
         return (
           <Card
             word={wordColumn[index]}
@@ -156,7 +162,7 @@ function Game(props) {
             handleCardClick={handleCardClick}
             color={realColor}
             user={user}
-            isDisabled={(user.team === 'RED' && !redTurn) || (user.team === 'BLUE' && redTurn) || isClicked}
+            isDisabled={isDisabled}
             redScore={redScore}
             setRedScore={handleRedScoreChange}
             blueScore={blueScore}
