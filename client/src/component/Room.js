@@ -21,13 +21,14 @@ function Room(props) {
     const emptyBlueTeam = [];
     const emptyNullTeam = [];
 
-    Object.keys(users).forEach((userID) => {
-        if(users[userID].team === "RED") {
-          emptyRedTeam.push(userID);
-        } else if (users[userID].team === "BLUE") {
-          emptyBlueTeam.push(userID);
+    users.forEach((user) => {
+      console.log("usersOrg", user);
+        if(user.team === "RED") {
+          emptyRedTeam.push(user);
+        } else if (user.team === "BLUE") {
+          emptyBlueTeam.push(user);
         } else {
-          emptyNullTeam.push(userID);
+          emptyNullTeam.push(user);
         }
     });
     setRedTeam(emptyRedTeam);
@@ -94,7 +95,7 @@ function Room(props) {
   useEffect(() => {
     socket.on('updateTeams', (data) => {
       organizeUsers(data.users);
-      setUser(data.users[props.location.state.userID]);
+      setUser(data.users.filter((user) => user.userID == props.location.state.userID));
       setRoomData(data);
     });
   }, []);
@@ -117,7 +118,7 @@ function Room(props) {
           {redTeam.map((user, i) => {
             return (
             <li key={i}>
-              {user}
+              {user.userID}
               {roomData.redSpy === user && <div>spymaster</div>}
             </li>);
           })}
@@ -127,7 +128,7 @@ function Room(props) {
         {nullTeam.map((user, i) => {
           return (
           <li key={i}>
-            {user}
+            {user.userID}
           </li>
           );
         })}
@@ -137,7 +138,7 @@ function Room(props) {
         {blueTeam.map((user, i) => {
           return (
             <li key={i}>
-              {user}
+              {user.userID}
               {roomData.blueSpy === user && <div>spymaster</div>}
             </li>);
           })}

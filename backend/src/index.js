@@ -4,7 +4,10 @@ import socketIO from 'socket.io';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import puppeteer from 'puppeteer';
+import Rooms from '../models/Rooms';
+import database from '../database/index';
 import "regenerator-runtime/runtime.js";
+import e from 'express';
 
 const port = process.env.PORT || 3001;
 
@@ -111,25 +114,37 @@ io.on('connection', (socket) => {
   socket.on('joinRoom', (data) => {
     //data is an object with the roomID and the user that joined the room
     socket.join(data.roomID);
-    if (!roomMap[data.roomID]) {
-      // Create new room with new user
-      roomMap[data.roomID] = {users:
-        newUser(data.userID, true)
-      };
-    } else {
-      // adding new users to the room
-      let users = roomMap[data.roomID]['users'];
-      if (!users[data.userID]) {
-        const newUserObj = newUser(data.userID);
-        let updatedUsers = {
-          ...users,
-          ...newUserObj,
-        };
-        roomMap[data.roomID]['users'] = updatedUsers;
+    Rooms.findOneAndUpdate({roomID: data.roomID}, {$push: {users: 
+      {
+        userID: data.userID,  
+        team: null, 
+        role: null, 
+        isHost: false
+      }}}, {upsert: true, new: true}, function(err, result) {
+        if (err) return;
+        io.in(data.roomID).emit('updateTeams', result);
+      });
       }
-    }
-    io.in(data.roomID).emit('updateTeams', roomMap[data.roomID]);
-  });
+    );
+
+    // if (!roomMap[data.roomID]) {
+    //   // Create new room with new user
+    //   roomMap[data.roomID] = {users:
+    //     newUser(data.userID, true)
+    //   };
+    // } else {
+    //   // adding new users to the room
+    //   let users = roomMap[data.roomID]['users'];
+    //   if (!users[data.userID]) {
+    //     const newUserObj = newUser(data.userID);
+    //     let updatedUsers = {
+    //       ...users,
+    //       ...newUserObj,
+    //     };
+    //     roomMap[data.roomID]['users'] = updatedUsers;
+    //   }
+    // }
+    // io.in(data.roomID).emit('updateTeams', roomMap[data.roomID]);
 
   socket.on('message', (data) => {
     //gives data as an object {message: what message was sent, roomId: has the given room id}
