@@ -231,11 +231,12 @@ io.on('connection', (socket) => {
   socket.on('flipCard', (data) => {
     Rooms.findOne({roomID: data.roomID}, function(err, res) {
       if (err) return;
-      res.cliked[data.index] = true;
+      res.clicked[data.index] = true;
       res.isRedTurn = data.isRedTurn;
       res.markModified('clicked', 'isRedTurn');
-      res.save()
+      res.save();
       socket.nsp.in(data.roomID).emit('updateFlipCard', {isRedTurn: res.isRedTurn, clicked: res.clicked})
+  });
   });
 
   socket.on('hostStartGame', async (data) => {
