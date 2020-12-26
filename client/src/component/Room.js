@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect} from "react";
 import socketIOClient from "socket.io-client";
 import { useHistory } from 'react-router-dom';
 const ENDPOINT = "http://127.0.0.1:3001";

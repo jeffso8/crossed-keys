@@ -86,18 +86,36 @@ io.on('connection', (socket) => {
   socket.on('joinRoom', (data) => {
     //data is an object with the roomID and the user that joined the room
     socket.join(data.roomID);
-    Rooms.findOneAndUpdate({roomID: data.roomID}, {$push: {users: 
-      {
+    Rooms.findOne({roomID: data.roomID}, function(err, res) {
+      if (!res) {
+        const newRoom = new Rooms(
+          {
+            roomID: data.roomID,
+            users: [{
+              userID: data.userID,  
+              team: null, 
+              role: null, 
+              isHost: true
+            }]
+          }
+        )
+        newRoom.save();
+        io.in(data.roomID).emit('updateTeams', newRoom);
+      }
+      const foundUser = res.users.find(user => user.userID === data.userID);
+      if (!foundUser) {
+      res.users.push({
         userID: data.userID,  
         team: null, 
         role: null, 
         isHost: false
-      }}}, {upsert: true, new: true}, function(err, result) {
-        if (err) return;
-        io.in(data.roomID).emit('updateTeams', result);
-      });
-      }
-    );
+      })}
+      if (err) return;
+      res.markModified('users')
+      res.save();
+      io.in(data.roomID).emit('updateTeams', res);
+    });
+  });
 
     // if (!roomMap[data.roomID]) {
     //   // Create new room with new user
@@ -124,19 +142,35 @@ io.on('connection', (socket) => {
   });
 
   socket.on('getWords', (data) => {
-    if (!roomMap[data.roomID].words) {
-      roomMap[data.roomID].words = getWords();
-    };
-    socket.nsp.in(data.roomID).emit('sendWords', roomMap[data.roomID].words);
+    Rooms.findOneAndUpdate({roomID: data.roomID}, {$set : {words: getWords()}}, {upsert: true, new: true}, function(err, result) {
+      if (err) return;
+      socket.nsp.in(data.roomID).emit('sendWords', result);
+      })
+    // if (!roomMap[data.roomID].words) {
+    //   roomMap[data.roomID].words = getWords();
+    // };
+    // socket.nsp.in(data.roomID).emit('sendWords', roomMap[data.roomID].words);
   });
 
   socket.on('setRedTeam', (data) => {
-    roomMap[data.roomID]["users"][data.userID]["team"] = "RED";
-    roomMap[data.roomID]["users"][data.userID]["role"] = null;
-    if(roomMap[data.roomID]['blueSpy'] === data.userID) {
-      delete roomMap[data.roomID]['blueSpy'];
-    }
-    socket.nsp.in(data.roomID).emit('updateTeams', roomMap[data.roomID]);
+    Rooms.findOne({roomID: data.roomID}, function(err, res) {
+      console.log("setred", res);
+      const foundUser = res.users.find(user => user.userID === data.userID);
+      foundUser.team = 'RED';
+      if (res.blueSpy == data.userID) {
+        res.blueSpy = null;
+      }
+      res.markModified('users', 'blueSpy');
+      res.save();
+      console.log("postred", res);
+      socket.nsp.in(data.roomID).emit('updateTeams', res);
+    })
+    // roomMap[data.roomID]["users"][data.userID]["team"] = "RED";
+    // roomMap[data.roomID]["users"][data.userID]["role"] = null;
+    // if(roomMap[data.roomID]['blueSpy'] === data.userID) {
+    //   delete roomMap[data.roomID]['blueSpy'];
+    // }
+    // socket.nsp.in(data.roomID).emit('updateTeams', roomMap[data.roomID]);
   });
 
   socket.on('setBlueTeam', (data) => {
