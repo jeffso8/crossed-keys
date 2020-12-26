@@ -22,7 +22,6 @@ function Room(props) {
     const emptyNullTeam = [];
 
     users.forEach((user) => {
-      console.log("usersOrg", user);
         if(user.team === "RED") {
           emptyRedTeam.push(user);
         } else if (user.team === "BLUE") {
@@ -90,7 +89,7 @@ function Room(props) {
   useEffect(() => {
     socket.on('updateTeams', (data) => {
       organizeUsers(data.users);
-      setUser(data.users.filter((user) => user.userID == props.location.state.userID));
+      setUser(data.users.find((user) => user.userID === props.location.state.userID));
       setRoomData(data);
     });
   }, []);
@@ -141,7 +140,7 @@ function Room(props) {
       </div>
       <div className="pickTeamButtons" style={style.teamButton}>
       <button value="red" onClick={handleSetRedTeamClick}>Red Team</button>
-      {user.host ?
+      {user.isHost ?
         <button onClick={startGame}>Start Game</button>
         : null
       }
