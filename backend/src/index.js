@@ -215,14 +215,14 @@ io.on('connection', (socket) => {
   });
 
   socket.on('redScoreChange', (data) => {
-    Rooms.findOneAndUpdate({roomID: data.roomID}, {$set : {redScore: data.gameScore}}, {upsert: true}, function(err, res) {
+    Rooms.findOneAndUpdate({roomID: data.roomID}, {$set : {redScore: data.gameScore}}, {upsert: true, new: true}, function(err, res) {
       if (err) return;
       socket.nsp.in(data.roomID).emit('updateRedScore', res.redScore)
     });
   });
 
   socket.on('blueScoreChange', (data) => {
-    Rooms.findOneAndUpdate({roomID: data.roomID}, {$set : {blueScore: data.gameScore}}, {upsert: true}, function(err, res) {
+    Rooms.findOneAndUpdate({roomID: data.roomID}, {$set : {blueScore: data.gameScore}}, {upsert: true, new: true}, function(err, res) {
       if (err) return;
       socket.nsp.in(data.roomID).emit('updateBlueScore', res.blueScore)
     });
@@ -235,9 +235,9 @@ io.on('connection', (socket) => {
       res.isRedTurn = data.isRedTurn;
       res.markModified('clicked', 'isRedTurn');
       res.save();
-      socket.nsp.in(data.roomID).emit('updateFlipCard', {isRedTurn: res.isRedTurn, clicked: res.clicked})
+      socket.nsp.in(data.roomID).emit('updateFlipCard', {isRedTurn: res.isRedTurn, clicked: res.clicked});
   });
-  });
+});
 
   socket.on('hostStartGame', async (data) => {
     const colorSorted = colors.sort(() => Math.random() - 0.5);
@@ -253,30 +253,11 @@ io.on('connection', (socket) => {
     })
   });
 
-
-    // roomMap[data.roomID]['clicked'] = clicked;
-    // roomMap[data.roomID]['isRedTurn'] = true;
-    // roomMap[data.roomID]['colors'] = colorSorted;
-    // roomMap[data.roomID]['words'] = words;
-
-    // socket.nsp.in(data.roomID).emit('startGame',
-    //   {
-    //     isRedTurn: roomMap[data.roomID]['isRedTurn'],
-    //     roomID: data.roomID,
-    //     users: roomMap[data.roomID]['users'],
-    //     clicked: roomMap[data.roomID]['clicked'],
-    //     colors: roomMap[data.roomID]['colors'],
-    //     words: roomMap[data.roomID]['words'],
-    //     redSpy: roomMap[data.roomID]['redSpy'],
-    //     blueSpy: roomMap[data.roomID]['blueSpy']
-    //   });
-  // });
-
   socket.on("disconnect", () => {
     clearInterval(interval);
   });
 });
 
-server.listen(port, () =>
-  console.log(`Example app listening on port ${port}!`),
-);
+  server.listen(port, () =>
+    console.log(`Example app listening on port ${port}!`),
+  );
