@@ -97,8 +97,7 @@ io.on('connection', (socket) => {
               role: null,
               isHost: true
             }]
-          }
-        )
+          })
         if (err) return;
         newRoom.save();
         io.in(data.roomID).emit('updateTeams', newRoom);
@@ -179,17 +178,22 @@ io.on('connection', (socket) => {
       res.markModified('users', 'redSpy');
       res.save();
       socket.nsp.in(data.roomID).emit('updateTeams', res);
-    })
+    });
   });
 
   socket.on('claimSpyMaster', (data) => {
-    roomMap[data.roomID]['users'][data.userID]["role"] = "MASTER";
-    if (roomMap[data.roomID]['users'][data.userID]["team"] === "RED") {
-      roomMap[data.roomID]["redSpy"] = data.userID;
-    } else if (roomMap[data.roomID]['users'][data.userID]["team"] === "BLUE"){
-      roomMap[data.roomID]["blueSpy"] = data.userID;
-    }
-    socket.nsp.in(data.roomID).emit('updateTeams', roomMap[data.roomID]);
+    Rooms.findOne({roomID: data.roomID}, function(err, res) {
+      const foundUser = res.users.find(user => user.userID === data.userID);
+      foundUser.role = "MASTER";
+      if (foundUser.team === "RED") {
+        res.redSpy = foundUser.userID;
+      } else if (foundUser.team === "BLUE") {
+        res.blueSpy = foundUser.userID;
+      }
+      res.markModified('users', 'redSpy', 'blueSpy');
+      res.save();
+      socket.nsp.in(data.roomID).emit('updateTeams', res);
+    });
   });
 
   socket.on('joinGame', (data) => {
@@ -226,23 +230,32 @@ io.on('connection', (socket) => {
     const words = await getWords();
     const clicked = new Array(25).fill(false);
 
-    roomMap[data.roomID]['clicked'] = clicked;
-    roomMap[data.roomID]['isRedTurn'] = true;
-    roomMap[data.roomID]['colors'] = colorSorted;
-    roomMap[data.roomID]['words'] = words;
-
-    socket.nsp.in(data.roomID).emit('startGame',
-      {
-        isRedTurn: roomMap[data.roomID]['isRedTurn'],
-        roomID: data.roomID,
-        users: roomMap[data.roomID]['users'],
-        clicked: roomMap[data.roomID]['clicked'],
-        colors: roomMap[data.roomID]['colors'],
-        words: roomMap[data.roomID]['words'],
-        redSpy: roomMap[data.roomID]['redSpy'],
-        blueSpy: roomMap[data.roomID]['blueSpy']
-      });
+    Rooms.findOneAndUpdate({roomID: data.roomID}, {$set : {colors: colorSorted, words: words, clicked: clicked, isRedTurn: true}}, 
+      {upsert:true}, function(err, res) {
+        if (err) return;
+        console.log("hoststartres", res);
+        socket.nsp.in(data.roomID).emit('startGame', res);
+    })
   });
+
+
+    // roomMap[data.roomID]['clicked'] = clicked;
+    // roomMap[data.roomID]['isRedTurn'] = true;
+    // roomMap[data.roomID]['colors'] = colorSorted;
+    // roomMap[data.roomID]['words'] = words;
+
+    // socket.nsp.in(data.roomID).emit('startGame',
+    //   {
+    //     isRedTurn: roomMap[data.roomID]['isRedTurn'],
+    //     roomID: data.roomID,
+    //     users: roomMap[data.roomID]['users'],
+    //     clicked: roomMap[data.roomID]['clicked'],
+    //     colors: roomMap[data.roomID]['colors'],
+    //     words: roomMap[data.roomID]['words'],
+    //     redSpy: roomMap[data.roomID]['redSpy'],
+    //     blueSpy: roomMap[data.roomID]['blueSpy']
+    //   });
+  // });
 
   socket.on("disconnect", () => {
     clearInterval(interval);
