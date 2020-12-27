@@ -55,6 +55,7 @@ function Home() {
       marginTop: 20,
       backgroundColor: BROWNISH,
       color: MUD_BROWN,
+      cursor: 'pointer',
     }
   };
 

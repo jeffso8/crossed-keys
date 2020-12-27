@@ -23,6 +23,7 @@ export default function TextInput (props) {
       name={props.name}
       value={props.value}
       onChange={props.onChange}
+      autocomplete="off"
     />
   );
 
