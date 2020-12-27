@@ -4,22 +4,22 @@ import {BOMB_CARD, CAMEL, MAIZE, BLUE_CARD, RED_CARD} from '../constants';
 function Card(props) {
   const [visible, setVisible] = useState(props.clicked);
   const [isDisabled, setIsDisabled] = useState(false);
+  const [isMaster, setIsMaster] = useState(false);
   const user = props.user;
   const redTurn = props.redTurn;
 
   useEffect(() => {
     setIsDisabled(props.isDisabled);
     if (user.role === "MASTER") {
-      console.log('setting?');
       setVisible(true);
       setIsDisabled(true);
+      setIsMaster(true);
     }
   });
 
   const style = {
     container: {
       backgroundColor: props.clicked || visible ? props.color : CAMEL,
-      opacity: props.isSelected ? 0.5 : 1,
       width: 185,
       height: 90,
       marginTop: 20,
@@ -41,9 +41,6 @@ function Card(props) {
   }
 
   const handleClick = () => {
-      console.log('click props.isDisabled', props.isDisabled);
-
-      console.log('click isDisabled', isDisabled);
       if(isDisabled) {
         return;
       }
@@ -76,7 +73,7 @@ function Card(props) {
     }
 
   return (
-    <div className="card-container" style={style.container} onClick={handleClick}>
+    <div className="card-container" style={{...style.container, opacity: (isMaster && props.clicked) ? 0.3 : 1}} onClick={handleClick}>
       <div style={style.word}>
         {props.word}
       </div>

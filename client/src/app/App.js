@@ -1,5 +1,5 @@
 import React from "react";
-import Game from '../component/Game';
+import Game from '../component/Game/index';
 import Home from '../component/Home';
 import Room from '../component/Room/index';
 import {BrowserRouter, Route} from 'react-router-dom';

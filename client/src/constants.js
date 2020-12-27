@@ -5,7 +5,7 @@ export const BROWNISH = '#A35E60';
 export const MAIZE = '#E8C709';
 export const CAMEL = '#BF9463'
 
-export const BLUE_CARD = '#6EA4BF';
-export const RED_CARD = '#EF6351';
+export const BLUE_CARD = '#33658A';
+export const RED_CARD = '#A71D31';
 export const BOMB_CARD = '#28262C';
 export const NEUTRAL_CARD = '#686963';

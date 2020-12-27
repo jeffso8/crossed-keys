@@ -29,23 +29,10 @@ html, body, div#root {
   top: 0px;
   left: 90px;
   z-index: 1;
-  background-color: #EF6351;
-  width: 90px;
-  height: 150px;
-}
-
-.red-flag:after {
-  position: absolute;
-  left: 14px;
-  top: 60px;
-  display: block;
-	  width: 0;
-	  height: 0;
-	  border-top: 60px solid transparent;
-	  border-bottom: 60px solid transparent;
-	  border-right: 60px solid #E8D2B9;
-  content:'';
-  transform: rotate(90deg);
+  background-color: #A71D31;
+  width: 85px;
+  height: 130px;
+  clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 50% 70%, 0% 100%);
 }
 
 .blue-flag {
@@ -53,23 +40,10 @@ html, body, div#root {
   top: 0px;
   right: 90px;
   z-index: 1;
-  background-color: #6EA4BF;
-  width: 90px;
-  height: 150px;
-}
-
-.blue-flag:after {
-  position: absolute;
-  left: 14px;
-  top: 60px;
-  display: block;
-	  width: 0;
-	  height: 0;
-	  border-top: 60px solid transparent;
-	  border-bottom: 60px solid transparent;
-	  border-right: 60px solid #E8D2B9;
-  content:'';
-  transform: rotate(90deg);
+  background-color: #33658A;
+  width: 85px;
+  height: 130px;
+  clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 50% 70%, 0% 100%);
 }
 
 *:focus {

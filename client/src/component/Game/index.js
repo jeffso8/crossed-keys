@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import Card from './Card';
-import socket from '../socket';
-import {MUD_BROWN, NEUTRAL_CARD, BLUE_CARD, RED_CARD, BOMB_CARD} from '../constants';
+import Card from '../Card';
+import ScoreBanner from './ScoreBanner';
+import socket from '../../socket';
+import {NEUTRAL_CARD, BLUE_CARD, RED_CARD, BOMB_CARD} from '../../constants';
 
 function Game(props) {
   const [roomID, setRoomID] = useState("");
@@ -114,15 +115,7 @@ function Game(props) {
     }
   };
 
-  const style = {
-    score: {
-      color: MUD_BROWN,
-      fontSize: 40,
-      textAlign: 'center',
-      marginTop: 20,
-      fontWeight: 900,
-    }
-  };
+
 
   const renderColumns = (rowColor, wordColumn, clickedColumn, className) => {
     return (
@@ -170,15 +163,11 @@ function Game(props) {
 
   return (
     <>
-      <div className="red-flag">
-        <div style={style.score}>{redScore}</div>
-      </div>
-      <div>
+      <ScoreBanner isRedTeam={true} score={redScore} />
+      <div style={{textAlign: 'center'}}>
         <h2>{redTurn ? 'Red\'s Turn' : 'Blue\'s Turn'}</h2>
       </div>
-      <div className="blue-flag">
-        <div style={style.score}>{blueScore}</div>
-      </div>
+      <ScoreBanner isRedTeam={false} score={blueScore} />
       <div style={cardStyle.container}>
         {renderColumns(rowColor1, wordsColumn1, 0, 'Column1')}
         {renderColumns(rowColor2, wordsColumn2, 1, 'Column2')}
