@@ -1,9 +1,12 @@
 import React, { useState, useEffect} from "react";
-import socketIOClient from "socket.io-client";
-import { useHistory } from 'react-router-dom';
-const ENDPOINT = "http://127.0.0.1:3001";
-export const socket = socketIOClient(ENDPOINT);
+// import socketIOClient from "socket.io-client";
+import io from 'socket.io-client';
 
+import { useHistory } from 'react-router-dom';
+// const ENDPOINT = "http://127.0.0.1:3001";
+// export const socket = socketIOClient(ENDPOINT);
+
+  export const socket = io();
 
 function Room(props) {
   const [roomID, setRoomID] = useState('');
@@ -13,7 +16,6 @@ function Room(props) {
   const [nullTeam, setNullTeam] = useState([]);
   const [onTeam, setOnTeam] = useState(false);
   const [roomData, setRoomData] = useState({});
-
   const history = useHistory();
 
   const organizeUsers = users => {
