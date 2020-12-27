@@ -11,6 +11,7 @@ export default function TextInput (props) {
       marginBottom: 24,
       color: `${MUD_BROWN}`,
       fontSize: '16px',
+      ...props.style,
     }
   }
 
