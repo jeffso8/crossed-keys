@@ -8,7 +8,7 @@
     "build": "babel src -d dist/",
     "start-dev": "nodemon --exec babel-node src/index.js",
     "start": "yarn build && node dist/index.js",
-    "heroku-postbuild": "cd client && yarn install && yarn start",
+    "heroku-postbuild": "cd client && yarn install && yarn build",
     "restart": "rimraf dist && npm run start",
     "dev": "nodemon --exec npm run restart"
   },
