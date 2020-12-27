@@ -1,12 +1,7 @@
 import React, { useState, useEffect} from "react";
-// import socketIOClient from "socket.io-client";
-import io from 'socket.io-client';
-
 import { useHistory } from 'react-router-dom';
-// const ENDPOINT = "http://127.0.0.1:3001";
-// export const socket = socketIOClient(ENDPOINT);
-
-  export const socket = io();
+import socket from '../../socket';
+import User from './User';
 
 function Room(props) {
   const [roomID, setRoomID] = useState('');
@@ -77,7 +72,7 @@ function Room(props) {
       gridGap: "250px",
       gridTemplateColumns:"1fr 1fr 1fr"
     }
-  }
+  };
 
   useEffect(() => {
     setRoomID(props.match.params.roomID);
@@ -114,19 +109,23 @@ function Room(props) {
           <h1>Red Team</h1>
           {redTeam.map((user, i) => {
             return (
-            <li key={i}>
-              {user.userID}
-              {roomData.redSpy === user && <div>spymaster</div>}
-            </li>);
+              <User
+                i={i}
+                name={user.userID}
+                isSpyMaster={roomData.redSpy === user}
+              />
+          );
           })}
         </div>
       <div className="mainColumn" style={style.columnStyle}>
         <h1>Pick Team</h1>
         {nullTeam.map((user, i) => {
           return (
-          <li key={i}>
-            {user.userID}
-          </li>
+            <User
+              i={i}
+              name={user.userID}
+              isSpyMaster={roomData.redSpy === user}
+            />
           );
         })}
       </div>
@@ -134,10 +133,12 @@ function Room(props) {
         <h1>Blue Team</h1>
         {blueTeam.map((user, i) => {
           return (
-            <li key={i}>
-              {user.userID}
-              {roomData.blueSpy === user && <div>spymaster</div>}
-            </li>);
+            <User
+              i={i}
+              name={user.userID}
+              isSpyMaster={roomData.blueSpy === user}
+            />
+            );
           })}
       </div>
       </div>

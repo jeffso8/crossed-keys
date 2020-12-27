@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Card from './Card';
-import {socket} from './Room';
+import socket from '../socket';
 import {MUD_BROWN, NEUTRAL_CARD, BLUE_CARD, RED_CARD, BOMB_CARD} from '../constants';
 
 function Game(props) {

@@ -72,6 +72,10 @@ html, body, div#root {
   transform: rotate(90deg);
 }
 
+*:focus {
+  outline: none;
+}
+
 
 
 
