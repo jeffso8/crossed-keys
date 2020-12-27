@@ -1,21 +1,41 @@
-import express from 'express';
-import http from 'http';
+"use strict";
 
-const socketIO = require('socket.io');
+var _express = _interopRequireDefault(require("express"));
 
-import cors from 'cors';
-import bodyParser from 'body-parser';
-import puppeteer from 'puppeteer';
-import Rooms from '../models/Rooms';
-import database from '../database/index';
-import "regenerator-runtime/runtime.js";
-import { getWords, newUser } from './utils';
-const port = process.env.PORT || 3001;
-let app = express();
-let server = http.Server(app);
-let io = socketIO(server);
-app.use(cors());
-app.use(express.json());
+var _http = _interopRequireDefault(require("http"));
+
+var _cors = _interopRequireDefault(require("cors"));
+
+var _bodyParser = _interopRequireDefault(require("body-parser"));
+
+var _puppeteer = _interopRequireDefault(require("puppeteer"));
+
+var _Rooms = _interopRequireDefault(require("../models/Rooms"));
+
+var _index = _interopRequireDefault(require("../database/index"));
+
+require("regenerator-runtime/runtime.js");
+
+var _utils = require("./utils");
+
+var _path = _interopRequireDefault(require("path"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+var socketIO = require('socket.io');
+
+var port = process.env.PORT || 3001;
+var app = (0, _express["default"])();
+
+var server = _http["default"].Server(app);
+
+var io = socketIO(server);
+app.use((0, _cors["default"])());
+app.use(_express["default"].json());
 app.options("/*", function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
@@ -50,9 +70,9 @@ app.all('*', function (req, res, next) {
  }
 */
 
-let roomMap = {};
-const colors = ["red", "red", "red", "red", "red", "red", "red", "red", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "white", "white", "white", "white", "white", "white", "white", "white", "black"];
-const clicked = new Array(25).fill(false); // let server = app.listen(port, () =>
+var roomMap = {};
+var colors = ["red", "red", "red", "red", "red", "red", "red", "red", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "white", "white", "white", "white", "white", "white", "white", "white", "black"];
+var clicked = new Array(25).fill(false); // let server = app.listen(port, () =>
 //   console.log(`🔥 server is listening on port ${port}!`)
 // );
 // const server = http.createServer(app);
@@ -63,31 +83,56 @@ const clicked = new Array(25).fill(false); // let server = app.listen(port, () =
 // });
 // let io = socketIO(server);
 
-let interval;
-app.get('/', (req, res) => {
-  res.send('Hello World!');
-});
-app.get('/words', async (req, res) => {
-  const words = await getWords();
-  return res.send(words);
-});
-app.post('/create-room', (req, res) => {
+var interval; // Serve any static files
+
+app.use(_express["default"]["static"](_path["default"].join(__dirname, 'client/build'))); // app.get('/', (req, res) => {
+//   res.send('Hello World!');
+// });
+
+app.get('/words', /*#__PURE__*/function () {
+  var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(req, res) {
+    var words;
+    return regeneratorRuntime.wrap(function _callee$(_context) {
+      while (1) {
+        switch (_context.prev = _context.next) {
+          case 0:
+            _context.next = 2;
+            return (0, _utils.getWords)();
+
+          case 2:
+            words = _context.sent;
+            return _context.abrupt("return", res.send(words));
+
+          case 4:
+          case "end":
+            return _context.stop();
+        }
+      }
+    }, _callee);
+  }));
+
+  return function (_x, _x2) {
+    return _ref.apply(this, arguments);
+  };
+}());
+app.post('/create-room', function (req, res) {
   return res.status(200).json({
     success: true,
-    redirectUrl: `/${req.body.roomName}`
+    redirectUrl: "/".concat(req.body.roomName)
   });
 });
-io.on('connection', socket => {
+io.on('connection', function (socket) {
   console.log('connection', socket);
-  socket.on('joinRoom', data => {
+  socket.on('joinRoom', function (data) {
     console.log('data', data); //data is an object with the roomID and the user that joined the room
 
     socket.join(data.roomID);
-    Rooms.findOne({
+
+    _Rooms["default"].findOne({
       roomID: data.roomID
     }, function (err, res) {
       if (!res) {
-        const newRoom = new Rooms({
+        var newRoom = new _Rooms["default"]({
           roomID: data.roomID,
           users: [{
             userID: data.userID,
@@ -98,9 +143,11 @@ io.on('connection', socket => {
         });
         if (err) return;
         newRoom.save();
-        io.in(data.roomID).emit('updateTeams', newRoom);
+        io["in"](data.roomID).emit('updateTeams', newRoom);
       } else {
-        const foundUser = res.users.find(user => user.userID === data.userID);
+        var foundUser = res.users.find(function (user) {
+          return user.userID === data.userID;
+        });
 
         if (!foundUser) {
           res.users.push({
@@ -114,7 +161,7 @@ io.on('connection', socket => {
         if (err) return;
         res.markModified('users');
         res.save();
-        io.in(data.roomID).emit('updateTeams', res);
+        io["in"](data.roomID).emit('updateTeams', res);
       }
     });
   }); // if (!roomMap[data.roomID]) {
@@ -136,33 +183,36 @@ io.on('connection', socket => {
   // }
   // io.in(data.roomID).emit('updateTeams', roomMap[data.roomID]);
 
-  socket.on('message', data => {
+  socket.on('message', function (data) {
     //gives data as an object {message: what message was sent, roomId: has the given room id}
-    socket.nsp.in(data.roomID).emit('newMessage', data.message);
+    socket.nsp["in"](data.roomID).emit('newMessage', data.message);
   });
-  socket.on('getWords', data => {
-    Rooms.findOneAndUpdate({
+  socket.on('getWords', function (data) {
+    _Rooms["default"].findOneAndUpdate({
       roomID: data.roomID
     }, {
       $set: {
-        words: getWords()
+        words: (0, _utils.getWords)()
       }
     }, {
       upsert: true,
-      new: true
+      "new": true
     }, function (err, result) {
       if (err) return;
-      socket.nsp.in(data.roomID).emit('sendWords', result);
+      socket.nsp["in"](data.roomID).emit('sendWords', result);
     }); // if (!roomMap[data.roomID].words) {
     //   roomMap[data.roomID].words = getWords();
     // };
     // socket.nsp.in(data.roomID).emit('sendWords', roomMap[data.roomID].words);
+
   });
-  socket.on('setRedTeam', data => {
-    Rooms.findOne({
+  socket.on('setRedTeam', function (data) {
+    _Rooms["default"].findOne({
       roomID: data.roomID
     }, function (err, res) {
-      const foundUser = res.users.find(user => user.userID === data.userID);
+      var foundUser = res.users.find(function (user) {
+        return user.userID === data.userID;
+      });
       foundUser.team = 'RED';
       foundUser.role = null;
 
@@ -172,14 +222,16 @@ io.on('connection', socket => {
 
       res.markModified('users', 'blueSpy');
       res.save();
-      socket.nsp.in(data.roomID).emit('updateTeams', res);
+      socket.nsp["in"](data.roomID).emit('updateTeams', res);
     });
   });
-  socket.on('setBlueTeam', data => {
-    Rooms.findOne({
+  socket.on('setBlueTeam', function (data) {
+    _Rooms["default"].findOne({
       roomID: data.roomID
     }, function (err, res) {
-      const foundUser = res.users.find(user => user.userID === data.userID);
+      var foundUser = res.users.find(function (user) {
+        return user.userID === data.userID;
+      });
       foundUser.team = 'BLUE';
       foundUser.role = null;
 
@@ -189,14 +241,16 @@ io.on('connection', socket => {
 
       res.markModified('users', 'redSpy');
       res.save();
-      socket.nsp.in(data.roomID).emit('updateTeams', res);
+      socket.nsp["in"](data.roomID).emit('updateTeams', res);
     });
   });
-  socket.on('claimSpyMaster', data => {
-    Rooms.findOne({
+  socket.on('claimSpyMaster', function (data) {
+    _Rooms["default"].findOne({
       roomID: data.roomID
     }, function (err, res) {
-      const foundUser = res.users.find(user => user.userID === data.userID);
+      var foundUser = res.users.find(function (user) {
+        return user.userID === data.userID;
+      });
       foundUser.role = "MASTER";
 
       if (foundUser.team === "RED") {
@@ -207,16 +261,17 @@ io.on('connection', socket => {
 
       res.markModified('users', 'redSpy', 'blueSpy');
       res.save();
-      socket.nsp.in(data.roomID).emit('updateTeams', res);
+      socket.nsp["in"](data.roomID).emit('updateTeams', res);
     });
   });
-  socket.on('joinGame', data => {
+  socket.on('joinGame', function (data) {
     socket.join(data.roomID);
-    Rooms.findOne({
+
+    _Rooms["default"].findOne({
       roomID: data.roomID
     }, function (err, res) {
       if (err) return;
-      socket.nsp.in(data.roomID).emit('refreshGame', res);
+      socket.nsp["in"](data.roomID).emit('refreshGame', res);
     }); // {
     //   isRedTurn: roomMap[data.roomID]['isRedTurn'],
     //   roomID: data.roomID,
@@ -227,9 +282,10 @@ io.on('connection', socket => {
     //   redSpy: roomMap[data.roomID]['redSpy'],
     //   blueSpy: roomMap[data.roomID]['blueSpy']
     // });
+
   });
-  socket.on('redScoreChange', data => {
-    Rooms.findOneAndUpdate({
+  socket.on('redScoreChange', function (data) {
+    _Rooms["default"].findOneAndUpdate({
       roomID: data.roomID
     }, {
       $set: {
@@ -237,14 +293,14 @@ io.on('connection', socket => {
       }
     }, {
       upsert: true,
-      new: true
+      "new": true
     }, function (err, res) {
       if (err) return;
-      socket.nsp.in(data.roomID).emit('updateRedScore', res.redScore);
+      socket.nsp["in"](data.roomID).emit('updateRedScore', res.redScore);
     });
   });
-  socket.on('blueScoreChange', data => {
-    Rooms.findOneAndUpdate({
+  socket.on('blueScoreChange', function (data) {
+    _Rooms["default"].findOneAndUpdate({
       roomID: data.roomID
     }, {
       $set: {
@@ -252,14 +308,14 @@ io.on('connection', socket => {
       }
     }, {
       upsert: true,
-      new: true
+      "new": true
     }, function (err, res) {
       if (err) return;
-      socket.nsp.in(data.roomID).emit('updateBlueScore', res.blueScore);
+      socket.nsp["in"](data.roomID).emit('updateBlueScore', res.blueScore);
     });
   });
-  socket.on('flipCard', data => {
-    Rooms.findOne({
+  socket.on('flipCard', function (data) {
+    _Rooms["default"].findOne({
       roomID: data.roomID
     }, function (err, res) {
       if (err) return;
@@ -267,37 +323,68 @@ io.on('connection', socket => {
       res.isRedTurn = data.isRedTurn;
       res.markModified('clicked', 'isRedTurn');
       res.save();
-      socket.nsp.in(data.roomID).emit('updateFlipCard', {
+      socket.nsp["in"](data.roomID).emit('updateFlipCard', {
         isRedTurn: res.isRedTurn,
         clicked: res.clicked
       });
     });
   });
-  socket.on('hostStartGame', async data => {
-    const colorSorted = colors.sort(() => Math.random() - 0.5);
-    const words = await getWords();
-    console.log('words', words);
-    const clicked = new Array(25).fill(false);
-    Rooms.findOneAndUpdate({
-      roomID: data.roomID
-    }, {
-      $set: {
-        colors: colorSorted,
-        words: words,
-        clicked: clicked,
-        isRedTurn: true
-      }
-    }, {
-      upsert: true,
-      new: true
-    }, function (err, res) {
-      if (err) return;
-      console.log("hoststartres", res);
-      socket.nsp.in(data.roomID).emit('startGame', res);
-    });
-  });
-  socket.on("disconnect", () => {
+  socket.on('hostStartGame', /*#__PURE__*/function () {
+    var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(data) {
+      var colorSorted, words, clicked;
+      return regeneratorRuntime.wrap(function _callee2$(_context2) {
+        while (1) {
+          switch (_context2.prev = _context2.next) {
+            case 0:
+              colorSorted = colors.sort(function () {
+                return Math.random() - 0.5;
+              });
+              _context2.next = 3;
+              return (0, _utils.getWords)();
+
+            case 3:
+              words = _context2.sent;
+              console.log('words', words);
+              clicked = new Array(25).fill(false);
+
+              _Rooms["default"].findOneAndUpdate({
+                roomID: data.roomID
+              }, {
+                $set: {
+                  colors: colorSorted,
+                  words: words,
+                  clicked: clicked,
+                  isRedTurn: true
+                }
+              }, {
+                upsert: true,
+                "new": true
+              }, function (err, res) {
+                if (err) return;
+                console.log("hoststartres", res);
+                socket.nsp["in"](data.roomID).emit('startGame', res);
+              });
+
+            case 7:
+            case "end":
+              return _context2.stop();
+          }
+        }
+      }, _callee2);
+    }));
+
+    return function (_x3) {
+      return _ref2.apply(this, arguments);
+    };
+  }());
+  socket.on("disconnect", function () {
     clearInterval(interval);
   });
+}); // Handle React routing, return all requests to React app
+
+app.get('/*', function (req, res) {
+  res.sendFile(_path["default"].join(__dirname, 'client/build', 'index.html'));
 });
-server.listen(port, () => console.log(`Example app listening on port ${port}!`));
+server.listen(port, function () {
+  return console.log("Example app listening on port ".concat(port, "!"));
+});

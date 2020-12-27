@@ -3,11 +3,12 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "babel src -d dist/",
-    "start": "nodemon --exec babel-node src/index.js",
+    "start-dev": "nodemon --exec babel-node src/index.js",
+    "start": "yarn build && node dist/index.js",
+    "heroku-postbuild": "cd client && yarn install && yarn start",
     "restart": "rimraf dist && npm run start",
     "dev": "nodemon --exec npm run restart"
   },
