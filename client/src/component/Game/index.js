@@ -3,6 +3,8 @@ import Card from './Card';
 import ScoreBanner from './ScoreBanner';
 import socket from '../../socket';
 import {NEUTRAL_CARD, BLUE_CARD, RED_CARD, BOMB_CARD} from '../../constants';
+import Modal from "../Modal";
+import { relative } from "path";
 
 function Game(props) {
   const [roomID, setRoomID] = useState("");
@@ -16,21 +18,7 @@ function Game(props) {
   const [blueScore, setBlueScore] = useState(0);
   const [redTurn, setRedTurn] = useState(props.location.state.data.isRedTurn);
   const [clicked, setClicked] = useState([]);
-
-
-  const organizeUsers = users => {
-    const emptyRedTeam = [];
-    const emptyBlueTeam = [];
-    Object.keys(users).forEach((userID) => {
-        if(users[userID].team === "RED") {
-          emptyRedTeam.push(userID);
-        } else {
-          emptyBlueTeam.push(userID);
-        }
-    });
-    setRedTeam(emptyRedTeam);
-    setBlueTeam(emptyBlueTeam);
-  };
+  const [showModal, setShowModal] = useState(true);
 
 
   useEffect(() => {
@@ -38,10 +26,12 @@ function Game(props) {
     socket.emit('joinGame', {roomID: props.location.state.data.roomID});
 
     socket.on('refreshGame', (data) => {
+      console.log('data', data);
       setClicked(data.clicked);
       setColor(data.colors);
       setBlueScore(data.blueScore);
-      setRedScore(data.redScore);
+      setRedScore(data.redScore);       
+      console.log('refreshusers', users);
     });
 
     socket.on('updateRedScore', (data) => {
@@ -62,12 +52,14 @@ function Game(props) {
     });
 
     setRoomID(props.location.state.data.roomID);
+    const newUsers = [...props.location.state.data.users];
     setUsers(props.location.state.data.users);
-    organizeUsers(props.location.state.data.users);
+    console.log('usereffect', users);
+    // organizeUsers(props.location.state.data.users);
     setWords(props.location.state.data.words);
     setUser(props.location.state.data.users.find(user => user.userID === props.location.state.userID));
     setRedTurn(props.location.state.data.isRedTurn);
-  }, []);
+  }, [users, words, redTurn, props.location.state]);
 
 
   const handleRedScoreChange = (event) => {
@@ -103,6 +95,16 @@ function Game(props) {
         <button onClick={() => handleTurnClick(!redTurn)}>End Turn</button>
       )
     }
+  };
+
+  const handleModalHover = () => {
+    if (showModal) {
+      return (
+        <div style={{display: 'flex', width: '100%', height: '100%',justifyContent: 'center'}}>
+          <Modal users={users} show={showModal} roomID={roomID}></Modal>
+        </div>
+      )
+    };
   };
 
   const rowColor1 = colors.slice(0,5);
@@ -169,7 +171,6 @@ function Game(props) {
             setBlueScore={handleBlueScoreChange}
             rotate={randDeg}
             redTurn={redTurn}
-            // handleRedTurn={handleRedTurn}
           />
         )
       }
@@ -195,6 +196,8 @@ function Game(props) {
       <div>
        {renderEndTurn()}
       </div>
+      <button style={{position:'absolute', top:'93%', right: '20px'}}onMouseEnter={() => setShowModal(true)} onMouseLeave={()=> setShowModal(false)}>Show Modal</button>
+      {handleModalHover()}
     </>
   );
 };

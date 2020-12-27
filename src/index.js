@@ -78,6 +78,16 @@ app.post('/create-room', (req, res) => {
   });
 });
 
+app.get('/game-stats', function(req,res){
+  Rooms.findOne({roomID: req.roomID}, function(err, foundRoom) {
+    if (!err) {
+      res.send(foundRoom);
+    } else {
+      console.log(err);
+    }
+    });
+  });
+
 io.on('connection', (socket) => {
   socket.on('joinRoom', (data) => {
     console.log('data', data);
