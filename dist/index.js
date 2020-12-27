@@ -36,6 +36,7 @@ var server = _http["default"].Server(app);
 var io = socketIO(server);
 app.use((0, _cors["default"])());
 app.use(_express["default"].json());
+app.use(_express["default"]["static"](_path["default"].join(__dirname, '../client/build')));
 app.options("/*", function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
@@ -83,9 +84,7 @@ var clicked = new Array(25).fill(false); // let server = app.listen(port, () =>
 // });
 // let io = socketIO(server);
 
-var interval; // Serve any static files
-
-app.use(_express["default"]["static"](_path["default"].join(__dirname, 'client/build'))); // app.get('/', (req, res) => {
+var interval; // app.get('/', (req, res) => {
 //   res.send('Hello World!');
 // });
 
@@ -383,7 +382,7 @@ io.on('connection', function (socket) {
 }); // Handle React routing, return all requests to React app
 
 app.get('/*', function (req, res) {
-  res.sendFile(_path["default"].join(__dirname, 'client/build', 'index.html'));
+  res.sendFile(_path["default"].join(__dirname, '../client/build', 'index.html'));
 });
 server.listen(port, function () {
   return console.log("Example app listening on port ".concat(port, "!"));
