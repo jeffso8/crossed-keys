@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {BOMB_CARD, CAMEL, MAIZE, BLUE_CARD, RED_CARD} from '../constants';
+import {BOMB_CARD, CAMEL, MAIZE, BLUE_CARD, RED_CARD} from '../../constants';
 
 function Card(props) {
   const [visible, setVisible] = useState(props.clicked);

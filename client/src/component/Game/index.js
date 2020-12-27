@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Card from '../Card';
+import Card from './Card';
 import ScoreBanner from './ScoreBanner';
 import socket from '../../socket';
 import {NEUTRAL_CARD, BLUE_CARD, RED_CARD, BOMB_CARD} from '../../constants';
