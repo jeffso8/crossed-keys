@@ -291,6 +291,11 @@ io.on('connection', function (socket) {
       });
     });
   });
+  socket.on('updateTurn', function (data) {
+    socket.nsp["in"](data.roomID).emit('redTurn', {
+      redTurn: data.redTurn
+    });
+  });
   socket.on('hostStartGame', /*#__PURE__*/function () {
     var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(data) {
       var colorSorted, words, clicked;

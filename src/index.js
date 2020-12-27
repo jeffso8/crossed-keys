@@ -202,8 +202,19 @@ io.on('connection', (socket) => {
       res.markModified('clicked', 'isRedTurn');
       res.save();
       socket.nsp.in(data.roomID).emit('updateFlipCard', {isRedTurn: res.isRedTurn, clicked: res.clicked});
+    });
   });
-});
+
+  socket.on('updateTurn', (data) => {
+    Rooms.findOne({roomID: data.roomID}, function(err, res) {
+      if (err) return;
+      res.isRedTurn = data.redTurn;
+      res.markModified('isRedTurn');
+      res.save();
+      socket.nsp.in(data.roomID).emit('redTurn', {redTurn: res.isRedTurn});
+    });
+  });
+
 
   socket.on('hostStartGame', async (data) => {
     const colorSorted = colors.sort(() => Math.random() - 0.5);

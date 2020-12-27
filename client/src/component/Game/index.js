@@ -48,6 +48,10 @@ function Game(props) {
       setRedScore(data.redScore);
     });
 
+    socket.on('redTurn', (data) => {
+      setRedTurn(data.redTurn);
+    });
+
     socket.on('updateBlueScore', (data) => {
       setBlueScore(data.blueScore);
     });
@@ -80,13 +84,26 @@ function Game(props) {
     socket.emit('blueScoreChange', {roomID, blueScore: newBlueScore})
   }
 
-  const handleRedTurn = (event) => {
-    socket.emit('updateTurn', {roomID, redTurn: event})
-  }
+  // const handleRedTurn = (event) => {
+  //   socket.emit('updateTurn', {roomID, redTurn: event})
+  // }
 
   const handleCardClick = (index, turn) => {
     socket.emit('flipCard', {roomID, index, isRedTurn: turn})
   }
+
+  const handleTurnClick = (turn) => {
+    console.log("handleturnClick", turn);
+    socket.emit('updateTurn', {roomID, redTurn: turn})
+  }
+
+  const renderEndTurn = () => {
+    if ((user.team === 'RED' && redTurn) || (user.team === 'BLUE' && !redTurn)) {
+      return (
+        <button onClick={() => handleTurnClick(!redTurn)}>End Turn</button>
+      )
+    }
+  };
 
   const rowColor1 = colors.slice(0,5);
   const rowColor2 = colors.slice(5,10);
@@ -152,7 +169,7 @@ function Game(props) {
             setBlueScore={handleBlueScoreChange}
             rotate={randDeg}
             redTurn={redTurn}
-            handleRedTurn={handleRedTurn}
+            // handleRedTurn={handleRedTurn}
           />
         )
       }
@@ -174,6 +191,9 @@ function Game(props) {
         {renderColumns(rowColor3, wordsColumn3, 2, 'Column3')}
         {renderColumns(rowColor4, wordsColumn4, 3, 'Column4')}
         {renderColumns(rowColor5, wordsColumn5, 4, 'Column5')}
+      </div>
+      <div>
+       {renderEndTurn()}
       </div>
     </>
   );
