@@ -39,6 +39,8 @@ function Game(props) {
     socket.on('refreshGame', (data) => {
       setClicked(data.clicked);
       setColor(data.colors);
+      setBlueScore(data.blueScore);
+      setRedScore(data.redScore);
     });
 
     socket.on('updateRedScore', (data) => {
@@ -65,12 +67,16 @@ function Game(props) {
 
   const handleRedScoreChange = (event) => {
     setRedScore(event);
-    socket.emit('redScoreChange', {roomID, gameScore: redScore + 1})
+    console.log("Game - RedScoreChange", redScore);
+    let newRedScore = redScore + 1
+    socket.emit('redScoreChange', {roomID, redScore: newRedScore})
   }
 
   const handleBlueScoreChange = (event) => {
     setBlueScore(event)
-    socket.emit('blueScoreChange', {roomID, gameScore: blueScore + 1})
+    console.log("Game - BlueScoreChange", blueScore);
+    let newBlueScore = blueScore + 1
+    socket.emit('blueScoreChange', {roomID, blueScore: newBlueScore})
   }
 
   const handleRedTurn = (event) => {

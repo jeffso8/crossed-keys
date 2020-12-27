@@ -1,7 +1,5 @@
 import express from 'express';
 import http from 'http';
-const socketIO = require('socket.io');
-
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import puppeteer from 'puppeteer';
@@ -10,7 +8,10 @@ import database from '../database/index';
 import "regenerator-runtime/runtime.js";
 import {getWords, newUser} from './utils';
 import path from 'path';
+
+const socketIO = require('socket.io');
 const port = process.env.PORT || 3001;
+
 let app = express();
 let server = http.Server(app);
 let io = socketIO(server);
@@ -55,24 +56,10 @@ app.all('*', function(req, res, next) {
   }
  }
 */
-let roomMap = {};
 
 const colors = ["red", "red", "red", "red", "red", "red", "red", "red", "blue", "blue", "blue", "blue",
 "blue", "blue", "blue", "blue", "white", "white", "white", "white", "white", "white", "white", "white", "black"];
 
-const clicked = new Array(25).fill(false);
-
-// let server = app.listen(port, () =>
-//   console.log(`🔥 server is listening on port ${port}!`)
-// );
-// const server = http.createServer(app);
-// let port = process.env.PORT || 3000;
-
-// let io = socketIO(server, {
-//   cors: true,
-//   origins:['http://127.0.0.1:3000'],
-// });
-// let io = socketIO(server);
 let interval;
 
 // app.get('/', (req, res) => {
@@ -92,7 +79,6 @@ app.post('/create-room', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-  console.log('connection', socket);
   socket.on('joinRoom', (data) => {
     console.log('data', data);
     //data is an object with the roomID and the user that joined the room
@@ -129,25 +115,6 @@ io.on('connection', (socket) => {
     });
   });
 
-    // if (!roomMap[data.roomID]) {
-    //   // Create new room with new user
-    //   roomMap[data.roomID] = {users:
-    //     newUser(data.userID, true)
-    //   };
-    // } else {
-    //   // adding new users to the room
-    //   let users = roomMap[data.roomID]['users'];
-    //   if (!users[data.userID]) {
-    //     const newUserObj = newUser(data.userID);
-    //     let updatedUsers = {
-    //       ...users,
-    //       ...newUserObj,
-    //     };
-    //     roomMap[data.roomID]['users'] = updatedUsers;
-    //   }
-    // }
-    // io.in(data.roomID).emit('updateTeams', roomMap[data.roomID]);
-
   socket.on('message', (data) => {
     //gives data as an object {message: what message was sent, roomId: has the given room id}
     socket.nsp.in(data.roomID).emit('newMessage', data.message);
@@ -158,10 +125,6 @@ io.on('connection', (socket) => {
       if (err) return;
       socket.nsp.in(data.roomID).emit('sendWords', result);
       })
-    // if (!roomMap[data.roomID].words) {
-    //   roomMap[data.roomID].words = getWords();
-    // };
-    // socket.nsp.in(data.roomID).emit('sendWords', roomMap[data.roomID].words);
   });
 
   socket.on('setRedTeam', (data) => {
@@ -213,29 +176,21 @@ io.on('connection', (socket) => {
       if (err) return;
       socket.nsp.in(data.roomID).emit('refreshGame', res);
     })
-      // {
-      //   isRedTurn: roomMap[data.roomID]['isRedTurn'],
-      //   roomID: data.roomID,
-      //   users: roomMap[data.roomID]['users'],
-      //   clicked: roomMap[data.roomID]['clicked'],
-      //   colors: roomMap[data.roomID]['colors'],
-      //   words: roomMap[data.roomID]['words'],
-      //   redSpy: roomMap[data.roomID]['redSpy'],
-      //   blueSpy: roomMap[data.roomID]['blueSpy']
-      // });
   });
 
   socket.on('redScoreChange', (data) => {
-    Rooms.findOneAndUpdate({roomID: data.roomID}, {$set : {redScore: data.gameScore}}, {upsert: true, new: true}, function(err, res) {
+    console.log("server - handleRed", data.redScore);
+    Rooms.findOneAndUpdate({roomID: data.roomID}, {$set : {redScore: data.redScore}}, {upsert: true, new: true}, function(err, res) {
       if (err) return;
-      socket.nsp.in(data.roomID).emit('updateRedScore', res.redScore)
+      socket.nsp.in(data.roomID).emit('updateRedScore', {redScore: res.redScore});
     });
   });
 
   socket.on('blueScoreChange', (data) => {
-    Rooms.findOneAndUpdate({roomID: data.roomID}, {$set : {blueScore: data.gameScore}}, {upsert: true, new: true}, function(err, res) {
+    console.log("server - handleBlue", data.blueScore);
+    Rooms.findOneAndUpdate({roomID: data.roomID}, {$set : {blueScore: data.blueScore}}, {upsert: true, new: true}, function(err, res) {
       if (err) return;
-      socket.nsp.in(data.roomID).emit('updateBlueScore', res.blueScore)
+      socket.nsp.in(data.roomID).emit('updateBlueScore', {blueScore: res.blueScore});
     });
   });
 
@@ -256,7 +211,7 @@ io.on('connection', (socket) => {
     console.log('words', words);
     const clicked = new Array(25).fill(false);
 
-    Rooms.findOneAndUpdate({roomID: data.roomID}, {$set : {colors: colorSorted, words: words, clicked: clicked, isRedTurn: true}},
+    Rooms.findOneAndUpdate({roomID: data.roomID}, {$set : {colors: colorSorted, words: words, clicked: clicked, isRedTurn: true, redScore: 0, blueScore: 0}},
       {upsert:true, new:true}, function(err, res) {
         if (err) return;
         console.log("hoststartres", res);
