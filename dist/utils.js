@@ -30,7 +30,9 @@ function _getWords() {
             _context.prev = 0;
             URL = 'https://www.randomlists.com/nouns?dup=false&qty=25';
             _context.next = 4;
-            return _puppeteer["default"].launch();
+            return _puppeteer["default"].launch({
+              args: ['--no-sandbox', '--disable-setuid-sandbox']
+            });
 
           case 4:
             browser = _context.sent;
