@@ -2,6 +2,7 @@ import React, { useState, useEffect} from "react";
 import { useHistory } from 'react-router-dom';
 import socket from '../../socket';
 import User from './User';
+import {organizeUsers} from '../shared/utils';
 
 function Room(props) {
   const [roomID, setRoomID] = useState('');
@@ -12,25 +13,6 @@ function Room(props) {
   const [onTeam, setOnTeam] = useState(false);
   const [roomData, setRoomData] = useState({});
   const history = useHistory();
-
-  const organizeUsers = users => {
-    const emptyRedTeam = [];
-    const emptyBlueTeam = [];
-    const emptyNullTeam = [];
-
-    users.forEach((user) => {
-        if(user.team === "RED") {
-          emptyRedTeam.push(user);
-        } else if (user.team === "BLUE") {
-          emptyBlueTeam.push(user);
-        } else {
-          emptyNullTeam.push(user);
-        }
-    });
-    setRedTeam(emptyRedTeam);
-    setBlueTeam(emptyBlueTeam);
-    setNullTeam(emptyNullTeam);
-  };
 
   const handleSetRedTeamClick = event => {
     setOnTeam(true);
@@ -86,7 +68,10 @@ function Room(props) {
 
   useEffect(() => {
     socket.on('updateTeams', (data) => {
-      organizeUsers(data.users);
+      const {redTeam, blueTeam, nullTeam } = organizeUsers(data.users);
+      setRedTeam(redTeam);
+      setBlueTeam(blueTeam);
+      setNullTeam(nullTeam);
       setUser(data.users.find((user) => user.userID === props.location.state.userID));
       setRoomData(data);
     });
