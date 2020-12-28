@@ -8,8 +8,6 @@ var _cors = _interopRequireDefault(require("cors"));
 
 var _bodyParser = _interopRequireDefault(require("body-parser"));
 
-var _puppeteer = _interopRequireDefault(require("puppeteer"));
-
 var _Rooms = _interopRequireDefault(require("../models/Rooms"));
 
 var _index = _interopRequireDefault(require("../database/index"));
@@ -106,6 +104,17 @@ app.post('/create-room', function (req, res) {
   return res.status(200).json({
     success: true,
     redirectUrl: "/".concat(req.body.roomName)
+  });
+});
+app.get('/game-stats', function (req, res) {
+  _Rooms["default"].findOne({
+    roomID: req.roomID
+  }, function (err, foundRoom) {
+    if (!err) {
+      res.send(foundRoom);
+    } else {
+      console.log(err);
+    }
   });
 });
 io.on('connection', function (socket) {
@@ -304,56 +313,33 @@ io.on('connection', function (socket) {
       });
     });
   });
-  socket.on('hostStartGame', /*#__PURE__*/function () {
-    var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(data) {
-      var colorSorted, words, clicked;
-      return regeneratorRuntime.wrap(function _callee2$(_context2) {
-        while (1) {
-          switch (_context2.prev = _context2.next) {
-            case 0:
-              colorSorted = colors.sort(function () {
-                return Math.random() - 0.5;
-              });
-              _context2.next = 3;
-              return (0, _utils.getWords)();
+  socket.on('hostStartGame', function (data) {
+    var colorSorted = colors.sort(function () {
+      return Math.random() - 0.5;
+    });
+    var words = (0, _utils.getWords)();
+    var clicked = new Array(25).fill(false);
 
-            case 3:
-              words = _context2.sent;
-              console.log('words', words);
-              clicked = new Array(25).fill(false);
-
-              _Rooms["default"].findOneAndUpdate({
-                roomID: data.roomID
-              }, {
-                $set: {
-                  colors: colorSorted,
-                  words: words,
-                  clicked: clicked,
-                  isRedTurn: true,
-                  redScore: 0,
-                  blueScore: 0
-                }
-              }, {
-                upsert: true,
-                "new": true
-              }, function (err, res) {
-                if (err) return;
-                console.log("hoststartres", res);
-                socket.nsp["in"](data.roomID).emit('startGame', res);
-              });
-
-            case 7:
-            case "end":
-              return _context2.stop();
-          }
-        }
-      }, _callee2);
-    }));
-
-    return function (_x3) {
-      return _ref2.apply(this, arguments);
-    };
-  }());
+    _Rooms["default"].findOneAndUpdate({
+      roomID: data.roomID
+    }, {
+      $set: {
+        colors: colorSorted,
+        words: words,
+        clicked: clicked,
+        isRedTurn: true,
+        redScore: 0,
+        blueScore: 0
+      }
+    }, {
+      upsert: true,
+      "new": true
+    }, function (err, res) {
+      if (err) return;
+      console.log("hoststartres", res);
+      socket.nsp["in"](data.roomID).emit('startGame', res);
+    });
+  });
   socket.on("disconnect", function () {
     clearInterval(interval);
   });

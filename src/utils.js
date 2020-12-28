@@ -1,27 +1,29 @@
-import puppeteer from 'puppeteer';
+var fs = require("fs");
 
-export async function getWords() {
-	try {
-		const URL = 'https://www.randomlists.com/nouns?dup=false&qty=25';
-		const browser = await puppeteer.launch({
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-      ],
-    });
-		const page = await browser.newPage();
+export function shuffle(array) {
+  var currentIndex = array.length, temporaryValue, randomIndex;
 
-    await page.goto(URL);
-    return await page.evaluate(() => {
-      const words = Array.from(document.querySelectorAll('span.rand_large'));
-      return words.map(word => {
-        return word.innerText;
-      })
-    });
-		await browser.close()
-	} catch (error) {
-		console.error(error)
-	}
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    // And swap it with the current element.
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+
+  return array;
+}
+
+export function getWords() {
+  const text = fs.readFileSync(__dirname + '/WORDS.txt', "utf-8");
+  const words = text.split("\n");
+  const shuffledArray = shuffle(words);
+  return shuffledArray.splice(0,25);
 }
 
 export const newUser = (userID, isHost = false) => {

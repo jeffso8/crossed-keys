@@ -2,7 +2,6 @@ import express from 'express';
 import http from 'http';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import puppeteer from 'puppeteer';
 import Rooms from '../models/Rooms';
 import database from '../database/index';
 import "regenerator-runtime/runtime.js";
@@ -226,10 +225,9 @@ io.on('connection', (socket) => {
   });
 
 
-  socket.on('hostStartGame', async (data) => {
+  socket.on('hostStartGame', (data) => {
     const colorSorted = colors.sort(() => Math.random() - 0.5);
-    const words = await getWords();
-    console.log('words', words);
+    const words = getWords();
     const clicked = new Array(25).fill(false);
 
     Rooms.findOneAndUpdate({roomID: data.roomID}, {$set : {colors: colorSorted, words: words, clicked: clicked, isRedTurn: true, redScore: 0, blueScore: 0}},
