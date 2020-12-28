@@ -97,6 +97,7 @@ io.on('connection', (socket) => {
         const newRoom = new Rooms(
           {
             roomID: data.roomID,
+            totalGameScore: [0,0],
             users: [{
               userID: data.userID,
               team: null,
@@ -188,18 +189,40 @@ io.on('connection', (socket) => {
   });
 
   socket.on('redScoreChange', (data) => {
-    console.log("server - handleRed", data.redScore);
-    Rooms.findOneAndUpdate({roomID: data.roomID}, {$set : {redScore: data.redScore}}, {upsert: true, new: true}, function(err, res) {
+    Rooms.findOne({roomID: data.roomID}, function(err, res) {
       if (err) return;
-      socket.nsp.in(data.roomID).emit('updateRedScore', {redScore: res.redScore});
+      res.redScore = data.redScore;
+      if (res.redScore === 0) {
+        const totalGameScore = res.totalGameScore;
+        res.totalGameScore = [totalGameScore[0] + 1, totalGameScore[1]];
+        res.gameOver = true;
+        res.markModified('totalGameScore', 'gameOver', 'redScore');
+        res.save();
+        socket.nsp.in(data.roomID).emit('gameOver', {gameScore: res.totalGameScore, gameOver: res.gameOver, redScore: res.redScore, blueScore: res.blueScore});
+      } else {
+        res.markModified('redScore');
+        res.save();
+        socket.nsp.in(data.roomID).emit('updateRedScore', {redScore: res.redScore});
+      }
     });
   });
 
   socket.on('blueScoreChange', (data) => {
-    console.log("server - handleBlue", data.blueScore);
-    Rooms.findOneAndUpdate({roomID: data.roomID}, {$set : {blueScore: data.blueScore}}, {upsert: true, new: true}, function(err, res) {
+    Rooms.findOne({roomID: data.roomID}, function(err, res) {
       if (err) return;
+      res.blueScore =  data.blueScore;
+      if (res.blueScore === 0) {
+        const totalGameScore = res.totalGameScore;
+        res.totalGameScore = [totalGameScore[0], totalGameScore[1] + 1];
+        res.gameOver = true;
+        res.markModified('totalGameScore', 'gameOver', 'blueScore');
+        res.save();
+        socket.nsp.in(data.roomID).emit('gameOver', {gameScore: res.totalGameScore, gameOver: res.gameOver, redScore: res.redScore, blueScore: res.blueScore});
+      } else {
+      res.markModified('blueScore');
+      res.save();
       socket.nsp.in(data.roomID).emit('updateBlueScore', {blueScore: res.blueScore});
+      }
     });
   });
 
@@ -224,16 +247,33 @@ io.on('connection', (socket) => {
     });
   });
 
+  socket.on('bombClicked', (data) => {
+    Rooms.findOne({roomID: data.roomID}, function(err, res) {
+      if (err) return;
+      if (data.bombClicked === "RED") {
+        res.totalGameScore = [res.totalGameScore[0] + 1, res.totalGameScore[1]];
+        res.gameOver = true;
+        res.markModified('totalGameScore', 'gameOver');
+        res.save();
+        socket.nsp.in(data.roomID).emit('gameOver', {gameScore: res.totalGameScore, gameOver: res.gameOver});
+      } else {
+        res.totalGameScore = [res.totalGameScore[0], res.totalGameScore[1] + 1];
+        res.gameOver = true;
+        res.markModified('totalGameScore', 'gameOver', 'blueScore');
+        res.save();
+        socket.nsp.in(data.roomID).emit('gameOver', {gameScore: res.totalGameScore, gameOver: res.gameOver});
+      }
+    });
+  });
 
   socket.on('hostStartGame', (data) => {
     const colorSorted = colors.sort(() => Math.random() - 0.5);
     const words = getWords();
     const clicked = new Array(25).fill(false);
 
-    Rooms.findOneAndUpdate({roomID: data.roomID}, {$set : {colors: colorSorted, words: words, clicked: clicked, isRedTurn: true, redScore: 0, blueScore: 0}},
+    Rooms.findOneAndUpdate({roomID: data.roomID}, {$set : {colors: colorSorted, words: words, clicked: clicked, isRedTurn: true, redScore: 8, blueScore: 8, gameOver: false}},
       {upsert:true, new:true}, function(err, res) {
         if (err) return;
-        console.log("hoststartres", res);
         socket.nsp.in(data.roomID).emit('startGame', res);
     })
   });

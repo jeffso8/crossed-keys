@@ -29,13 +29,16 @@ const RoomSchema = new mongoose.Schema({
       words: Array,
       clicked: Array,
       isRedTurn: Boolean,
+      gameOver: Boolean,
       totalGameScore: Array,
       redScore: Number,
       blueScore: Number, 
       redSpy: String, 
       blueSpy: String,
       users: Array
-    })
+    },{
+      versionKey: false
+    });
 
 const Rooms = mongoose.model("Rooms", RoomSchema);
 module.exports = Rooms;
