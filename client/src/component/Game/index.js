@@ -4,12 +4,10 @@ import ScoreBanner from './ScoreBanner';
 import socket from '../../socket';
 import {NEUTRAL_CARD, BLUE_CARD, RED_CARD, BOMB_CARD} from '../../constants';
 import Modal from "../Modal";
-import { relative } from "path";
+import {Responsive} from '../shared/responsive';
 
 function Game(props) {
   const [roomID, setRoomID] = useState("");
-  const [redTeam, setRedTeam] = useState([]);
-  const [blueTeam, setBlueTeam] = useState([]);
   const [colors, setColor] = useState([]);
   const [words, setWords] = useState([]);
   const [users, setUsers] = useState([]);
@@ -18,19 +16,17 @@ function Game(props) {
   const [blueScore, setBlueScore] = useState(0);
   const [redTurn, setRedTurn] = useState(props.location.state.data.isRedTurn);
   const [clicked, setClicked] = useState([]);
-  const [showModal, setShowModal] = useState(true);
-
+  const [showModal, setShowModal] = useState(false);
+  const {isMobile} = Responsive();
 
   useEffect(() => {
-    console.log('props', props.location.state);
     socket.emit('joinGame', {roomID: props.location.state.data.roomID});
 
     socket.on('refreshGame', (data) => {
-      console.log('data', data);
       setClicked(data.clicked);
       setColor(data.colors);
       setBlueScore(data.blueScore);
-      setRedScore(data.redScore);       
+      setRedScore(data.redScore);
       console.log('refreshusers', users);
     });
 
@@ -52,10 +48,7 @@ function Game(props) {
     });
 
     setRoomID(props.location.state.data.roomID);
-    const newUsers = [...props.location.state.data.users];
     setUsers(props.location.state.data.users);
-    console.log('usereffect', users);
-    // organizeUsers(props.location.state.data.users);
     setWords(props.location.state.data.words);
     setUser(props.location.state.data.users.find(user => user.userID === props.location.state.userID));
     setRedTurn(props.location.state.data.isRedTurn);
@@ -75,10 +68,6 @@ function Game(props) {
     let newBlueScore = blueScore + 1
     socket.emit('blueScoreChange', {roomID, blueScore: newBlueScore})
   }
-
-  // const handleRedTurn = (event) => {
-  //   socket.emit('updateTurn', {roomID, redTurn: event})
-  // }
 
   const handleCardClick = (index, turn) => {
     socket.emit('flipCard', {roomID, index, isRedTurn: turn})
@@ -134,11 +123,28 @@ function Game(props) {
     }
   };
 
+  const mobileCardStyle = {
+    container : {
+      display:"grid",
+      position: "fixed",
+      left:"50%",
+      top:"35%",
+      transform:"translate(-50%, -50%)",
+      gridGap: 2,
+      gridTemplateColumns:"1fr 1fr 1fr 1fr 1fr"
+    },
+    columns : {
+      margin: 0,
+    }
+  }
+
+  const style = isMobile ? mobileCardStyle : cardStyle;
+
 
 
   const renderColumns = (rowColor, wordColumn, clickedColumn, className) => {
     return (
-    <div className={className} style={cardStyle.columns}>
+    <div className={className} style={style.columns}>
       {rowColor.map((color, index) => {
         let realColor = '';
         if (color === 'blue') {
@@ -180,25 +186,25 @@ function Game(props) {
   };
 
   return (
-    <>
+    <div style={{width: '100%', height: '100%'}}>
       <ScoreBanner isRedTeam={true} score={redScore} />
       <div style={{textAlign: 'center'}}>
         <h2>{redTurn ? 'Red\'s Turn' : 'Blue\'s Turn'}</h2>
       </div>
       <ScoreBanner isRedTeam={false} score={blueScore} />
-      <div style={cardStyle.container}>
+      <div style={style.container}>
         {renderColumns(rowColor1, wordsColumn1, 0, 'Column1')}
         {renderColumns(rowColor2, wordsColumn2, 1, 'Column2')}
         {renderColumns(rowColor3, wordsColumn3, 2, 'Column3')}
         {renderColumns(rowColor4, wordsColumn4, 3, 'Column4')}
         {renderColumns(rowColor5, wordsColumn5, 4, 'Column5')}
       </div>
-      <div>
+      <div style={{position:'absolute', top:'90%', right: '20px'}}>
        {renderEndTurn()}
       </div>
-      <button style={{position:'absolute', top:'93%', right: '20px'}}onMouseEnter={() => setShowModal(true)} onMouseLeave={()=> setShowModal(false)}>Show Modal</button>
+      <button style={{position:'absolute', top:'93%', right: '20px'}} onMouseEnter={() => setShowModal(true)} onMouseLeave={()=> setShowModal(false)}>Show Modal</button>
       {handleModalHover()}
-    </>
+    </div>
   );
 };
 

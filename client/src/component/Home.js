@@ -7,7 +7,6 @@ import ReactArcText from 'react-arc-text-fix';
 import {Responsive} from './shared/responsive';
 
 function Home() {
-
   const style = {
     container: {
       height: '100%',
@@ -67,6 +66,14 @@ function Home() {
       textAlign: 'center',
       marginTop: '100px',
     },
+    title: {
+      color: MUD_BROWN,
+      fontSize: 48,
+      fontWeight: 900,
+      marginBottom: 20,
+      textAlign: 'center',
+      letterSpacing: 4,
+    }
   }
 
   const [username, setUsername] = useState('');
@@ -75,7 +82,6 @@ function Home() {
   const { isMobile } = Responsive();
   const handleUsernameChange = (event)  => setUsername(event.target.value);
   const handleRoomNameChange = (event)  => setRoomName(event.target.value);
-  console.log('isTabletOrMobile', isMobile);
   const createRoom = () => {
     axios.post('/create-room', {username, roomName}).then(
       res => {
@@ -105,7 +111,7 @@ function Home() {
             CARD GAME
             </div>
           </div>
-          <div style={style.title}>
+          <div style={isMobile ? mobileStyle.title : style.title}>
             PROTECT YA CODE
           </div>
 
@@ -116,7 +122,7 @@ function Home() {
             value={username}
             placeholder={'Username'}
             onChange={handleUsernameChange}
-            style={isMobile ? {width: '100%', margin: '5px'} : {}}
+            style={isMobile ? {width: '90%', margin: '5px'} : {}}
           />
         </div>
         <div>
@@ -124,7 +130,7 @@ function Home() {
               value={roomName}
               placeholder={'Room Name'}
               onChange={handleRoomNameChange}
-              style={isMobile ? {width: '100%', margin: '5px'} : {}}
+              style={isMobile ? {width: '90%', margin: '5px'} : {}}
           />
         </div>
         <button style={style.button} onClick={createRoom}>SUBMIT</button>

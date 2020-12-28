@@ -3,6 +3,7 @@ import { useHistory } from 'react-router-dom';
 import socket from '../../socket';
 import User from './User';
 import {organizeUsers} from '../shared/utils';
+import {Responsive} from '../shared/responsive';
 
 function Room(props) {
   const [roomID, setRoomID] = useState('');
@@ -13,6 +14,7 @@ function Room(props) {
   const [onTeam, setOnTeam] = useState(false);
   const [roomData, setRoomData] = useState({});
   const history = useHistory();
+  const {isMobile} = Responsive();
 
   const handleSetRedTeamClick = event => {
     setOnTeam(true);
@@ -32,7 +34,7 @@ function Room(props) {
     socket.emit('hostStartGame', {roomID});
   };
 
-  const style = {
+  const webStyle = {
     columnStyle:{
       margin:"50px",
       height:"auto",
@@ -52,6 +54,24 @@ function Room(props) {
       left:"25%",
       bottom:"10%",
       gridGap: "250px",
+      gridTemplateColumns:"1fr 1fr 1fr"
+    }
+  };
+
+  const mobileStyle = {
+    containerStyle:{
+      display:"grid",
+      width: '100%',
+      position: "absolute",
+      gridTemplateColumns:"1fr 1fr 1fr"
+    },
+    columnStyle:{
+      height:"auto",
+    },
+    teamButton:{
+      display:"grid",
+      position: "absolute",
+      bottom:"10%",
       gridTemplateColumns:"1fr 1fr 1fr"
     }
   };
@@ -86,12 +106,13 @@ function Room(props) {
     return true;
   };
 
+  const style = isMobile ? mobileStyle : webStyle;
   return (
-    <>
+    <div style={{width: '100%', height: '100%'}}>
       <h1>Current Room: {roomID}</h1>
       <div className="teamChooseContainer" style={style.containerStyle}>
         <div className="redColumn" style={style.columnStyle}>
-          <h1>Red Team</h1>
+          <div>Red Team</div>
           {redTeam.map((user, i) => {
             return (
               <User
@@ -102,30 +123,30 @@ function Room(props) {
           );
           })}
         </div>
-      <div className="mainColumn" style={style.columnStyle}>
-        <h1>Pick Team</h1>
-        {nullTeam.map((user, i) => {
-          return (
-            <User
-              i={i}
-              name={user.userID}
-              isSpyMaster={roomData.redSpy === user}
-            />
-          );
-        })}
-      </div>
-      <div className="blueColumn" style={style.columnStyle}>
-        <h1>Blue Team</h1>
-        {blueTeam.map((user, i) => {
-          return (
-            <User
-              i={i}
-              name={user.userID}
-              isSpyMaster={roomData.blueSpy === user}
-            />
+        <div className="mainColumn" style={style.columnStyle}>
+          <div>Pick Team</div>
+          {nullTeam.map((user, i) => {
+            return (
+              <User
+                i={i}
+                name={user.userID}
+                isSpyMaster={roomData.redSpy === user}
+              />
             );
           })}
-      </div>
+        </div>
+        <div className="blueColumn" style={style.columnStyle}>
+          <div>Blue Team</div>
+          {blueTeam.map((user, i) => {
+            return (
+              <User
+                i={i}
+                name={user.userID}
+                isSpyMaster={roomData.blueSpy === user}
+              />
+              );
+            })}
+        </div>
       </div>
       <div className="pickTeamButtons" style={style.teamButton}>
       <button value="red" onClick={handleSetRedTeamClick}>Red Team</button>
@@ -139,7 +160,7 @@ function Room(props) {
         : null
       }
       </div>
-    </>
+    </div>
   );
 }
 
