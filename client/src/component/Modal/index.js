@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {organizeUsers} from '../shared/utils';
-import {NEUTRAL_CARD, BLUE_CARD, RED_CARD} from '../../constants';
+import {BLUE_CARD, RED_CARD} from '../../constants';
 
 
 function Modal(props) {
@@ -67,7 +67,7 @@ function Modal(props) {
       </div>
       <div className="middleColumn" style={style.columns}>
        <div style={{position:"relative", top:"35%", fontSize:"30px", fontWeight:"880"}}>
-         0-1
+         <h1>{props.gameScore[0]} - {props.gameScore[1]}</h1>
        </div>
       </div>
       <div className="blueTeam" style={style.columns}>

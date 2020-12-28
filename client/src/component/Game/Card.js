@@ -74,25 +74,27 @@ function Card(props) {
 
       if(props.color === BOMB_CARD) {
         console.log('GAME OVER');
+        props.bombClicked(props.user.team);
+        console.log("bombclicked", props.user.team);
       }
 
       if (redTurn) {
         if (props.color === RED_CARD) {
-          props.setRedScore(props.redScore + 1);
+          props.setRedScore(props.redScore - 1);
           props.handleCardClick(props.idx, true);
         } else {
           if (props.color === BLUE_CARD) {
-            props.setBlueScore(props.blueScore + 1);
+            props.setBlueScore(props.blueScore - 1);
           }
           props.handleCardClick(props.idx, false);
         }
       } else {
         if (BLUE_CARD === props.color) {
-          props.setBlueScore(props.blueScore + 1);
+          props.setBlueScore(props.blueScore - 1);
           props.handleCardClick(props.idx, false);
         } else {
           if (props.color === RED_CARD) {
-            props.setRedScore(props.redScore + 1);
+            props.setRedScore(props.redScore - 1);
           }
           props.handleCardClick(props.idx, true);
         }

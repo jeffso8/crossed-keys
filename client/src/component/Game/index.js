@@ -12,11 +12,14 @@ function Game(props) {
   const [words, setWords] = useState([]);
   const [users, setUsers] = useState([]);
   const [user, setUser] = useState({});
-  const [redScore, setRedScore] = useState(0);
-  const [blueScore, setBlueScore] = useState(0);
+  const [redScore, setRedScore] = useState(8);
+  const [blueScore, setBlueScore] = useState(8);
   const [redTurn, setRedTurn] = useState(props.location.state.data.isRedTurn);
   const [clicked, setClicked] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [bombClicked, setBombClicked] = useState("");
+  const [gameScore, setGameScore] = useState(props.location.state.data.totalGameScore);
+  const [gameOver, setGameOver] = useState(props.location.state.data.gameOver);
   const {isMobile} = Responsive();
 
   useEffect(() => {
@@ -27,7 +30,9 @@ function Game(props) {
       setColor(data.colors);
       setBlueScore(data.blueScore);
       setRedScore(data.redScore);
-      console.log('refreshusers', users);
+      setGameScore(data.totalGameScore);
+      setGameOver(data.gameOver);
+      console.log('refreshusers', data);
     });
 
     socket.on('updateRedScore', (data) => {
@@ -39,6 +44,13 @@ function Game(props) {
     });
 
     socket.on('updateBlueScore', (data) => {
+      setBlueScore(data.blueScore);
+    });
+
+    socket.on('gameOver', (data) => {
+      setGameScore(data.gameScore);
+      setGameOver(data.gameOver);
+      setRedScore(data.redScore);
       setBlueScore(data.blueScore);
     });
 
@@ -54,18 +66,16 @@ function Game(props) {
     setRedTurn(props.location.state.data.isRedTurn);
   }, []);
 
-
   const handleRedScoreChange = (event) => {
+    console.log('handleRedScoreChange');
     setRedScore(event);
-    console.log("Game - RedScoreChange", redScore);
-    let newRedScore = redScore + 1
+    let newRedScore = redScore - 1
     socket.emit('redScoreChange', {roomID, redScore: newRedScore})
   }
 
   const handleBlueScoreChange = (event) => {
     setBlueScore(event)
-    console.log("Game - BlueScoreChange", blueScore);
-    let newBlueScore = blueScore + 1
+    let newBlueScore = blueScore - 1
     socket.emit('blueScoreChange', {roomID, blueScore: newBlueScore})
   }
 
@@ -77,23 +87,49 @@ function Game(props) {
     socket.emit('updateTurn', {roomID, redTurn: turn})
   }
 
+  const handleBombClick = (event) => {
+    setBombClicked(event);
+    socket.emit('bombClicked', {roomID, bombClicked: event});
+  };
+
   const renderEndTurn = () => {
     if ((user.team === 'RED' && redTurn) || (user.team === 'BLUE' && !redTurn)) {
       return (
         <button onClick={() => handleTurnClick(!redTurn)}>End Turn</button>
-      )
-    }
+    )}
   };
 
   const handleModalHover = () => {
     if (showModal) {
       return (
-        <div style={{display: 'flex', width: '100%', height: '100%',justifyContent: 'center'}}>
-          <Modal users={users} show={showModal} roomID={roomID}></Modal>
+        <div style={{display: 'flex', width: '100%', height: '100%', justifyContent: 'center'}}>
+          <Modal users={users} show={showModal} roomID={roomID} gameScore={gameScore}></Modal>
+        </div>
+      )};
+  };
+
+  const handleGameOver = () => {
+    if(gameOver)
+      return (
+        <div style={{
+        display: 'flex',
+        top: '5%',
+        width:'100%',
+        height: '100%',
+        justifyContent: 'center'}}>
+          <div style={{width: '600px', height: '500px', backgroundColor: 'white', zIndex: '2', 
+          position: 'relative', top: '10%', textAlign: 'center', borderRadius: '1em', boxShadow: '5px 15px 20px #686963'}}>
+          <div style={{position:'relative', top:'25%', margin:'10px'}}>
+          Game Over:
+          <h1>{gameScore[0]} - {gameScore[1]}</h1>
+          <button>Start Next Game</button>
+          <button>Re-Pick SpyMaster</button>
+          <button>Re-Shuffle Teams</button>
+          </div>
+          </div>
         </div>
       )
     };
-  };
 
   const rowColor1 = colors.slice(0,5);
   const rowColor2 = colors.slice(5,10);
@@ -160,7 +196,8 @@ function Game(props) {
         const randDeg = (Math.random() + 0.1) * (Math.round(Math.random()) ? 1 : -1);
         const isClicked = clicked[index + (clickedColumn * 5)];
 
-        const isDisabled = ((user.team === 'RED' && !redTurn) || (user.team === 'BLUE' && redTurn) || isClicked);
+        const isDisabled = ((user.team === 'RED' && !redTurn) || (user.team === 'BLUE' && redTurn) || isClicked || gameOver);
+        console.log('gameover', gameOver);
         return (
           <Card
             word={wordColumn[index]}
@@ -176,6 +213,7 @@ function Game(props) {
             setBlueScore={handleBlueScoreChange}
             rotate={randDeg}
             redTurn={redTurn}
+            bombClicked={handleBombClick}
           />
         )
       }
@@ -203,8 +241,9 @@ function Game(props) {
       </div>
       <button style={{position:'absolute', top:'93%', right: '20px'}} onMouseEnter={() => setShowModal(true)} onMouseLeave={()=> setShowModal(false)}>Show Modal</button>
       {handleModalHover()}
-    </div>
-  );
-};
+      {handleGameOver()}
+      </div>
+    );
+  };
 
 export default Game;

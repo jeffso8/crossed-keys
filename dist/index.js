@@ -108,6 +108,17 @@ app.post('/create-room', function (req, res) {
     redirectUrl: "/".concat(req.body.roomName)
   });
 });
+app.get('/game-stats', function (req, res) {
+  _Rooms["default"].findOne({
+    roomID: req.roomID
+  }, function (err, foundRoom) {
+    if (!err) {
+      res.send(foundRoom);
+    } else {
+      console.log(err);
+    }
+  });
+});
 io.on('connection', function (socket) {
   socket.on('joinRoom', function (data) {
     console.log('data', data); //data is an object with the roomID and the user that joined the room
@@ -120,6 +131,7 @@ io.on('connection', function (socket) {
       if (!res) {
         var newRoom = new _Rooms["default"]({
           roomID: data.roomID,
+          totalGameScore: [0, 0],
           users: [{
             userID: data.userID,
             team: null,
@@ -330,8 +342,8 @@ io.on('connection', function (socket) {
                   words: words,
                   clicked: clicked,
                   isRedTurn: true,
-                  redScore: 0,
-                  blueScore: 0
+                  redScore: 8,
+                  blueScore: 8
                 }
               }, {
                 upsert: true,
