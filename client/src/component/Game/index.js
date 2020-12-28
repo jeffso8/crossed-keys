@@ -52,7 +52,7 @@ function Game(props) {
     setWords(props.location.state.data.words);
     setUser(props.location.state.data.users.find(user => user.userID === props.location.state.userID));
     setRedTurn(props.location.state.data.isRedTurn);
-  }, [users, words, redTurn, props.location.state]);
+  }, []);
 
 
   const handleRedScoreChange = (event) => {
@@ -74,7 +74,6 @@ function Game(props) {
   }
 
   const handleTurnClick = (turn) => {
-    console.log("handleturnClick", turn);
     socket.emit('updateTurn', {roomID, redTurn: turn})
   }
 
