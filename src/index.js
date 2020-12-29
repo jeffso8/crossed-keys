@@ -168,6 +168,10 @@ io.on('connection', (socket) => {
   socket.on('claimSpyMaster', (data) => {
     Rooms.findOne({roomID: data.roomID}, function(err, res) {
       const foundUser = res.users.find(user => user.userID === data.userID);
+      const prevUser = res.users.find(user => user.role === "MASTER");
+      if (prevUser) {
+        prevUser.role = null;
+      }
       foundUser.role = "MASTER";
       if (foundUser.team === "RED") {
         res.redSpy = foundUser.userID;
@@ -252,13 +256,13 @@ io.on('connection', (socket) => {
     Rooms.findOne({roomID: data.roomID}, function(err, res) {
       if (err) return;
       if (data.bombClicked === "RED") {
-        res.totalGameScore = [res.totalGameScore[0] + 1, res.totalGameScore[1]];
+        res.totalGameScore = [res.totalGameScore[0], res.totalGameScore[1] + 1];
         res.gameOver = true;
         res.markModified('totalGameScore', 'gameOver');
         res.save();
         socket.nsp.in(data.roomID).emit('gameOver', {gameScore: res.totalGameScore, gameOver: res.gameOver});
       } else {
-        res.totalGameScore = [res.totalGameScore[0], res.totalGameScore[1] + 1];
+        res.totalGameScore = [res.totalGameScore[0] + 1, res.totalGameScore[1]];
         res.gameOver = true;
         res.markModified('totalGameScore', 'gameOver', 'blueScore');
         res.save();
@@ -277,6 +281,18 @@ io.on('connection', (socket) => {
         if (err) return;
         socket.nsp.in(data.roomID).emit('startGame', res);
     })
+  });
+
+  socket.on('nextGameTrigger', (data) => {
+    const colorSorted = colors.sort(() => Math.random() - 0.5);
+    const words = getWords();
+    const clicked = new Array(25).fill(false);
+    
+    Rooms.findOneAndUpdate({roomID: data.roomID}, {$set : {colors: colorSorted, words: words, clicked: clicked, isRedTurn: true, redScore: 8, blueScore: 8, gameOver: false}},
+      {upsert:true, new:true}, function(err, res) {
+        if (err) return;
+        socket.nsp.in(data.roomID).emit('nextGameStart', res);
+    });
   });
 
   socket.on("disconnect", () => {

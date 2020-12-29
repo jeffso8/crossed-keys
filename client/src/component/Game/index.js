@@ -20,12 +20,30 @@ function Game(props) {
   useEffect(() => {
     socket.emit('joinGame', {roomID: props.location.state.data.roomID});
 
+    setRoomID(props.location.state.data.roomID);
+    setUsers(props.location.state.data.users);
+    setUser(props.location.state.data.users.find(user => user.userID === props.location.state.userID));
+    setRedTurn(props.location.state.data.isRedTurn);
+
+
     socket.on('refreshGame', (data) => {
       setBlueScore(data.blueScore);
       setRedScore(data.redScore);
       setGameScore(data.totalGameScore);
       setGameOver(data.gameOver);
       setRedTurn(data.isRedTurn);
+      console.log('refreshusers', data);
+    });
+
+    socket.on('updateTeams', (data) => {
+      console.log("dataUpdateTeam", data);
+      console.log("user on updateTeams", props.location.state.userID);
+      setUsers(data.users);
+      setUser(data.users.find((user) => user.userID === props.location.state.userID));
+    });
+
+    socket.on('updateRedScore', (data) => {
+      setRedScore(data.redScore);
     });
 
     socket.on('redTurn', (data) => {
@@ -54,6 +72,16 @@ function Game(props) {
     setRoomID(props.location.state.data.roomID);
     setUsers(props.location.state.data.users);
     setUser(props.location.state.data.users.find(user => user.userID === props.location.state.userID));
+    
+    socket.on('nextGameStart', (data) => {
+      console.log("nextGameStart", data);
+      setGameScore(data.totalGameScore);
+      setGameOver(data.gameOver);
+      setRedScore(data.redScore);
+      setBlueScore(data.blueScore);
+      setRedTurn(data.isRedTurn);
+    });
+
   }, []);
 
   const handleRedScoreChange = (score) => {
@@ -97,7 +125,7 @@ function Game(props) {
       </div>
       <button style={{position:'absolute', top:'93%', right: '20px'}} onMouseEnter={() => setShowModal(true)} onMouseLeave={()=> setShowModal(false)}>Show Modal</button>
       {showModal ? <GameInfoModal  users={users} show={showModal} roomID={roomID} gameScore={gameScore} /> : null}
-      {gameOver ? <GameOverModal gameScore={gameScore} /> : null}
+      {gameOver ? <GameOverModal gameScore={gameScore} user={user} roomID={roomID} /> : null}
     </div>
   );
 };

@@ -1,5 +1,6 @@
-import React from "react";
+import React, {useState} from "react";
 import Modal from '../shared/Modal';
+import socket from '../../socket';
 
 function GameOverModal(props) {
   const style = {
@@ -9,6 +10,26 @@ function GameOverModal(props) {
       margin:'10px'
     }
   };
+  const {gameScore, roomID, user} = props;
+  const [claimVisible, setClaimVisible] = useState(false);
+
+  const handleNextGame = () => {
+    socket.emit('nextGameTrigger', {roomID});
+  };
+
+  const handleClaimSpyMasterClick = () => {
+    socket.emit('claimSpyMaster', {roomID, userID: user.userID});
+    if(user.team === "RED") {
+      setClaimVisible(false);
+    } else if (user.team === "BLUE") {
+      setClaimVisible(false);
+    }
+  };
+
+  const handleSpyChange = () => {
+    console.log("handleSpyChangeCalled");
+    setClaimVisible(true);
+  };
 
   return(
     <Modal
@@ -17,10 +38,10 @@ function GameOverModal(props) {
       <div>
         <div style={style.content}>
         Game Over:
-        <h1>{props.gameScore[0]} - {props.gameScore[1]}</h1>
-        <button>Start Next Game</button>
-        <button>Re-Pick SpyMaster</button>
-        <button>Re-Shuffle Teams</button>
+        <h1>{gameScore[0]} - {gameScore[1]}</h1>
+        <button onClick={() => handleNextGame()}>Start Next Game</button>
+        <button onClick={() => handleSpyChange()}>Re-Pick SpyMaster</button>
+          {claimVisible ? <button onClick={handleClaimSpyMasterClick}>Claim Spy</button> : null}
         </div>
       </div>
     </Modal>

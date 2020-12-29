@@ -18,7 +18,7 @@ function Card(props) {
       setIsDisabled(true);
       setIsMaster(true);
     }
-  });
+  }, [props.isDisabled, user.role]);
 
   const webStyle = {
     container: {

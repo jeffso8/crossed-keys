@@ -67,6 +67,14 @@ export default function Grid(props) {
     socket.on('updateFlipCard', (data) => {
       setClicked(data.clicked);
     });
+
+        
+    socket.on('nextGameStart', (data) => {
+      console.log("nextGameStart", data);
+      setClicked(data.clicked);
+      setColors(data.colors);
+      setWords(data.words);
+    });
   },[]);
 
   const handleCardClick = (index, turn) => {
