@@ -14,7 +14,7 @@ export default function TextInput (props) {
       textTransform: 'uppercase',
       ...props.style,
     }
-  }
+  };
 
   return (
     <input

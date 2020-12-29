@@ -23,17 +23,17 @@ function Card(props) {
   const webStyle = {
     container: {
       backgroundColor: props.clicked || visible ? props.color : CAMEL,
-      width: 185,
-      height: 90,
-      marginTop: 20,
-      marginBottom: 20,
+      width: 165,
+      height: 80,
+      marginTop: 12,
+      marginBottom: 12,
       display: 'flex',
       justifyContent: 'center',
       transform: `rotate(${props.rotate}deg)`,
-      boxShadow: `0 4px 8px 0 rgba(0,0,0,0.2)`,
+      boxShadow: `0 2px 4px 0 rgba(0,0,0,0.2)`,
     },
     word: {
-      fontSize: 16,
+      fontSize: 14,
       textTransform: 'uppercase',
       letterSpacing: 2,
       fontWeight: 900,
@@ -46,8 +46,8 @@ function Card(props) {
   const mobileStyle = {
     container: {
       backgroundColor: props.clicked || visible ? props.color : CAMEL,
-      width: 70,
-      height: 38,
+      width: 90,
+      height: 46,
       marginTop: 10,
       marginBottom: 10,
       display: 'flex',

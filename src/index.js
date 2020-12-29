@@ -191,6 +191,7 @@ io.on('connection', (socket) => {
   socket.on('redScoreChange', (data) => {
     Rooms.findOne({roomID: data.roomID}, function(err, res) {
       if (err) return;
+      console.log('redScoreChange', data);
       res.redScore = data.redScore;
       if (res.redScore === 0) {
         const totalGameScore = res.totalGameScore;

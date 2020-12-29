@@ -4,6 +4,7 @@ import socket from '../../socket';
 import User from './User';
 import {organizeUsers} from '../shared/utils';
 import {Responsive} from '../shared/responsive';
+import {Button} from '../shared/Button';
 
 function Room(props) {
   const [roomID, setRoomID] = useState('');
@@ -149,14 +150,15 @@ function Room(props) {
         </div>
       </div>
       <div className="pickTeamButtons" style={style.teamButton}>
-      <button value="red" onClick={handleSetRedTeamClick}>Red Team</button>
+      <Button onClick={handleSetRedTeamClick} text={'Red Team'}/>
       {user.isHost ?
-        <button onClick={startGame}>Start Game</button>
+        // <button onClick={startGame}>Start Game</button>
+        <Button onClick={startGame} text={'Start Game'}/>
         : null
       }
-      <button value="blue" onClick={handleSetBlueTeamClick}>Blue Team</button>
+      <Button onClick={handleSetBlueTeamClick} text={'Blue Team'}/>
       {showClaimSpyMaster() ?
-        <button onClick={handleClaimSpyMasterClick}>Claim Spy</button>
+        <Button onClick={handleClaimSpyMasterClick} text={'Claim Spy'}/>
         : null
       }
       </div>

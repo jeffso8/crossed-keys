@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
 import {BEIGE, BROWNISH, MUD_BROWN} from '../constants';
-import TextInput from './shared/input';
+import TextInput from './shared/Input';
 import ReactArcText from 'react-arc-text-fix';
 import {Responsive} from './shared/responsive';
 
@@ -18,16 +18,6 @@ function Home() {
       width: 800,
       alignSelf:'center',
       textAlign: 'center',
-    },
-    box: {
-      alignSelf:'center',
-      border: `1px solid ${MUD_BROWN}`,
-      height: 'min-content',
-      padding: 10,
-    },
-    boxinner: {
-      border: `4px solid ${MUD_BROWN}`,
-      padding: 120,
     },
     by: {
       color: MUD_BROWN,
@@ -64,7 +54,6 @@ function Home() {
       width: '100%',
       alignSelf:'center',
       textAlign: 'center',
-      marginTop: '100px',
     },
     title: {
       color: MUD_BROWN,
@@ -91,8 +80,6 @@ function Home() {
 
   return (
     <div style={style.container}>
-      <div style={isMobile ? {} : style.box}>
-      <div style={isMobile ? {height: '100%'} : style.boxinner}>
       <div class='content' style={isMobile ? mobileStyle.content : style.content}>
         <div style={{marginBottom: '40px'}}>
           <div style={style.by}>
@@ -114,7 +101,6 @@ function Home() {
           <div style={isMobile ? mobileStyle.title : style.title}>
             PROTECT YA CODE
           </div>
-
         </div>
         <div>
           <TextInput
@@ -122,7 +108,7 @@ function Home() {
             value={username}
             placeholder={'Username'}
             onChange={handleUsernameChange}
-            style={isMobile ? {width: '90%', margin: '5px'} : {}}
+            style={isMobile ? {width: '90%'} : {}}
           />
         </div>
         <div>
@@ -130,12 +116,10 @@ function Home() {
               value={roomName}
               placeholder={'Room Name'}
               onChange={handleRoomNameChange}
-              style={isMobile ? {width: '90%', margin: '5px'} : {}}
+              style={isMobile ? {width: '90%'} : {}}
           />
         </div>
         <button style={style.button} onClick={createRoom}>SUBMIT</button>
-      </div>
-      </div>
       </div>
     </div>
   );

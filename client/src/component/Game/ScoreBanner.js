@@ -1,4 +1,4 @@
-import {MUD_BROWN, BLUE_CARD, RED_CARD} from '../../constants';
+import {BLUE_CARD, RED_CARD, MAIZE} from '../../constants';
 import {Responsive} from '../shared/responsive';
 
 export default function ScoreBanner(props) {
@@ -12,13 +12,13 @@ export default function ScoreBanner(props) {
       right: !props.isRedTeam ? '90px' : 'initial',
       zIndex: 1,
       backgroundColor: props.isRedTeam ? RED_CARD : BLUE_CARD,
-      width: '85px',
-      height: '130px',
+      width: '75px',
+      height: '110px',
       clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 50% 70%, 0% 100%)',
     },
     score: {
-      color: MUD_BROWN,
-      fontSize: 40,
+      color: MAIZE,
+      fontSize: 36,
       textAlign: 'center',
       marginTop: 20,
       fontWeight: 900,
@@ -38,7 +38,7 @@ export default function ScoreBanner(props) {
       clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 50% 70%, 0% 100%)',
     },
     score: {
-      color: MUD_BROWN,
+      color: MAIZE,
       fontSize: 30,
       textAlign: 'center',
       marginTop: 20,

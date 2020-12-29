@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import {organizeUsers} from '../shared/utils';
 import {BLUE_CARD, RED_CARD} from '../../constants';
+import Modal from '../shared/Modal';
 
-
-function Modal(props) {
+function GameInfoModal(props) {
   const style = {
     container : {
       width: 600,
-      height: 500, 
+      height: 500,
       backgroundColor: 'white',
       zIndex: 1,
       position: 'relative',
@@ -39,7 +39,7 @@ function Modal(props) {
     setRedTeam(redTeam);
     setBlueTeam(blueTeam);
   }, [props.users]);
-  
+
   const blueTeamColumn = () => {
     return blueTeam.map((user) => {
       return (
@@ -58,25 +58,25 @@ function Modal(props) {
 
   //Currently the score is hard coded, so we need to update that with the total game score stored in the database
   return(
-    <div style={style.container}>
-      <h1>Your Current Room: {props.roomID}</h1>
-    <div style={style.teamContainer}>
-       <div className="redTeam" style={style.columns}> 
-        <h2 style={{color:RED_CARD}}>Red Team</h2>
-       {redTeamColumn()}
+    <Modal
+      title={`Your Current Room: ${props.roomID}`}
+    >
+      <div>
+        <div className="redTeam" style={style.columns}>
+          <div style={{position:"relative", top:"35%", fontSize:"30px", fontWeight:"880"}}>
+            <h1>{props.gameScore[0]} - {props.gameScore[1]}</h1>
+          </div>
+            <h2 style={{color:RED_CARD}}>Red Team</h2>
+            {redTeamColumn()}
+          </div>
+        <div className="middleColumn" style={style.columns} />
+        <div className="blueTeam" style={style.columns}>
+          <h2 style={{color:BLUE_CARD}}>Blue Team</h2>
+          {blueTeamColumn()}
+        </div>
       </div>
-      <div className="middleColumn" style={style.columns}>
-       <div style={{position:"relative", top:"35%", fontSize:"30px", fontWeight:"880"}}>
-         <h1>{props.gameScore[0]} - {props.gameScore[1]}</h1>
-       </div>
-      </div>
-      <div className="blueTeam" style={style.columns}>
-        <h2 style={{color:BLUE_CARD}}>Blue Team</h2>
-        {blueTeamColumn()}
-      </div>
-    </div>
-    </div>
+    </Modal>
   );
 };
 
-export default Modal;
+export default GameInfoModal;
