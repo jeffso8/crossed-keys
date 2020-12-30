@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
 import {BEIGE, BROWNISH, MUD_BROWN} from '../constants';
-import TextInput from './shared/Input';
+import TextInput from './shared/TextInput';
 import ReactArcText from 'react-arc-text-fix';
 import {Responsive} from './shared/responsive';
 
