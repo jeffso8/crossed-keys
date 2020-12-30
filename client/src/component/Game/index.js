@@ -4,6 +4,7 @@ import ScoreBanner from './ScoreBanner';
 import socket from '../../socket';
 import GameInfoModal from './GameInfoModal';
 import GameOverModal from './GameOverModal';
+import Timer from "./Timer";
 
 function Game(props) {
   let [redScore, setRedScore] = useState(8);
@@ -16,6 +17,7 @@ function Game(props) {
   const [showModal, setShowModal] = useState(false);
   const [gameScore, setGameScore] = useState(props.location.state.data.totalGameScore);
   const [gameOver, setGameOver] = useState(props.location.state.data.gameOver);
+  const [timerID, setTimerID] = useState(0);
 
   useEffect(() => {
     socket.emit('joinGame', {roomID: props.location.state.data.roomID});
@@ -68,8 +70,7 @@ function Game(props) {
     });
 
     setRoomID(props.location.state.data.roomID);
-
-    
+ 
     socket.on('nextGameStart', (data) => {
       console.log("nextGameStart", data);
       setGameScore(data.totalGameScore);
@@ -87,12 +88,17 @@ function Game(props) {
     socket.emit('redScoreChange', {roomID, redScore: score})
   }
 
+  const handleRedTurnChange = (bool) => {
+    socket.emit('updateTurn', {roomID, redTurn: bool})
+  }
+
   const handleBlueScoreChange = (score) => {
     socket.emit('blueScoreChange', {roomID, blueScore: score})
   }
 
   const handleTurnClick = (turn) => {
-    socket.emit('updateTurn', {roomID, redTurn: turn})
+    socket.emit('updateTurn', {roomID, redTurn: turn});
+    socket.emit('startTimer', {roomID, redTurn: turn, currentTimer: timerID});
   }
 
   const renderEndTurn = () => {
@@ -106,6 +112,7 @@ function Game(props) {
     <div style={{width: '100%', height: '100%'}}>
       <ScoreBanner isRedTeam={true} score={redScore} />
       <div style={{textAlign: 'center'}}>
+        <Timer redTurn={redTurn} setTimerID={setTimerID}/>
         <h2>{redTurn ? 'Red\'s Turn' : 'Blue\'s Turn'}</h2>
       </div>
       <ScoreBanner isRedTeam={false} score={blueScore} />
@@ -118,6 +125,7 @@ function Game(props) {
         user={user}
         handleRedScoreChange={handleRedScoreChange}
         handleBlueScoreChange={handleBlueScoreChange}
+        timerID={timerID}
       />
       <div style={{position:'absolute', top:'90%', right: '20px'}}>
         {renderEndTurn()}

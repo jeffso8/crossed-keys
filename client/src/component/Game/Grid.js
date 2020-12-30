@@ -84,7 +84,10 @@ export default function Grid(props) {
   },[]);
 
   const handleCardClick = (index, turn) => {
-    socket.emit('flipCard', {roomID, index, isRedTurn: turn})
+    socket.emit('flipCard', {roomID, index, isRedTurn: turn});
+    if (!turn) {
+      socket.emit('startTimer', {roomID, currentTimer: props.timerID});
+    }
   }
 
   const handleBombClick = (event) => {

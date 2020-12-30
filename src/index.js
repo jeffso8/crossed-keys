@@ -7,6 +7,7 @@ import database from '../database/index';
 import "regenerator-runtime/runtime.js";
 import {getWords, newUser} from './utils';
 import path from 'path';
+import { start } from 'repl';
 
 const socketIO = require('socket.io');
 const port = process.env.PORT || 3001;
@@ -271,6 +272,24 @@ io.on('connection', (socket) => {
     });
   });
 
+  socket.on('startTimer', (data) => {
+    if (data.currentTimer) {  
+      console.log('startTimer', data.currentTimer);
+      clearInterval(data.currentTimer);
+    }
+    let time = 180
+    const currentTimer = setInterval(() => {
+      if (time === 0) {
+        
+      }
+      time--;
+      socket.nsp.in(data.roomID).emit('timer', {time:time, currentTimer: Number(currentTimer)});
+    }, 1000);
+  });
+    // res.markModified('isRedTurn');
+    // res.save();
+  // });
+
   socket.on('hostStartGame', (data) => {
     const colorSorted = colors.sort(() => Math.random() - 0.5);
     const words = getWords();
@@ -292,11 +311,11 @@ io.on('connection', (socket) => {
       {upsert:true, new:true}, function(err, res) {
         if (err) return;
         socket.nsp.in(data.roomID).emit('nextGameStart', res);
-    });
+      });
   });
 
   socket.on("disconnect", () => {
-    clearInterval(interval);
+    // clearInterval(interval);
   });
 });
 
