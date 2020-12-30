@@ -99,7 +99,7 @@ function Home() {
             </div>
           </div>
           <div style={isMobile ? mobileStyle.title : style.title}>
-            PROTECT YA CODE
+            CROSSED KEYS
           </div>
         </div>
         <div>
