@@ -14,7 +14,7 @@ function GameOverModal(props) {
   const [claimVisible, setClaimVisible] = useState(false);
 
   const handleNextGame = () => {
-    socket.emit('nextGameTrigger', { roomID });
+    socket.emit('hostStartGame', { roomID });
   };
 
   const handleClaimSpyMasterClick = () => {

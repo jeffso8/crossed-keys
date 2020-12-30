@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
 import {BEIGE, BROWNISH, MUD_BROWN} from '../constants';
@@ -63,7 +63,7 @@ function Home() {
       textAlign: 'center',
       letterSpacing: 4,
     }
-  }
+  };
 
   const [username, setUsername] = useState('');
   const [roomName, setRoomName] = useState('');
@@ -74,21 +74,21 @@ function Home() {
   const createRoom = () => {
     axios.post('/create-room', {username, roomName}).then(
       res => {
-        history.push(res.data.redirectUrl, {userID: username})
+        history.push(res.data.redirectUrl, {userID: username});
       });
   };
 
   return (
     <div style={style.container}>
-      <div class='content' style={isMobile ? mobileStyle.content : style.content}>
+      <div className='content' style={isMobile ? mobileStyle.content : style.content}>
         <div style={{marginBottom: '40px'}}>
           <div style={style.by}>
             <div style={{marginBottom: '4px'}}>
             A
             </div>
             <div style={{fontWeight: 900}}>
-             <ReactArcText
-                text={"CODENAME INSPIRED"}
+              <ReactArcText
+                text={'CODENAME INSPIRED'}
                 direction={1}
                 arc={360}
                 class={''}
@@ -113,10 +113,10 @@ function Home() {
         </div>
         <div>
           <TextInput name="roomName"
-              value={roomName}
-              placeholder={'Room Name'}
-              onChange={handleRoomNameChange}
-              style={isMobile ? {width: '90%'} : {}}
+            value={roomName}
+            placeholder={'Room Name'}
+            onChange={handleRoomNameChange}
+            style={isMobile ? {width: '90%'} : {}}
           />
         </div>
         <button style={style.button} onClick={createRoom}>SUBMIT</button>

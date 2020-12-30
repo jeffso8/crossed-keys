@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BOMB_CARD, CAMEL, MAIZE, BLUE_CARD, RED_CARD } from '../../constants';
 import { Responsive } from '../shared/responsive';
+import socket from '../../socket';
 
 function Card(props) {
   const [visible, setVisible] = useState(props.clicked);
@@ -12,6 +13,7 @@ function Card(props) {
 
   useEffect(() => {
     setIsDisabled(props.isDisabled);
+
     if (props.user.role === 'MASTER') {
       setVisible(true);
       setIsDisabled(true);
@@ -75,27 +77,31 @@ function Card(props) {
       console.log('GAME OVER');
       props.bombClicked(props.user.team);
       console.log('bombclicked', props.user.team);
-    }
-
-    if (redTurn) {
-      if (props.color === RED_CARD) {
-        props.setRedScore(props.redScore - 1);
-        props.handleCardClick(props.idx, true);
-      } else {
-        if (props.color === BLUE_CARD) {
-          props.setBlueScore(props.blueScore - 1);
-        }
-        props.handleCardClick(props.idx, false);
-      }
     } else {
-      if (BLUE_CARD === props.color) {
-        props.setBlueScore(props.blueScore - 1);
-        props.handleCardClick(props.idx, false);
-      } else {
+      if (redTurn) {
         if (props.color === RED_CARD) {
           props.setRedScore(props.redScore - 1);
+          props.handleCardClick(props.idx, true);
+        } else {
+          if (props.color === BLUE_CARD) {
+            props.setBlueScore(props.blueScore - 1);
+            socket.emit('startTimer', {roomID: props.roomID, currentTimer: props.timerID});
+          }
+          props.handleCardClick(props.idx, false);
+          socket.emit('startTimer', {roomID: props.roomID, currentTimer: props.timerID});
         }
-        props.handleCardClick(props.idx, true);
+      } else {
+        if (BLUE_CARD === props.color) {
+          props.setBlueScore(props.blueScore - 1);
+          props.handleCardClick(props.idx, false);
+        } else {
+          if (props.color === RED_CARD) {
+            props.setRedScore(props.redScore - 1);
+            socket.emit('startTimer', {roomID: props.roomID, currentTimer: props.timerID});
+          }
+          props.handleCardClick(props.idx, true);
+          socket.emit('startTimer', {roomID: props.roomID, currentTimer: props.timerID});
+        }
       }
     }
   };

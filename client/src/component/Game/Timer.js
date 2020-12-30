@@ -1,11 +1,9 @@
-import React, { useState, useEffect } from "react";
-import socket from "../../socket";
-import {Responsive} from '../shared/responsive';
+import React, { useState, useEffect } from 'react';
+import socket from '../../socket';
 
 
 function Timer(props) {
-  const {redTurn} = props;
-  const [time, setTime] = useState(180)
+  const [time, setTime] = useState(180);
 
   useEffect(() => {
     socket.on('timer', (data) => {
@@ -13,7 +11,7 @@ function Timer(props) {
       setTime(data.time);
       props.setTimerID(data.currentTimer);
     });
-  }, [])
+  }, []);
   
 
   var seconds = time % 60;

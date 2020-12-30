@@ -1,4 +1,4 @@
-
+import React from 'react';
 import {BROWNISH, MUD_BROWN} from '../../constants';
 
 export function Button (props) {

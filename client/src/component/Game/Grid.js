@@ -18,6 +18,8 @@ export default function Grid(props) {
     handleRedScoreChange,
     handleBlueScoreChange,
     blueScore,
+    timerID,
+    gameScore
   } = props;
 
   const { isMobile } = Responsive();
@@ -92,13 +94,14 @@ export default function Grid(props) {
 
   const handleCardClick = (index, turn) => {
     socket.emit('flipCard', {roomID, index, isRedTurn: turn});
-    if (!turn) {
-      socket.emit('startTimer', {roomID, currentTimer: props.timerID});
-    }
-  }
+  };
 
-  const handleBombClick = (event) => {
-    socket.emit('bombClicked', { roomID, bombClicked: event });
+  const handleBombClick = (team) => {
+    if (team === 'RED') {
+      socket.emit('gameOver', {roomID, gameScore: [gameScore[0], gameScore[1] + 1], gameOver: true, redScore:redScore, blueScore:blueScore, timerID});
+    } else {
+      socket.emit('gameOver', {roomID, gameScore: [gameScore[0] + 1, gameScore[1]], gameOver: true, redScore:redScore, blueScore:blueScore, timerID});
+    }
   };
 
   const renderColumns = (rowColor, wordColumn, clickedColumn, className) => {
@@ -128,6 +131,7 @@ export default function Grid(props) {
             gameOver;
           return (
             <Card
+              roomID={roomID}
               word={wordColumn[index]}
               idx={index + clickedColumn * 5}
               clicked={isClicked}
@@ -142,6 +146,7 @@ export default function Grid(props) {
               rotate={randDeg}
               redTurn={redTurn}
               bombClicked={handleBombClick}
+              timerID={timerID}
             />
           );
         })}
