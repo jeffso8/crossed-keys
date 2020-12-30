@@ -32,7 +32,8 @@ function Room(props) {
   };
 
   const startGame = () => {
-    socket.emit('hostStartGame', { roomID });
+    socket.emit('hostStartGame', {roomID});
+    socket.emit('startTimer', {roomID});
   };
 
   const webStyle = {

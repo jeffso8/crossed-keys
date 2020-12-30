@@ -7,6 +7,7 @@ import database from '../database/index';
 import "regenerator-runtime/runtime.js";
 import {getWords, newUser} from './utils';
 import path from 'path';
+import { start } from 'repl';
 
 const socketIO = require('socket.io');
 const port = process.env.PORT || 3001;
@@ -197,38 +198,40 @@ io.on('connection', (socket) => {
       if (err) return;
       console.log('redScoreChange', data);
       res.redScore = data.redScore;
-      if (res.redScore === 0) {
-        const totalGameScore = res.totalGameScore;
-        res.totalGameScore = [totalGameScore[0] + 1, totalGameScore[1]];
-        res.gameOver = true;
-        res.markModified('totalGameScore', 'gameOver', 'redScore');
-        res.save();
-        socket.nsp.in(data.roomID).emit('gameOver', {gameScore: res.totalGameScore, gameOver: res.gameOver, redScore: res.redScore, blueScore: res.blueScore});
-      } else {
+      // if (res.redScore === 0) {
+      //   const totalGameScore = res.totalGameScore;
+      //   res.totalGameScore = [totalGameScore[0] + 1, totalGameScore[1]];
+      //   res.gameOver = true;
+      //   res.markModified('totalGameScore', 'gameOver', 'redScore');
+      //   res.save();
+      //   socket.nsp.in(data.roomID).emit('gameOver', {gameScore: res.totalGameScore, gameOver: res.gameOver, redScore: res.redScore, blueScore: res.blueScore});
+      // } else {
         res.markModified('redScore');
         res.save();
         socket.nsp.in(data.roomID).emit('updateRedScore', {redScore: res.redScore});
       }
-    });
+    //}
+    );
   });
 
   socket.on('blueScoreChange', (data) => {
     Rooms.findOne({roomID: data.roomID}, function(err, res) {
       if (err) return;
       res.blueScore =  data.blueScore;
-      if (res.blueScore === 0) {
-        const totalGameScore = res.totalGameScore;
-        res.totalGameScore = [totalGameScore[0], totalGameScore[1] + 1];
-        res.gameOver = true;
-        res.markModified('totalGameScore', 'gameOver', 'blueScore');
-        res.save();
-        socket.nsp.in(data.roomID).emit('gameOver', {gameScore: res.totalGameScore, gameOver: res.gameOver, redScore: res.redScore, blueScore: res.blueScore});
-      } else {
+      // if (res.blueScore === 0) {
+      //   const totalGameScore = res.totalGameScore;
+      //   res.totalGameScore = [totalGameScore[0], totalGameScore[1] + 1];
+      //   res.gameOver = true;
+      //   res.markModified('totalGameScore', 'gameOver', 'blueScore');
+      //   res.save();
+      //   socket.nsp.in(data.roomID).emit('gameOver', {gameScore: res.totalGameScore, gameOver: res.gameOver, redScore: res.redScore, blueScore: res.blueScore});
+      // } else {
       res.markModified('blueScore');
       res.save();
       socket.nsp.in(data.roomID).emit('updateBlueScore', {blueScore: res.blueScore});
       }
-    });
+      //}
+    );
   });
 
   socket.on('flipCard', (data) => {
@@ -252,22 +255,60 @@ io.on('connection', (socket) => {
     });
   });
 
-  socket.on('bombClicked', (data) => {
+  // socket.on('bombClicked', (data) => {
+  //   Rooms.findOne({roomID: data.roomID}, function(err, res) {
+  //     if (err) return;
+  //     if (data.bombClicked === "RED") {
+  //       res.totalGameScore = [res.totalGameScore[0], res.totalGameScore[1] + 1];
+  //       res.gameOver = true;
+  //       res.markModified('totalGameScore', 'gameOver');
+  //       res.save();
+  //       socket.nsp.in(data.roomID).emit('gameOver', {gameScore: res.totalGameScore, gameOver: res.gameOver});
+  //     } else {
+  //       res.totalGameScore = [res.totalGameScore[0] + 1, res.totalGameScore[1]];
+  //       res.gameOver = true;
+  //       res.markModified('totalGameScore', 'gameOver', 'blueScore');
+  //       res.save();
+  //       socket.nsp.in(data.roomID).emit('gameOver', {gameScore: res.totalGameScore, gameOver: res.gameOver});
+  //     }
+  //   });
+  // });
+
+  socket.on('startTimer', (data) => {
+    Rooms.findOne({roomID: data.roomID},function(err, res) {
+      if (err) return;
+
+      if (data.currentTimer) {  
+        clearInterval(data.currentTimer);
+      }
+      let time = 180
+      const currentTimer = setInterval(() => {
+        if (time === 0) {
+          res.redTurn = (!res.redTurn);
+          res.markModified('isRedTurn');
+          res.save();
+          socket.nsp.in(data.roomID).emit('redTurn', {redTurn: res.isRedTurn});
+        }
+        time--;
+        socket.nsp.in(data.roomID).emit('timer', {time:time, currentTimer: Number(currentTimer)});
+      }, 1000);
+    });
+  });
+    // res.markModified('isRedTurn');
+    // res.save();
+  // });
+
+  socket.on('gameOver', (data) => {
     Rooms.findOne({roomID: data.roomID}, function(err, res) {
       if (err) return;
-      if (data.bombClicked === "RED") {
-        res.totalGameScore = [res.totalGameScore[0], res.totalGameScore[1] + 1];
-        res.gameOver = true;
-        res.markModified('totalGameScore', 'gameOver');
-        res.save();
-        socket.nsp.in(data.roomID).emit('gameOver', {gameScore: res.totalGameScore, gameOver: res.gameOver});
-      } else {
-        res.totalGameScore = [res.totalGameScore[0] + 1, res.totalGameScore[1]];
-        res.gameOver = true;
-        res.markModified('totalGameScore', 'gameOver', 'blueScore');
-        res.save();
-        socket.nsp.in(data.roomID).emit('gameOver', {gameScore: res.totalGameScore, gameOver: res.gameOver});
-      }
+      clearInterval(data.timerID);
+      res.totalGameScore = data.gameScore;
+      res.gameOver = data.gameOver;
+      res.redScore = data.redScore;
+      res.blueScore = data.blueScore;
+      res.markModified('gameScore', 'gameOver', 'redScore', 'blueScore');
+      res.save();
+      socket.nsp.in(data.roomID).emit('updateGameOver', res);
     });
   });
 
@@ -283,20 +324,9 @@ io.on('connection', (socket) => {
     })
   });
 
-  socket.on('nextGameTrigger', (data) => {
-    const colorSorted = colors.sort(() => Math.random() - 0.5);
-    const words = getWords();
-    const clicked = new Array(25).fill(false);
-    
-    Rooms.findOneAndUpdate({roomID: data.roomID}, {$set : {colors: colorSorted, words: words, clicked: clicked, isRedTurn: true, redScore: 8, blueScore: 8, gameOver: false}},
-      {upsert:true, new:true}, function(err, res) {
-        if (err) return;
-        socket.nsp.in(data.roomID).emit('nextGameStart', res);
-    });
-  });
 
   socket.on("disconnect", () => {
-    clearInterval(interval);
+    // clearInterval(interval);
   });
 });
 
