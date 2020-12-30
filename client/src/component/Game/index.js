@@ -98,7 +98,7 @@ function Game(props) {
 
   const handleTurnClick = (turn) => {
     socket.emit('updateTurn', {roomID, redTurn: turn});
-    socket.emit('startTimer', {roomID, redTurn: turn, currentTimer: timerID});
+    socket.emit('startTimer', {roomID, currentTimer: timerID});
   }
 
   const renderEndTurn = () => {

@@ -1,10 +1,9 @@
-import {BROWNISH} from '../../constants';
-
+import React from 'react';
+import { BROWNISH } from '../../constants';
 
 export default function User(props) {
-
   const style = {
-    name:{
+    name: {
       fontSize: 24,
       margin: 12,
       textTransform: 'uppercase',

@@ -1,6 +1,7 @@
-import {MUD_BROWN} from '../../constants';
+import React from 'react';
+import { MUD_BROWN } from '../../constants';
 
-export default function TextInput (props) {
+export default function TextInput(props) {
   const style = {
     input: {
       background: 'transparent',
@@ -13,20 +14,19 @@ export default function TextInput (props) {
       fontSize: '16px',
       textTransform: 'uppercase',
       ...props.style,
-    }
+    },
   };
 
   return (
     <input
-      class='login-input'
+      className="login-input"
       style={style.input}
-      type='text'
+      type="text"
       placeholder={props.placeholder}
       name={props.name}
       value={props.value}
       onChange={props.onChange}
-      autocomplete="off"
+      autoComplete="off"
     />
   );
-
 }

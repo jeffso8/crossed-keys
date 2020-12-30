@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
-import {BOMB_CARD, CAMEL, MAIZE, BLUE_CARD, RED_CARD} from '../../constants';
-import {Responsive} from '../shared/responsive';
+import React, { useState, useEffect } from 'react';
+import { BOMB_CARD, CAMEL, MAIZE, BLUE_CARD, RED_CARD } from '../../constants';
+import { Responsive } from '../shared/responsive';
 
 function Card(props) {
   const [visible, setVisible] = useState(props.clicked);
@@ -8,15 +8,15 @@ function Card(props) {
   const [isMaster, setIsMaster] = useState(false);
   const redTurn = props.redTurn;
 
-  const {isMobile} = Responsive();
+  const { isMobile } = Responsive();
 
   useEffect(() => {
     setIsDisabled(props.isDisabled);
-    if (props.user.role === "MASTER") {
+    if (props.user.role === 'MASTER') {
       setVisible(true);
       setIsDisabled(true);
       setIsMaster(true);
-    } 
+    }
   }, [props.isDisabled, props.user.role]);
 
   const webStyle = {
@@ -29,7 +29,7 @@ function Card(props) {
       display: 'flex',
       justifyContent: 'center',
       transform: `rotate(${props.rotate}deg)`,
-      boxShadow: `0 2px 4px 0 rgba(0,0,0,0.2)`,
+      boxShadow: '0 2px 4px 0 rgba(0,0,0,0.2)',
     },
     word: {
       fontSize: 14,
@@ -39,8 +39,8 @@ function Card(props) {
       textAlign: 'center',
       alignSelf: 'center',
       color: MAIZE,
-    }
-  }
+    },
+  };
 
   const mobileStyle = {
     container: {
@@ -51,7 +51,7 @@ function Card(props) {
       marginBottom: 10,
       display: 'flex',
       justifyContent: 'center',
-      boxShadow: `0 2px 4px 0 rgba(0,0,0,0.2)`,
+      boxShadow: '0 2px 4px 0 rgba(0,0,0,0.2)',
     },
     word: {
       fontSize: 8,
@@ -61,50 +61,55 @@ function Card(props) {
       textAlign: 'center',
       alignSelf: 'center',
       color: MAIZE,
-    }
-  }
+    },
+  };
 
   const style = isMobile ? mobileStyle : webStyle;
 
   const handleClick = () => {
-      if(isDisabled) {
-        return;
-      }
-
-      if(props.color === BOMB_CARD) {
-        console.log('GAME OVER');
-        props.bombClicked(props.user.team);
-        console.log("bombclicked", props.user.team);
-      }
-
-      if (redTurn) {
-        if (props.color === RED_CARD) {
-          props.setRedScore(props.redScore - 1);
-          props.handleCardClick(props.idx, true);
-        } else {
-          if (props.color === BLUE_CARD) {
-            props.setBlueScore(props.blueScore - 1);
-          }
-          props.handleCardClick(props.idx, false);
-        }
-      } else {
-        if (BLUE_CARD === props.color) {
-          props.setBlueScore(props.blueScore - 1);
-          props.handleCardClick(props.idx, false);
-        } else {
-          if (props.color === RED_CARD) {
-            props.setRedScore(props.redScore - 1);
-          }
-          props.handleCardClick(props.idx, true);
-        }
-      }
+    if (isDisabled) {
+      return;
     }
 
+    if (props.color === BOMB_CARD) {
+      console.log('GAME OVER');
+      props.bombClicked(props.user.team);
+      console.log('bombclicked', props.user.team);
+    }
+
+    if (redTurn) {
+      if (props.color === RED_CARD) {
+        props.setRedScore(props.redScore - 1);
+        props.handleCardClick(props.idx, true);
+      } else {
+        if (props.color === BLUE_CARD) {
+          props.setBlueScore(props.blueScore - 1);
+        }
+        props.handleCardClick(props.idx, false);
+      }
+    } else {
+      if (BLUE_CARD === props.color) {
+        props.setBlueScore(props.blueScore - 1);
+        props.handleCardClick(props.idx, false);
+      } else {
+        if (props.color === RED_CARD) {
+          props.setRedScore(props.redScore - 1);
+        }
+        props.handleCardClick(props.idx, true);
+      }
+    }
+  };
+
   return (
-    <div className="card-container" style={{...style.container, opacity: (isMaster && props.clicked) ? 0.3 : 1}} onClick={handleClick}>
-      <div style={style.word}>
-        {props.word}
-      </div>
+    <div
+      className="card-container"
+      style={{
+        ...style.container,
+        opacity: isMaster && props.clicked ? 0.3 : 1,
+      }}
+      onClick={handleClick}
+    >
+      <div style={style.word}>{props.word}</div>
     </div>
   );
 }
