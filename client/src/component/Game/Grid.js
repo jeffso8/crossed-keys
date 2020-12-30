@@ -75,6 +75,12 @@ export default function Grid(props) {
       setColors(data.colors);
       setWords(data.words);
     });
+
+    socket.on('nextGameStart', (data) => {
+      console.log("nextGameStart", data);
+      setClicked(data.clicked);
+    });
+
   },[]);
 
   const handleCardClick = (index, turn) => {

@@ -34,6 +34,7 @@ function GameOverModal(props) {
   return(
     <Modal
       title={`New Game`}
+
     >
       <div>
         <div style={style.content}>

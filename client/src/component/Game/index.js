@@ -22,7 +22,6 @@ function Game(props) {
 
     setRoomID(props.location.state.data.roomID);
     setUsers(props.location.state.data.users);
-    setUser(props.location.state.data.users.find(user => user.userID === props.location.state.userID));
     setRedTurn(props.location.state.data.isRedTurn);
 
 
@@ -32,12 +31,11 @@ function Game(props) {
       setGameScore(data.totalGameScore);
       setGameOver(data.gameOver);
       setRedTurn(data.isRedTurn);
-      console.log('refreshusers', data);
+      setUsers(data.users);
+      setUser(data.users.find((user) => user.userID === props.location.state.userID));
     });
 
     socket.on('updateTeams', (data) => {
-      console.log("dataUpdateTeam", data);
-      console.log("user on updateTeams", props.location.state.userID);
       setUsers(data.users);
       setUser(data.users.find((user) => user.userID === props.location.state.userID));
     });
@@ -70,8 +68,7 @@ function Game(props) {
     });
 
     setRoomID(props.location.state.data.roomID);
-    setUsers(props.location.state.data.users);
-    setUser(props.location.state.data.users.find(user => user.userID === props.location.state.userID));
+
     
     socket.on('nextGameStart', (data) => {
       console.log("nextGameStart", data);
@@ -80,6 +77,8 @@ function Game(props) {
       setRedScore(data.redScore);
       setBlueScore(data.blueScore);
       setRedTurn(data.isRedTurn);
+      setUsers(data.users);
+      setUser(data.users.find((user) => user.userID === props.location.state.userID));
     });
 
   }, []);

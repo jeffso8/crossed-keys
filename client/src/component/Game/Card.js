@@ -6,19 +6,18 @@ function Card(props) {
   const [visible, setVisible] = useState(props.clicked);
   const [isDisabled, setIsDisabled] = useState(false);
   const [isMaster, setIsMaster] = useState(false);
-  const user = props.user;
   const redTurn = props.redTurn;
 
   const {isMobile} = Responsive();
 
   useEffect(() => {
     setIsDisabled(props.isDisabled);
-    if (user.role === "MASTER") {
+    if (props.user.role === "MASTER") {
       setVisible(true);
       setIsDisabled(true);
       setIsMaster(true);
-    }
-  }, [props.isDisabled, user.role]);
+    } 
+  }, [props.isDisabled, props.user.role]);
 
   const webStyle = {
     container: {
