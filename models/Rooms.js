@@ -32,8 +32,8 @@ const RoomSchema = new mongoose.Schema({
       gameOver: Boolean,
       totalGameScore: Array,
       redScore: Number,
-      blueScore: Number, 
-      redSpy: String, 
+      blueScore: Number,
+      redSpy: String,
       blueSpy: String,
       users: Array
     },{

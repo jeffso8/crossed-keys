@@ -1,8 +1,9 @@
-import {BLUE_CARD, RED_CARD, MAIZE} from '../../constants';
-import {Responsive} from '../shared/responsive';
+import React from 'react';
+import { BLUE_CARD, RED_CARD, MAIZE } from '../../constants';
+import { Responsive } from '../shared/responsive';
 
 export default function ScoreBanner(props) {
-  const {isMobile} = Responsive();
+  const { isMobile } = Responsive();
 
   const webStyle = {
     container: {
@@ -22,7 +23,7 @@ export default function ScoreBanner(props) {
       textAlign: 'center',
       marginTop: 20,
       fontWeight: 900,
-    }
+    },
   };
 
   const mobileStyle = {
@@ -43,7 +44,7 @@ export default function ScoreBanner(props) {
       textAlign: 'center',
       marginTop: 20,
       fontWeight: 900,
-    }
+    },
   };
 
   const style = isMobile ? mobileStyle : webStyle;
