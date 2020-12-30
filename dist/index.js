@@ -18,11 +18,9 @@ var _utils = require("./utils");
 
 var _path = _interopRequireDefault(require("path"));
 
-var _Room = _interopRequireDefault(require("../client/src/component/Room"));
+var _repl = require("repl");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-function _readOnlyError(name) { throw new TypeError("\"" + name + "\" is read-only"); }
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
@@ -266,56 +264,44 @@ io.on('connection', function (socket) {
     }, function (err, res) {
       if (err) return;
       console.log('redScoreChange', data);
-      res.redScore = data.redScore;
+      res.redScore = data.redScore; // if (res.redScore === 0) {
+      //   const totalGameScore = res.totalGameScore;
+      //   res.totalGameScore = [totalGameScore[0] + 1, totalGameScore[1]];
+      //   res.gameOver = true;
+      //   res.markModified('totalGameScore', 'gameOver', 'redScore');
+      //   res.save();
+      //   socket.nsp.in(data.roomID).emit('gameOver', {gameScore: res.totalGameScore, gameOver: res.gameOver, redScore: res.redScore, blueScore: res.blueScore});
+      // } else {
 
-      if (res.redScore === 0) {
-        var totalGameScore = res.totalGameScore;
-        res.totalGameScore = [totalGameScore[0] + 1, totalGameScore[1]];
-        res.gameOver = true;
-        res.markModified('totalGameScore', 'gameOver', 'redScore');
-        res.save();
-        socket.nsp["in"](data.roomID).emit('gameOver', {
-          gameScore: res.totalGameScore,
-          gameOver: res.gameOver,
-          redScore: res.redScore,
-          blueScore: res.blueScore
-        });
-      } else {
-        res.markModified('redScore');
-        res.save();
-        socket.nsp["in"](data.roomID).emit('updateRedScore', {
-          redScore: res.redScore
-        });
-      }
-    });
+      res.markModified('redScore');
+      res.save();
+      socket.nsp["in"](data.roomID).emit('updateRedScore', {
+        redScore: res.redScore
+      });
+    } //}
+    );
   });
   socket.on('blueScoreChange', function (data) {
     _Rooms["default"].findOne({
       roomID: data.roomID
     }, function (err, res) {
       if (err) return;
-      res.blueScore = data.blueScore;
+      res.blueScore = data.blueScore; // if (res.blueScore === 0) {
+      //   const totalGameScore = res.totalGameScore;
+      //   res.totalGameScore = [totalGameScore[0], totalGameScore[1] + 1];
+      //   res.gameOver = true;
+      //   res.markModified('totalGameScore', 'gameOver', 'blueScore');
+      //   res.save();
+      //   socket.nsp.in(data.roomID).emit('gameOver', {gameScore: res.totalGameScore, gameOver: res.gameOver, redScore: res.redScore, blueScore: res.blueScore});
+      // } else {
 
-      if (res.blueScore === 0) {
-        var totalGameScore = res.totalGameScore;
-        res.totalGameScore = [totalGameScore[0], totalGameScore[1] + 1];
-        res.gameOver = true;
-        res.markModified('totalGameScore', 'gameOver', 'blueScore');
-        res.save();
-        socket.nsp["in"](data.roomID).emit('gameOver', {
-          gameScore: res.totalGameScore,
-          gameOver: res.gameOver,
-          redScore: res.redScore,
-          blueScore: res.blueScore
-        });
-      } else {
-        res.markModified('blueScore');
-        res.save();
-        socket.nsp["in"](data.roomID).emit('updateBlueScore', {
-          blueScore: res.blueScore
-        });
-      }
-    });
+      res.markModified('blueScore');
+      res.save();
+      socket.nsp["in"](data.roomID).emit('updateBlueScore', {
+        blueScore: res.blueScore
+      });
+    } //}
+    );
   });
   socket.on('flipCard', function (data) {
     _Rooms["default"].findOne({
@@ -344,70 +330,72 @@ io.on('connection', function (socket) {
         redTurn: res.isRedTurn
       });
     });
-  });
-  socket.on('bombClicked', function (data) {
+  }); // socket.on('bombClicked', (data) => {
+  //   Rooms.findOne({roomID: data.roomID}, function(err, res) {
+  //     if (err) return;
+  //     if (data.bombClicked === "RED") {
+  //       res.totalGameScore = [res.totalGameScore[0], res.totalGameScore[1] + 1];
+  //       res.gameOver = true;
+  //       res.markModified('totalGameScore', 'gameOver');
+  //       res.save();
+  //       socket.nsp.in(data.roomID).emit('gameOver', {gameScore: res.totalGameScore, gameOver: res.gameOver});
+  //     } else {
+  //       res.totalGameScore = [res.totalGameScore[0] + 1, res.totalGameScore[1]];
+  //       res.gameOver = true;
+  //       res.markModified('totalGameScore', 'gameOver', 'blueScore');
+  //       res.save();
+  //       socket.nsp.in(data.roomID).emit('gameOver', {gameScore: res.totalGameScore, gameOver: res.gameOver});
+  //     }
+  //   });
+  // });
+
+  socket.on('startTimer', function (data) {
     _Rooms["default"].findOne({
       roomID: data.roomID
     }, function (err, res) {
       if (err) return;
 
-      if (data.bombClicked === "RED") {
-        res.totalGameScore = [res.totalGameScore[0], res.totalGameScore[1] + 1];
-        res.gameOver = true;
-        res.markModified('totalGameScore', 'gameOver');
-        res.save();
-        socket.nsp["in"](data.roomID).emit('gameOver', {
-          gameScore: res.totalGameScore,
-          gameOver: res.gameOver
-        });
-      } else {
-        res.totalGameScore = [res.totalGameScore[0] + 1, res.totalGameScore[1]];
-        res.gameOver = true;
-        res.markModified('totalGameScore', 'gameOver', 'blueScore');
-        res.save();
-        socket.nsp["in"](data.roomID).emit('gameOver', {
-          gameScore: res.totalGameScore,
-          gameOver: res.gameOver
-        });
+      if (data.currentTimer) {
+        clearInterval(data.currentTimer);
       }
+
+      var time = 180;
+      var currentTimer = setInterval(function () {
+        if (time === 0) {
+          res.redTurn = !res.redTurn;
+          res.markModified('isRedTurn');
+          res.save();
+          socket.nsp["in"](data.roomID).emit('redTurn', {
+            redTurn: res.isRedTurn
+          });
+        }
+
+        time--;
+        socket.nsp["in"](data.roomID).emit('timer', {
+          time: time,
+          currentTimer: Number(currentTimer)
+        });
+      }, 1000);
     });
-  });
-  socket.on('startTimer', function (data) {
+  }); // res.markModified('isRedTurn');
+  // res.save();
+  // });
+
+  socket.on('gameOver', function (data) {
     _Rooms["default"].findOne({
       roomID: data.roomID
     }, function (err, res) {
-      var minutes = 2;
-      var seconds = 59;
-      setInterval(function () {
-        if (seconds > 0) {
-          _readOnlyError("seconds"), seconds--;
-        }
-
-        if (seconds === 0) {
-          if (minutes === 0) {
-            res.isRedTurn = data.redTurn;
-          } else {
-            _readOnlyError("minutes"), minutes--;
-            seconds = (_readOnlyError("seconds"), 59);
-          }
-        }
-      });
-      socket.nsp["in"](data.roomID).emit('timer', {
-        minutes: minutes,
-        seconds: seconds,
-        isRedTurn: res.isRedTurn
-      });
-    }, 1000);
-
-    res.markModified('isRedTurn');
-    res.save();
-  }); // socket.on('currentTime', (data) => {
-  //   Rooms.findOne({roomID: data.roomID}, function(err, res) {
-  //     if (err) return;
-  //     socket.nsp.in(data.roomID).emit('timer', {minutes: data.minutes, seconds: data.seconds});
-  //   })
-  // });
-
+      if (err) return;
+      clearInterval(data.timerID);
+      res.totalGameScore = data.gameScore;
+      res.gameOver = data.gameOver;
+      res.redScore = data.redScore;
+      res.blueScore = data.blueScore;
+      res.markModified('gameScore', 'gameOver', 'redScore', 'blueScore');
+      res.save();
+      socket.nsp["in"](data.roomID).emit('updateGameOver', res);
+    });
+  });
   socket.on('hostStartGame', function (data) {
     var colorSorted = colors.sort(function () {
       return Math.random() - 0.5;
@@ -435,35 +423,7 @@ io.on('connection', function (socket) {
       socket.nsp["in"](data.roomID).emit('startGame', res);
     });
   });
-  socket.on('nextGameTrigger', function (data) {
-    var colorSorted = colors.sort(function () {
-      return Math.random() - 0.5;
-    });
-    var words = (0, _utils.getWords)();
-    var clicked = new Array(25).fill(false);
-
-    _Rooms["default"].findOneAndUpdate({
-      roomID: data.roomID
-    }, {
-      $set: {
-        colors: colorSorted,
-        words: words,
-        clicked: clicked,
-        isRedTurn: true,
-        redScore: 8,
-        blueScore: 8,
-        gameOver: false
-      }
-    }, {
-      upsert: true,
-      "new": true
-    }, function (err, res) {
-      if (err) return;
-      socket.nsp["in"](data.roomID).emit('nextGameStart', res);
-    });
-  });
-  socket.on("disconnect", function () {
-    clearInterval(interval);
+  socket.on("disconnect", function () {// clearInterval(interval);
   });
 }); // Handle React routing, return all requests to React app
 
