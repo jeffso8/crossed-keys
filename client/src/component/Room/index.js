@@ -5,6 +5,8 @@ import User from './User';
 import { organizeUsers } from '../shared/utils';
 import { Responsive } from '../shared/responsive';
 import { Button } from '../shared/Button';
+import {MUD_BROWN} from '../../constants';
+import ReactArcText from 'react-arc-text-fix';
 
 function Room(props) {
   const [roomID, setRoomID] = useState('');
@@ -37,30 +39,64 @@ function Room(props) {
   };
 
   const webStyle = {
+    title: {
+      fontSize: 52,
+      letterSpacing: 3,
+      fontWeight: 900,
+      color: MUD_BROWN,
+      width: '100%',
+      textAlign: 'center',
+      marginTop: 80,
+    },
+    body: {
+      width: '100%',
+      paddingTop: 50,
+    },
     columnStyle: {
-      margin: '50px',
       height: 'auto',
-      width: '200px',
+    },
+    columnTitle: {
+      fontSize: 20,
+      fontWeight: 900,
+      letterSpacing: 1,
+      textAlign: 'center',
     },
     containerStyle: {
       display: 'grid',
-      position: 'absolute',
-      left: '20%',
-      top: '15%',
       gridGap: '25px',
       gridTemplateColumns: '1fr 1fr 1fr',
     },
     teamButton: {
       display: 'grid',
-      position: 'absolute',
-      left: '25%',
-      bottom: '10%',
-      gridGap: '250px',
+      gridGap: '25px',
+      marginTop: 100,
       gridTemplateColumns: '1fr 1fr 1fr',
     },
+    button: {
+      margin: 'auto',
+    }
   };
 
   const mobileStyle = {
+    title: {
+      fontSize: 52,
+      letterSpacing: 3,
+      fontWeight: 900,
+      color: MUD_BROWN,
+      width: '100%',
+      textAlign: 'center',
+      marginTop: 80,
+    },
+    body: {
+      width: '100%',
+      paddingTop: 50,
+    },
+    columnTitle: {
+      fontSize: 20,
+      fontWeight: 900,
+      letterSpacing: 1,
+      textAlign: 'center',
+    },
     containerStyle: {
       display: 'grid',
       width: '100%',
@@ -72,10 +108,13 @@ function Room(props) {
     },
     teamButton: {
       display: 'grid',
-      position: 'absolute',
-      bottom: '10%',
+      gridGap: '25px',
+      marginTop: 100,
       gridTemplateColumns: '1fr 1fr 1fr',
     },
+    button: {
+      margin: 'auto',
+    }
   };
 
   useEffect(() => {
@@ -118,56 +157,66 @@ function Room(props) {
 
   const style = isMobile ? mobileStyle : webStyle;
   return (
-    <div style={{ width: '100%', height: '100%' }}>
-      <h1>Current Room: {roomID}</h1>
-      <div className="teamChooseContainer" style={style.containerStyle}>
-        <div className="redColumn" style={style.columnStyle}>
-          <div>Red Team</div>
-          {redTeam.map((user, i) => {
-            return (
-              <User
-                i={i}
-                name={user.userID}
-                isSpyMaster={roomData.redSpy === user}
-              />
-            );
-          })}
-        </div>
-        <div className="mainColumn" style={style.columnStyle}>
-          <div>Pick Team</div>
-          {nullTeam.map((user, i) => {
-            return (
-              <User
-                i={i}
-                name={user.userID}
-                isSpyMaster={roomData.redSpy === user}
-              />
-            );
-          })}
-        </div>
-        <div className="blueColumn" style={style.columnStyle}>
-          <div>Blue Team</div>
-          {blueTeam.map((user, i) => {
-            return (
-              <User
-                i={i}
-                name={user.userID}
-                isSpyMaster={roomData.blueSpy === user}
-              />
-            );
-          })}
-        </div>
+    <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <div style={style.title}>
+        <div style={{fontSize: 34}}>WELCOME</div>
+        <div style={{textAlign: 'center', fontSize: 28}}>TO</div>
+        <ReactArcText
+          text={`THE ${roomID} HOTEL`}
+          direction={1}
+          arc={420}
+        />
       </div>
-      <div className="pickTeamButtons" style={style.teamButton}>
-        <Button onClick={handleSetRedTeamClick} text={'Red Team'} />
-        {user.isHost ? (
-          // <button onClick={startGame}>Start Game</button>
-          <Button onClick={startGame} text={'Start Game'} />
-        ) : null}
-        <Button onClick={handleSetBlueTeamClick} text={'Blue Team'} />
-        {showClaimSpyMaster() ? (
-          <Button onClick={handleClaimSpyMasterClick} text={'Claim Spy'} />
-        ) : null}
+      <div className="body" style={style.body}>
+        <div className="teamChooseContainer" style={style.containerStyle}>
+          <div className="redColumn" style={style.columnStyle}>
+            <div style={style.columnTitle}>RED TEAM</div>
+            {redTeam.map((user, i) => {
+              return (
+                <User
+                  i={i}
+                  name={user.userID}
+                  isSpyMaster={roomData.redSpy === user}
+                />
+              );
+            })}
+          </div>
+          <div className="mainColumn" style={style.columnStyle}>
+            <div style={style.columnTitle}></div>
+            {nullTeam.map((user, i) => {
+              return (
+                <User
+                  i={i}
+                  name={user.userID}
+                  isSpyMaster={roomData.redSpy === user}
+                />
+              );
+            })}
+          </div>
+          <div className="blueColumn" style={style.columnStyle}>
+            <div style={style.columnTitle}>BLUE TEAM</div>
+            {blueTeam.map((user, i) => {
+              return (
+                <User
+                  i={i}
+                  name={user.userID}
+                  isSpyMaster={roomData.blueSpy === user}
+                />
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="pickTeamButtons" style={style.teamButton}>
+          <Button style={style.button} onClick={handleSetRedTeamClick} text={'Red Team'} />
+          {user.isHost ? (
+            <Button style={style.button} onClick={startGame} text={'Start Game'} />
+          ) : null}
+          <Button style={style.button} onClick={handleSetBlueTeamClick} text={'Blue Team'} />
+          {showClaimSpyMaster() ? (
+            <Button style={style.button} onClick={handleClaimSpyMasterClick} text={'Claim Spy'} />
+          ) : null}
+        </div>
       </div>
     </div>
   );
