@@ -5,6 +5,8 @@ import socket from '../../socket';
 import GameInfoModal from './GameInfoModal';
 import GameOverModal from './GameOverModal';
 import Timer from './Timer';
+import Hint from './Hint';
+import HintDisplay from './HintDisplay';
 
 function Game(props) {
   let [redScore, setRedScore] = useState(8);
@@ -67,9 +69,8 @@ function Game(props) {
     });
 
     setRoomID(props.location.state.data.roomID);
- 
+
     socket.on('startGame', (data) => {
-      console.log('startgame', data);
       setGameScore(data.totalGameScore);
       setGameOver(data.gameOver);
       setRedScore(data.redScore);
@@ -110,7 +111,7 @@ function Game(props) {
   };
 
   return (
-    <div style={{width: '100%', height: '100%'}}>
+    <div style={{width: '100%', height: '100%', display: 'flex', flexDirection: 'column'}}>
       <ScoreBanner isRedTeam={true} score={redScore} />
       <div style={{textAlign: 'center'}}>
         <Timer redTurn={redTurn} setTimerID={setTimerID}/>
@@ -129,6 +130,8 @@ function Game(props) {
         timerID={timerID}
         gameScore={gameScore}
       />
+      <HintDisplay />
+      {user.role === 'MASTER' ? <Hint /> : null}
       <div style={{position:'absolute', top:'90%', right: '20px'}}>
         {renderEndTurn()}
       </div>

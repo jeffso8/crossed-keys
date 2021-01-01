@@ -4,7 +4,7 @@ import socket from '../../socket';
 import User from './User';
 import { organizeUsers } from '../shared/utils';
 import { Responsive } from '../shared/responsive';
-import { Button } from '../shared/Button';
+import Button from '../shared/Button';
 import {MUD_BROWN} from '../../constants';
 import ReactArcText from 'react-arc-text-fix';
 
