@@ -5,7 +5,7 @@ export default function HintDisplay() {
   const [hints, setHints] = useState([]);
 
   useEffect(() => {
-    socket.on('sendHint', (data) => {
+    socket.on('displayHint', (data) => {
       setHints([...hints, data.hint]);
     });
   }, []);
