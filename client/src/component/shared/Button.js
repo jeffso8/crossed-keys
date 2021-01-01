@@ -1,7 +1,7 @@
 import React from 'react';
 import {BROWNISH, MUD_BROWN} from '../../constants';
 
-export function Button (props) {
+export default function Button (props) {
   const style = {
     width: 100,
     height: 50,
