@@ -18,8 +18,6 @@ var _utils = require("./utils");
 
 var _path = _interopRequireDefault(require("path"));
 
-var _repl = require("repl");
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
@@ -71,8 +69,8 @@ app.all('*', function (req, res, next) {
  }
 */
 
-var colors = ["red", "red", "red", "red", "red", "red", "red", "red", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "white", "white", "white", "white", "white", "white", "white", "white", "black"];
-var interval; // app.get('/', (req, res) => {
+var colors = ["red", "red", "red", "red", "red", "red", "red", "red", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "white", "white", "white", "white", "white", "white", "white", "white", "black"]; // let interval;
+// app.get('/', (req, res) => {
 //   res.send('Hello World!');
 // });
 
@@ -121,8 +119,7 @@ app.get('/game-stats', function (req, res) {
 });
 io.on('connection', function (socket) {
   socket.on('joinRoom', function (data) {
-    console.log('data', data); //data is an object with the roomID and the user that joined the room
-
+    //data is an object with the roomID and the user that joined the room
     socket.join(data.roomID);
 
     _Rooms["default"].findOne({
@@ -163,9 +160,23 @@ io.on('connection', function (socket) {
       }
     });
   });
-  socket.on('message', function (data) {
-    //gives data as an object {message: what message was sent, roomId: has the given room id}
-    socket.nsp["in"](data.roomID).emit('newMessage', data.message);
+  socket.on('newHint', function (data) {
+    _Rooms["default"].findOneAndUpdate({
+      roomID: data.roomID
+    }, {
+      $addToSet: {
+        hints: {
+          hint: data.hint,
+          hintCount: data.hintCount
+        }
+      }
+    }, {
+      upsert: true,
+      "new": true
+    }, function (err, res) {
+      if (err) return;
+      socket.nsp["in"](data.roomID).emit('sendHint', res); //gives data as an object {message: what message was sent, roomId: has the given room id}
+    });
   });
   socket.on('getWords', function (data) {
     _Rooms["default"].findOneAndUpdate({
@@ -250,6 +261,8 @@ io.on('connection', function (socket) {
   });
   socket.on('joinGame', function (data) {
     socket.join(data.roomID);
+    socket.userID = data.userID;
+    socket.roomID = data.roomID;
 
     _Rooms["default"].findOne({
       roomID: data.roomID
@@ -263,36 +276,26 @@ io.on('connection', function (socket) {
       roomID: data.roomID
     }, function (err, res) {
       if (err) return;
-      res.redScore = data.redScore; 
+      res.redScore = data.redScore;
       res.markModified('redScore');
       res.save();
       socket.nsp["in"](data.roomID).emit('updateRedScore', {
         redScore: res.redScore
       });
-    } //}
-    );
+    });
   });
   socket.on('blueScoreChange', function (data) {
     _Rooms["default"].findOne({
       roomID: data.roomID
     }, function (err, res) {
       if (err) return;
-      res.blueScore = data.blueScore; // if (res.blueScore === 0) {
-      //   const totalGameScore = res.totalGameScore;
-      //   res.totalGameScore = [totalGameScore[0], totalGameScore[1] + 1];
-      //   res.gameOver = true;
-      //   res.markModified('totalGameScore', 'gameOver', 'blueScore');
-      //   res.save();
-      //   socket.nsp.in(data.roomID).emit('gameOver', {gameScore: res.totalGameScore, gameOver: res.gameOver, redScore: res.redScore, blueScore: res.blueScore});
-      // } else {
-
+      res.blueScore = data.blueScore;
       res.markModified('blueScore');
       res.save();
       socket.nsp["in"](data.roomID).emit('updateBlueScore', {
         blueScore: res.blueScore
       });
-    } //}
-    );
+    });
   });
   socket.on('flipCard', function (data) {
     _Rooms["default"].findOne({
@@ -321,25 +324,7 @@ io.on('connection', function (socket) {
         redTurn: res.isRedTurn
       });
     });
-  }); // socket.on('bombClicked', (data) => {
-  //   Rooms.findOne({roomID: data.roomID}, function(err, res) {
-  //     if (err) return;
-  //     if (data.bombClicked === "RED") {
-  //       res.totalGameScore = [res.totalGameScore[0], res.totalGameScore[1] + 1];
-  //       res.gameOver = true;
-  //       res.markModified('totalGameScore', 'gameOver');
-  //       res.save();
-  //       socket.nsp.in(data.roomID).emit('gameOver', {gameScore: res.totalGameScore, gameOver: res.gameOver});
-  //     } else {
-  //       res.totalGameScore = [res.totalGameScore[0] + 1, res.totalGameScore[1]];
-  //       res.gameOver = true;
-  //       res.markModified('totalGameScore', 'gameOver', 'blueScore');
-  //       res.save();
-  //       socket.nsp.in(data.roomID).emit('gameOver', {gameScore: res.totalGameScore, gameOver: res.gameOver});
-  //     }
-  //   });
-  // });
-
+  });
   socket.on('startTimer', function (data) {
     _Rooms["default"].findOne({
       roomID: data.roomID
@@ -356,6 +341,7 @@ io.on('connection', function (socket) {
           res.redTurn = !res.redTurn;
           res.markModified('isRedTurn');
           res.save();
+          clearInterval(currentTimer);
           socket.nsp["in"](data.roomID).emit('redTurn', {
             redTurn: res.isRedTurn
           });
@@ -368,10 +354,7 @@ io.on('connection', function (socket) {
         });
       }, 1000);
     });
-  }); // res.markModified('isRedTurn');
-  // res.save();
-  // });
-
+  });
   socket.on('gameOver', function (data) {
     _Rooms["default"].findOne({
       roomID: data.roomID
@@ -393,6 +376,7 @@ io.on('connection', function (socket) {
     });
     var words = (0, _utils.getWords)();
     var clicked = new Array(25).fill(false);
+    socket.roomID = data.roomID;
 
     _Rooms["default"].findOneAndUpdate({
       roomID: data.roomID
@@ -404,7 +388,8 @@ io.on('connection', function (socket) {
         isRedTurn: true,
         redScore: 8,
         blueScore: 8,
-        gameOver: false
+        gameOver: false,
+        hints: []
       }
     }, {
       upsert: true,
@@ -414,7 +399,32 @@ io.on('connection', function (socket) {
       socket.nsp["in"](data.roomID).emit('startGame', res);
     });
   });
-  socket.on("disconnect", function () {// clearInterval(interval);
+  socket.on('disconnect', function () {
+    if (socket.userID && socket.roomID) {
+      _Rooms["default"].findOneAndUpdate({
+        roomID: socket.roomID,
+        'users.userID': socket.userID
+      }, {
+        $pull: {
+          users: {
+            userID: socket.userID
+          }
+        }
+      }, {
+        "new": true
+      }, function (err, res) {
+        if (err) return;
+
+        if (res.users.length === 0) {
+          _Rooms["default"].findOneAndDelete({
+            roomID: socket.roomID
+          }, function (err, res) {
+            if (err) return;
+            console.log("Room deleted!");
+          });
+        }
+      });
+    }
   });
 }); // Handle React routing, return all requests to React app
 

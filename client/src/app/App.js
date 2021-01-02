@@ -5,9 +5,10 @@ import Room from '../component/Room/index';
 import {BrowserRouter, Route} from 'react-router-dom';
 import ReactGA from 'react-ga';
 
-ReactGA.initialize('G-ZH84JK7WV8');
+ReactGA.initialize('G-E591MG37EY');
+console.log('reactga', ReactGA);
 ReactGA.pageview(window.location.pathname + window.location.search);
-
+console.log('window.location.pathname + window.location.search', window.location.pathname + window.location.search);
 function App() {
   return (
     <BrowserRouter>
