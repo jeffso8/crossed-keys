@@ -39,12 +39,10 @@ export default function Grid(props) {
   const cardStyle = {
     container: {
       display: 'grid',
-      position: 'fixed',
-      left: '50%',
-      top: '50%',
-      transform: 'translate(-50%, -50%)',
-      gridGap: 36,
       gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr',
+      gridGap: 40,
+      justifyContent: 'center',
+      maxWidth: 'min-content'
     },
     columns: {
       margin: 0,
@@ -70,6 +68,7 @@ export default function Grid(props) {
 
   useEffect(() => {
     socket.on('refreshGame', (data) => {
+      console.log('data', data);
       setWords(data.words);
       setColors(data.colors);
       setClicked(data.clicked);
@@ -153,12 +152,12 @@ export default function Grid(props) {
   };
 
   return (
-    <div style={style.container}>
-      {renderColumns(rowColor1, wordsColumn1, 0, 'Column1')}
-      {renderColumns(rowColor2, wordsColumn2, 1, 'Column2')}
-      {renderColumns(rowColor3, wordsColumn3, 2, 'Column3')}
-      {renderColumns(rowColor4, wordsColumn4, 3, 'Column4')}
-      {renderColumns(rowColor5, wordsColumn5, 4, 'Column5')}
-    </div>
+      <div style={style.container}>
+        {renderColumns(rowColor1, wordsColumn1, 0, 'Column1')}
+        {renderColumns(rowColor2, wordsColumn2, 1, 'Column2')}
+        {renderColumns(rowColor3, wordsColumn3, 2, 'Column3')}
+        {renderColumns(rowColor4, wordsColumn4, 3, 'Column4')}
+        {renderColumns(rowColor5, wordsColumn5, 4, 'Column5')}
+      </div>
   );
 }

@@ -89,6 +89,7 @@ app.get('/game-stats', function(req,res){
 
 io.on('connection', (socket) => {
   socket.on('joinRoom', (data) => {
+    console.log('joinRoom socketId', socket.id);
     //data is an object with the roomID and the user that joined the room
     socket.join(data.roomID);
     Rooms.findOne({roomID: data.roomID}, function(err, res) {
@@ -101,7 +102,8 @@ io.on('connection', (socket) => {
               userID: data.userID,
               team: null,
               role: null,
-              isHost: true
+              isHost: true,
+              socketId: socket.id
             }]
           })
         if (err) return;
@@ -114,8 +116,9 @@ io.on('connection', (socket) => {
         userID: data.userID,
         team: null,
         role: null,
-        isHost: false
-      })}
+        isHost: false,
+        socketId: socket.id
+      })};
       if (err) return;
       res.markModified('users');
       res.save();
@@ -188,9 +191,9 @@ io.on('connection', (socket) => {
 
   socket.on('joinGame', (data) => {
     socket.join(data.roomID);
-    socket.userID = data.userID;
+    socket.userID = data.user.userID;
     socket.roomID = data.roomID;
-    Rooms.findOne({roomID: data.roomID}, function(err, res) {
+    Rooms.findOneAndUpdate({roomID: data.roomID, 'users.userID': data.user.userID}, {$set : {'users.$.socketId': socket.id}}, {upsert: true, new: true},  function(err, res) {
       if (err) return;
       socket.nsp.in(data.roomID).emit('refreshGame', res);
     })
@@ -243,7 +246,7 @@ io.on('connection', (socket) => {
     Rooms.findOne({roomID: data.roomID},function(err, res) {
       if (err) return;
 
-      if (data.currentTimer) {  
+      if (data.currentTimer) {
         clearInterval(data.currentTimer);
       }
       let time = 180
@@ -288,17 +291,30 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {
-    if (socket.userID && socket.roomID){
-    Rooms.findOneAndUpdate({roomID: socket.roomID, 'users.userID': socket.userID}, {$pull: {users: {userID: socket.userID}}}, {new: true}, function(err, res) {
-      if (err) return;
-      if (res.users.length === 0) {
-        Rooms.findOneAndDelete({roomID: socket.roomID}, function(err, res) {
+    setTimeout(() => {
+      if (socket.userID && socket.roomID){
+        Rooms.findOne({roomID: socket.roomID}, function(err, res) {
           if (err) return;
-          console.log("Room deleted!");
+          const foundUser = res.users.find(user => user.userID === socket.userID);
+          const foundUserIdx = res.users.indexOf(foundUser);
+
+          if(foundUser.socketId === socket.id) {
+            const users = res.users;
+            users.splice(foundUserIdx, 1);
+            res.users = users;
+            res.markModified('users');
+            res.save();
+            if(res && res.users.length === 0) {
+              console.log('no users left');
+              Rooms.findOneAndDelete({roomID: socket.roomID}, function(err, res) {
+                if (err) return;
+                console.log("Room deleted!");
+              });
+            }
+          }
         });
       }
-    });
-   }
+    }, 5000);
   });
 });
 

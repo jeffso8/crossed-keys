@@ -22,7 +22,7 @@ function Game(props) {
   const [timerID, setTimerID] = useState(0);
 
   useEffect(() => {
-    socket.emit('joinGame', {roomID: props.location.state.data.roomID, userID: props.location.state.userID});
+    socket.emit('joinGame', {roomID: props.location.state.data.roomID, user: props.location.state.data.users.find((user) => user.userID === props.location.state.userID)});
 
     setRoomID(props.location.state.data.roomID);
     setUsers(props.location.state.data.users);
@@ -112,25 +112,29 @@ function Game(props) {
 
   return (
     <div style={{width: '100%', height: '100%', display: 'flex', flexDirection: 'column'}}>
-      <ScoreBanner isRedTeam={true} score={redScore} />
-      <div style={{textAlign: 'center'}}>
-        <Timer redTurn={redTurn} setTimerID={setTimerID}/>
-        <h2>{redTurn ? 'Red\'s Turn' : 'Blue\'s Turn'}</h2>
+      <div>
+        <ScoreBanner isRedTeam={true} score={redScore} />
+        <div style={{textAlign: 'center'}}>
+          <Timer redTurn={redTurn} setTimerID={setTimerID}/>
+          <h2>{redTurn ? 'Red\'s Turn' : 'Blue\'s Turn'}</h2>
+        </div>
+        <ScoreBanner isRedTeam={false} score={blueScore} />
       </div>
-      <ScoreBanner isRedTeam={false} score={blueScore} />
-      <Grid
-        gameOver={gameOver}
-        redTurn={redTurn}
-        roomID={roomID}
-        redScore={redScore}
-        blueScore={blueScore}
-        user={user}
-        handleRedScoreChange={handleRedScoreChange}
-        handleBlueScoreChange={handleBlueScoreChange}
-        timerID={timerID}
-        gameScore={gameScore}
-      />
-      <HintDisplay />
+      <div style={{display: 'flex', justifyContent: 'center', position: 'relative', marginTop: 50, marginBottom: 50}}>
+        <Grid
+          gameOver={gameOver}
+          redTurn={redTurn}
+          roomID={roomID}
+          redScore={redScore}
+          blueScore={blueScore}
+          user={user}
+          handleRedScoreChange={handleRedScoreChange}
+          handleBlueScoreChange={handleBlueScoreChange}
+          timerID={timerID}
+          gameScore={gameScore}
+        />
+        <HintDisplay />
+        </div>
       {user.role === 'MASTER' ? <Hint roomID={roomID}/> : null}
       <div style={{position:'absolute', top:'90%', right: '20px'}}>
         {renderEndTurn()}

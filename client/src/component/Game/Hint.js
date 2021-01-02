@@ -15,7 +15,7 @@ export default function Hint(props) {
   };
 
   return (
-    <div>
+    <div style={{alignSelf: 'center'}}>
       <TextInput
         value={hint}
         onChange={handleHintChange}
