@@ -74,9 +74,7 @@ function Card(props) {
     }
 
     if (props.color === BOMB_CARD) {
-      console.log('GAME OVER');
       props.bombClicked(props.user.team);
-      console.log('bombclicked', props.user.team);
     } else {
       if (redTurn) {
         if (props.color === RED_CARD) {

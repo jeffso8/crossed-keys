@@ -7,7 +7,6 @@ import database from '../database/index';
 import "regenerator-runtime/runtime.js";
 import {getWords, newUser} from './utils';
 import path from 'path';
-import { start } from 'repl';
 
 const socketIO = require('socket.io');
 const port = process.env.PORT || 3001;
@@ -60,7 +59,7 @@ app.all('*', function(req, res, next) {
 const colors = ["red", "red", "red", "red", "red", "red", "red", "red", "blue", "blue", "blue", "blue",
 "blue", "blue", "blue", "blue", "white", "white", "white", "white", "white", "white", "white", "white", "black"];
 
-let interval;
+// let interval;
 
 // app.get('/', (req, res) => {
 //   res.send('Hello World!');
@@ -90,7 +89,6 @@ app.get('/game-stats', function(req,res){
 
 io.on('connection', (socket) => {
   socket.on('joinRoom', (data) => {
-    console.log('data', data);
     //data is an object with the roomID and the user that joined the room
     socket.join(data.roomID);
     Rooms.findOne({roomID: data.roomID}, function(err, res) {
@@ -126,9 +124,12 @@ io.on('connection', (socket) => {
     });
   });
 
-  socket.on('message', (data) => {
+  socket.on('newHint', (data) => {
+    Rooms.findOneAndUpdate({roomID: data.roomID}, {$addToSet: {hints: {hint: data.hint, hintCount: data.hintCount}}}, {upsert: true, new: true}, function(err, res) {
+      if (err) return;
+      socket.nsp.in(data.roomID).emit('sendHint', res);
     //gives data as an object {message: what message was sent, roomId: has the given room id}
-    socket.nsp.in(data.roomID).emit('newMessage', data.message);
+    });
   });
 
   socket.on('getWords', (data) => {
@@ -187,6 +188,8 @@ io.on('connection', (socket) => {
 
   socket.on('joinGame', (data) => {
     socket.join(data.roomID);
+    socket.userID = data.userID;
+    socket.roomID = data.roomID;
     Rooms.findOne({roomID: data.roomID}, function(err, res) {
       if (err) return;
       socket.nsp.in(data.roomID).emit('refreshGame', res);
@@ -196,21 +199,11 @@ io.on('connection', (socket) => {
   socket.on('redScoreChange', (data) => {
     Rooms.findOne({roomID: data.roomID}, function(err, res) {
       if (err) return;
-      console.log('redScoreChange', data);
-      res.redScore = data.redScore;
-      // if (res.redScore === 0) {
-      //   const totalGameScore = res.totalGameScore;
-      //   res.totalGameScore = [totalGameScore[0] + 1, totalGameScore[1]];
-      //   res.gameOver = true;
-      //   res.markModified('totalGameScore', 'gameOver', 'redScore');
-      //   res.save();
-      //   socket.nsp.in(data.roomID).emit('gameOver', {gameScore: res.totalGameScore, gameOver: res.gameOver, redScore: res.redScore, blueScore: res.blueScore});
-      // } else {
+        res.redScore = data.redScore;
         res.markModified('redScore');
         res.save();
         socket.nsp.in(data.roomID).emit('updateRedScore', {redScore: res.redScore});
       }
-    //}
     );
   });
 
@@ -218,19 +211,10 @@ io.on('connection', (socket) => {
     Rooms.findOne({roomID: data.roomID}, function(err, res) {
       if (err) return;
       res.blueScore =  data.blueScore;
-      // if (res.blueScore === 0) {
-      //   const totalGameScore = res.totalGameScore;
-      //   res.totalGameScore = [totalGameScore[0], totalGameScore[1] + 1];
-      //   res.gameOver = true;
-      //   res.markModified('totalGameScore', 'gameOver', 'blueScore');
-      //   res.save();
-      //   socket.nsp.in(data.roomID).emit('gameOver', {gameScore: res.totalGameScore, gameOver: res.gameOver, redScore: res.redScore, blueScore: res.blueScore});
-      // } else {
       res.markModified('blueScore');
       res.save();
       socket.nsp.in(data.roomID).emit('updateBlueScore', {blueScore: res.blueScore});
       }
-      //}
     );
   });
 
@@ -255,25 +239,6 @@ io.on('connection', (socket) => {
     });
   });
 
-  // socket.on('bombClicked', (data) => {
-  //   Rooms.findOne({roomID: data.roomID}, function(err, res) {
-  //     if (err) return;
-  //     if (data.bombClicked === "RED") {
-  //       res.totalGameScore = [res.totalGameScore[0], res.totalGameScore[1] + 1];
-  //       res.gameOver = true;
-  //       res.markModified('totalGameScore', 'gameOver');
-  //       res.save();
-  //       socket.nsp.in(data.roomID).emit('gameOver', {gameScore: res.totalGameScore, gameOver: res.gameOver});
-  //     } else {
-  //       res.totalGameScore = [res.totalGameScore[0] + 1, res.totalGameScore[1]];
-  //       res.gameOver = true;
-  //       res.markModified('totalGameScore', 'gameOver', 'blueScore');
-  //       res.save();
-  //       socket.nsp.in(data.roomID).emit('gameOver', {gameScore: res.totalGameScore, gameOver: res.gameOver});
-  //     }
-  //   });
-  // });
-
   socket.on('startTimer', (data) => {
     Rooms.findOne({roomID: data.roomID},function(err, res) {
       if (err) return;
@@ -287,6 +252,7 @@ io.on('connection', (socket) => {
           res.redTurn = (!res.redTurn);
           res.markModified('isRedTurn');
           res.save();
+          clearInterval(currentTimer);
           socket.nsp.in(data.roomID).emit('redTurn', {redTurn: res.isRedTurn});
         }
         time--;
@@ -294,9 +260,6 @@ io.on('connection', (socket) => {
       }, 1000);
     });
   });
-    // res.markModified('isRedTurn');
-    // res.save();
-  // });
 
   socket.on('gameOver', (data) => {
     Rooms.findOne({roomID: data.roomID}, function(err, res) {
@@ -316,17 +279,26 @@ io.on('connection', (socket) => {
     const colorSorted = colors.sort(() => Math.random() - 0.5);
     const words = getWords();
     const clicked = new Array(25).fill(false);
-
-    Rooms.findOneAndUpdate({roomID: data.roomID}, {$set : {colors: colorSorted, words: words, clicked: clicked, isRedTurn: true, redScore: 8, blueScore: 8, gameOver: false}},
+    socket.roomID = data.roomID;
+    Rooms.findOneAndUpdate({roomID: data.roomID}, {$set : {colors: colorSorted, words: words, clicked: clicked, isRedTurn: true, redScore: 8, blueScore: 8, gameOver: false, hints:[]}},
       {upsert:true, new:true}, function(err, res) {
         if (err) return;
         socket.nsp.in(data.roomID).emit('startGame', res);
     })
   });
 
-
-  socket.on("disconnect", () => {
-    // clearInterval(interval);
+  socket.on('disconnect', () => {
+    if (socket.userID && socket.roomID){
+    Rooms.findOneAndUpdate({roomID: socket.roomID, 'users.userID': socket.userID}, {$pull: {users: {userID: socket.userID}}}, {new: true}, function(err, res) {
+      if (err) return;
+      if (res.users.length === 0) {
+        Rooms.findOneAndDelete({roomID: socket.roomID}, function(err, res) {
+          if (err) return;
+          console.log("Room deleted!");
+        });
+      }
+    });
+   }
   });
 });
 

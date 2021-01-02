@@ -27,7 +27,6 @@ function GameOverModal(props) {
   };
 
   const handleSpyChange = () => {
-    console.log('handleSpyChangeCalled');
     setClaimVisible(true);
   };
 

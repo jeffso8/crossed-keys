@@ -22,7 +22,7 @@ function Game(props) {
   const [timerID, setTimerID] = useState(0);
 
   useEffect(() => {
-    socket.emit('joinGame', {roomID: props.location.state.data.roomID});
+    socket.emit('joinGame', {roomID: props.location.state.data.roomID, userID: props.location.state.userID});
 
     setRoomID(props.location.state.data.roomID);
     setUsers(props.location.state.data.users);
@@ -131,7 +131,7 @@ function Game(props) {
         gameScore={gameScore}
       />
       <HintDisplay />
-      {user.role === 'MASTER' ? <Hint /> : null}
+      {user.role === 'MASTER' ? <Hint roomID={roomID}/> : null}
       <div style={{position:'absolute', top:'90%', right: '20px'}}>
         {renderEndTurn()}
       </div>

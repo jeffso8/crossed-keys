@@ -11,7 +11,7 @@ export default function Hint(props) {
   const handleHintCountChange = (event)  => setHintCount(event.target.value);
 
   const handleSubmit = () => {
-    socket.emit('sendHint', {hint, hintCount});
+    socket.emit('newHint', {roomID: props.roomID, hint, hintCount});
   };
 
   return (

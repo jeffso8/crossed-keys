@@ -80,14 +80,12 @@ export default function Grid(props) {
     });
 
     socket.on('nextGameStart', (data) => {
-      console.log('nextGameStart', data);
       setClicked(data.clicked);
       setColors(data.colors);
       setWords(data.words);
     });
 
     socket.on('nextGameStart', (data) => {
-      console.log('nextGameStart', data);
       setClicked(data.clicked);
     });
   }, []);

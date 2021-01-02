@@ -35,7 +35,11 @@ const RoomSchema = new mongoose.Schema({
       blueScore: Number,
       redSpy: String,
       blueSpy: String,
-      users: Array
+      users: Array,
+      hints: [
+       {hint: String,
+        hintCount: Number
+      }]
     },{
       versionKey: false
     });

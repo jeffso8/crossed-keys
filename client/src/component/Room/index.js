@@ -125,7 +125,6 @@ function Room(props) {
     });
 
     socket.on('startGame', (data) => {
-      console.log('data', data);
       history.push(`/${data.roomID}/game`, {
         data,
         userID: props.location.state.userID,

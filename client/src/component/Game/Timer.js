@@ -7,7 +7,6 @@ function Timer(props) {
 
   useEffect(() => {
     socket.on('timer', (data) => {
-      console.log('clint side timer', data);
       setTime(data.time);
       props.setTimerID(data.currentTimer);
     });

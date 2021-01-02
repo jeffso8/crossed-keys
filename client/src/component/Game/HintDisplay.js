@@ -6,7 +6,7 @@ export default function HintDisplay() {
 
   useEffect(() => {
     socket.on('sendHint', (data) => {
-      setHints([...hints, data.hint]);
+      setHints(data.hints);
     });
   }, []);
 
@@ -15,7 +15,7 @@ export default function HintDisplay() {
       {hints.map(hint => {
         return (
         <div>
-          {hint.hint} for {hint.hintCount.toString()}
+          {hint.hint} for {hint.hintCount}
         </div>)
       })}
     </div>

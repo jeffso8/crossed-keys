@@ -263,16 +263,7 @@ io.on('connection', function (socket) {
       roomID: data.roomID
     }, function (err, res) {
       if (err) return;
-      console.log('redScoreChange', data);
-      res.redScore = data.redScore; // if (res.redScore === 0) {
-      //   const totalGameScore = res.totalGameScore;
-      //   res.totalGameScore = [totalGameScore[0] + 1, totalGameScore[1]];
-      //   res.gameOver = true;
-      //   res.markModified('totalGameScore', 'gameOver', 'redScore');
-      //   res.save();
-      //   socket.nsp.in(data.roomID).emit('gameOver', {gameScore: res.totalGameScore, gameOver: res.gameOver, redScore: res.redScore, blueScore: res.blueScore});
-      // } else {
-
+      res.redScore = data.redScore; 
       res.markModified('redScore');
       res.save();
       socket.nsp["in"](data.roomID).emit('updateRedScore', {
