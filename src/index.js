@@ -255,6 +255,7 @@ io.on('connection', (socket) => {
           res.save();
           clearInterval(currentTimer);
           socket.nsp.in(data.roomID).emit('redTurn', {redTurn: res.isRedTurn});
+          socket.nsp.in(data.roomID).emit('timerDone');
         }
         time--;
         socket.nsp.in(data.roomID).emit('timer', {time:time, currentTimer: Number(currentTimer)});
