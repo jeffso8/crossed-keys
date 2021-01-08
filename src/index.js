@@ -89,7 +89,6 @@ app.get('/game-stats', function(req,res){
 
 io.on('connection', (socket) => {
   socket.on('joinRoom', (data) => {
-    console.log('joinRoom socketId', socket.id);
     //data is an object with the roomID and the user that joined the room
     socket.join(data.roomID);
     Rooms.findOne({roomID: data.roomID}, function(err, res) {
@@ -245,14 +244,13 @@ io.on('connection', (socket) => {
   socket.on('startTimer', (data) => {
     Rooms.findOne({roomID: data.roomID},function(err, res) {
       if (err) return;
-
       if (data.currentTimer) {
         clearInterval(data.currentTimer);
       }
       let time = 180
       const currentTimer = setInterval(() => {
-        if (time === 0) {
-          res.redTurn = (!res.redTurn);
+        if (!time === 0) {
+          res.isRedTurn = (!res.isRedTurn);
           res.markModified('isRedTurn');
           res.save();
           clearInterval(currentTimer);

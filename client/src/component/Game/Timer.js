@@ -12,9 +12,9 @@ function Timer(props) {
     });
   }, []);
   
-
   var seconds = time % 60;
   var minutes = Math.floor(time / 60) % 60;
+  
 
   return(
     <div>

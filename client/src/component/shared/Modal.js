@@ -7,7 +7,7 @@ function Modal(props) {
       height: 500,
       backgroundColor: 'white',
       zIndex: 1,
-      position: 'relative',
+      position: 'absolute',
       top: '5%',
       textAlign: 'center',
       borderRadius: '1em',
@@ -18,6 +18,7 @@ function Modal(props) {
       height: 450,
       top: '5%',
       margin: '10px',
+      alignItems: 'center'
     },
     columns: {
       margin: '2px',

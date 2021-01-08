@@ -20,6 +20,7 @@ function Game(props) {
   const [gameScore, setGameScore] = useState(props.location.state.data.totalGameScore);
   const [gameOver, setGameOver] = useState(props.location.state.data.gameOver);
   const [timerID, setTimerID] = useState(0);
+  const [timerEnd, setTimerEnd] = useState(false);
 
   useEffect(() => {
     socket.emit('joinGame', {roomID: props.location.state.data.roomID, user: props.location.state.data.users.find((user) => user.userID === props.location.state.userID)});
@@ -51,7 +52,7 @@ function Game(props) {
     socket.on('updateRedScore', (data) => {
       setRedScore(data.redScore);
     });
-
+    
     socket.on('updateBlueScore', (data) => {
       setBlueScore(data.blueScore);
     });
@@ -61,7 +62,6 @@ function Game(props) {
       setGameOver(data.gameOver);
       setRedScore(data.redScore);
       setBlueScore(data.blueScore);
-      // socket.emit('stopTimer', timerID);
     });
 
     socket.on('updateFlipCard', (data) => {
@@ -69,6 +69,10 @@ function Game(props) {
     });
 
     setRoomID(props.location.state.data.roomID);
+
+    socket.on('timerDone', () => {
+      socket.emit('startTimer', {roomID});
+    });
 
     socket.on('startGame', (data) => {
       setGameScore(data.totalGameScore);
@@ -89,6 +93,13 @@ function Game(props) {
       socket.emit('gameOver', {roomID, gameScore: [gameScore[0] + 1, gameScore[1]], gameOver: true, redScore: score, blueScore: blueScore});
     }
   };
+
+  // const handleTimerEnd = () => {
+  //   if (timerEnd) {
+  //     socket.emit('startTimer', {roomID, currentTimer: timerID});
+  //     setTimerEnd(false);
+  //   }
+  // }
 
   const handleBlueScoreChange = (score) => {
     socket.emit('blueScoreChange', {roomID, blueScore: score});

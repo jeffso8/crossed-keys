@@ -10,7 +10,7 @@ function GameInfoModal(props) {
       height: 500,
       backgroundColor: 'white',
       zIndex: 1,
-      position: 'relative',
+      position: 'absolute',
       top: '5%',
       textAlign: 'center',
       borderRadius: '1em',
@@ -75,6 +75,7 @@ function GameInfoModal(props) {
               top: '35%',
               fontSize: '30px',
               fontWeight: '880',
+              alignItems: 'center'
             }}
           >
             <h1>

@@ -5,10 +5,13 @@ import socket from '../../socket';
 
 export default function Hint(props) {
   const [hint, setHint] = useState('');
-  const [hintCount, setHintCount] = useState(0);
+  const [hintCount, setHintCount] = useState(1);
 
-  const handleHintChange = (event)  => setHint(event.target.value);
-  const handleHintCountChange = (event)  => setHintCount(event.target.value);
+  const handleHintChange = (event)  => setHint((event.target.value).toUpperCase());
+  const handleHintCountChange = (event)  => {
+    console.log("eventTarget", event.target.value);
+    setHintCount(event.target.value)
+  }
 
   const handleSubmit = () => {
     socket.emit('newHint', {roomID: props.roomID, hint, hintCount});
