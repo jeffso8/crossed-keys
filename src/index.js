@@ -247,15 +247,16 @@ io.on('connection', (socket) => {
       if (data.currentTimer) {
         clearInterval(data.currentTimer);
       }
-      let time = 180
+
+      let time = 20;
       const currentTimer = setInterval(() => {
-        if (!time === 0) {
+        if (time === 1) {
           res.isRedTurn = (!res.isRedTurn);
           res.markModified('isRedTurn');
           res.save();
           clearInterval(currentTimer);
           socket.nsp.in(data.roomID).emit('redTurn', {redTurn: res.isRedTurn});
-          socket.nsp.in(data.roomID).emit('timerDone');
+          socket.nsp.in(data.roomID).emit('timerDone', {roomID: res.roomID});
         }
         time--;
         socket.nsp.in(data.roomID).emit('timer', {time:time, currentTimer: Number(currentTimer)});

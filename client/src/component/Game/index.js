@@ -52,7 +52,7 @@ function Game(props) {
     socket.on('updateRedScore', (data) => {
       setRedScore(data.redScore);
     });
-    
+
     socket.on('updateBlueScore', (data) => {
       setBlueScore(data.blueScore);
     });
@@ -70,8 +70,8 @@ function Game(props) {
 
     setRoomID(props.location.state.data.roomID);
 
-    socket.on('timerDone', () => {
-      socket.emit('startTimer', {roomID});
+    socket.on('timerDone', (data) => {
+      socket.emit('startTimer', {roomID: data.roomID});
     });
 
     socket.on('startGame', (data) => {
