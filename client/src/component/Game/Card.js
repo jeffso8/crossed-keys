@@ -5,18 +5,18 @@ import socket from '../../socket';
 
 function Card(props) {
   const [visible, setVisible] = useState(props.clicked);
-  const [isDisabled, setIsDisabled] = useState(false);
+  // const [isDisabled, setIsDisabled] = useState(false);
   const [isMaster, setIsMaster] = useState(false);
-  const redTurn = props.redTurn;
+  // const redTurn = props.redTurn;
 
   const { isMobile } = Responsive();
 
   useEffect(() => {
-    setIsDisabled(props.isDisabled);
+    // setIsDisabled(props.isDisabled);
 
     if (props.user.role === 'MASTER') {
       setVisible(true);
-      setIsDisabled(true);
+      // setIsDisabled(true);
       setIsMaster(true);
     }
   }, [props.isDisabled, props.user.role]);
@@ -68,41 +68,41 @@ function Card(props) {
 
   const style = isMobile ? mobileStyle : webStyle;
 
-  const handleClick = () => {
-    if (isDisabled) {
-      return;
-    }
+  // const handleClick = () => {
+  //   if (isDisabled) {
+  //     return;
+  //   }
 
-    if (props.color === BOMB_CARD) {
-      props.bombClicked(props.user.team);
-    } else {
-      if (redTurn) {
-        if (props.color === RED_CARD) {
-          props.setRedScore(props.redScore - 1);
-          props.handleCardClick(props.idx, true);
-        } else {
-          if (props.color === BLUE_CARD) {
-            props.setBlueScore(props.blueScore - 1);
-            socket.emit('startTimer', {roomID: props.roomID, currentTimer: props.timerID});
-          }
-          props.handleCardClick(props.idx, false);
-          socket.emit('startTimer', {roomID: props.roomID, currentTimer: props.timerID});
-        }
-      } else {
-        if (BLUE_CARD === props.color) {
-          props.setBlueScore(props.blueScore - 1);
-          props.handleCardClick(props.idx, false);
-        } else {
-          if (props.color === RED_CARD) {
-            props.setRedScore(props.redScore - 1);
-            socket.emit('startTimer', {roomID: props.roomID, currentTimer: props.timerID});
-          }
-          props.handleCardClick(props.idx, true);
-          socket.emit('startTimer', {roomID: props.roomID, currentTimer: props.timerID});
-        }
-      }
-    }
-  };
+  //   if (props.color === BOMB_CARD) {
+  //     props.bombClicked(props.user.team);
+  //   } else {
+  //     if (redTurn) {
+  //       if (props.color === RED_CARD) {
+  //         props.setRedScore(props.redScore - 1);
+  //         props.handleCardClick(props.idx, true);
+  //       } else {
+  //         if (props.color === BLUE_CARD) {
+  //           props.setBlueScore(props.blueScore - 1);
+  //           socket.emit('startTimer', {roomID: props.roomID, currentTimer: props.timerID});
+  //         }
+  //         props.handleCardClick(props.idx, false);
+  //         socket.emit('startTimer', {roomID: props.roomID, currentTimer: props.timerID});
+  //       }
+  //     } else {
+  //       if (BLUE_CARD === props.color) {
+  //         props.setBlueScore(props.blueScore - 1);
+  //         props.handleCardClick(props.idx, false);
+  //       } else {
+  //         if (props.color === RED_CARD) {
+  //           props.setRedScore(props.redScore - 1);
+  //           socket.emit('startTimer', {roomID: props.roomID, currentTimer: props.timerID});
+  //         }
+  //         props.handleCardClick(props.idx, true);
+  //         socket.emit('startTimer', {roomID: props.roomID, currentTimer: props.timerID});
+  //       }
+  //     }
+  //   }
+  // };
 
   return (
     <div
@@ -111,7 +111,7 @@ function Card(props) {
         ...style.container,
         opacity: isMaster && props.clicked ? 0.3 : 1,
       }}
-      onClick={handleClick}
+      onClick={props.handleClick}
     >
       <div style={style.word}>{props.word}</div>
     </div>

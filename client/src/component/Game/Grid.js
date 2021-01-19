@@ -101,6 +101,8 @@ export default function Grid(props) {
     }
   };
 
+
+
   const renderColumns = (rowColor, wordColumn, clickedColumn, className) => {
     return (
       <div className={className} style={style.columns}>
@@ -126,24 +128,61 @@ export default function Grid(props) {
             (user.team === 'BLUE' && redTurn) ||
             isClicked ||
             gameOver;
+
+          const handleClick = () => {
+            if (isDisabled) {
+              return;
+            }
+            if (realColor === BOMB_CARD) {
+              handleBombClick(user.team);
+            } else {
+              if (redTurn) {
+                if (realColor === RED_CARD) {
+                  handleRedScoreChange(redScore - 1);
+                  handleCardClick((index + clickedColumn * 5), true);
+                } else {
+                  if (realColor === BLUE_CARD) {
+                    handleBlueScoreChange(blueScore - 1);
+                    socket.emit('startTimer', {roomID: roomID, currentTimer: timerID});
+                  }
+                  handleCardClick((index + clickedColumn * 5), false);
+                  socket.emit('startTimer', {roomID: roomID, currentTimer: timerID});
+                }
+              } else {
+                if (BLUE_CARD === realColor) {
+                  handleBlueScoreChange(blueScore - 1);
+                  handleCardClick((index + clickedColumn * 5), false);
+                } else {
+                  if (realColor === RED_CARD) {
+                    handleRedScoreChange(redScore - 1);
+                    socket.emit('startTimer', {roomID: roomID, currentTimer: timerID});
+                  }
+                  handleCardClick((index + clickedColumn * 5), true);
+                  socket.emit('startTimer', {roomID: roomID, currentTimer: timerID});
+                }
+              }
+            }
+          }
+
           return (
             <Card
-              roomID={roomID}
+              // roomID={roomID}
               word={wordColumn[index]}
-              idx={index + clickedColumn * 5}
+              // idx={index + clickedColumn * 5}
               clicked={isClicked}
-              handleCardClick={handleCardClick}
+              // handleCardClick={handleCardClick}
               color={realColor}
               user={user}
-              isDisabled={isDisabled}
-              redScore={redScore}
-              setRedScore={handleRedScoreChange}
-              blueScore={blueScore}
-              setBlueScore={handleBlueScoreChange}
+              // isDisabled={isDisabled}
+              // redScore={redScore}
+              // setRedScore={handleRedScoreChange}
+              // blueScore={blueScore}
+              // setBlueScore={handleBlueScoreChange}
               rotate={randDeg}
-              redTurn={redTurn}
-              bombClicked={handleBombClick}
-              timerID={timerID}
+              // redTurn={redTurn}
+              // bombClicked={handleBombClick}
+              // timerID={timerID}
+              handleClick={handleClick}
             />
           );
         })}

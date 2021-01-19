@@ -2,14 +2,15 @@ import React, { useState, useEffect } from 'react';
 import socket from '../../socket';
 import {Responsive} from '../shared/responsive';
 import {RED_CARD, BLUE_CARD} from '../../constants';
+import {DataType, HintsType} from '../../types';
 
 export default function HintDisplay() {
-  const [hints, setHints] = useState([]);
-  const [redTurn, setRedTurn] = useState(true);
+  const [hints, setHints] = useState<HintsType>([]);
+  const [redTurn, setRedTurn] = useState<boolean>(true);
   // const { isMobile } = Responsive();
-  
+
   useEffect(() => {
-    socket.on('sendHint', (data) => {
+    socket.on('sendHint', (data: DataType) => {
       setHints(data.hints);
       setRedTurn(data.isRedTurn);
     });
