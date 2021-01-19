@@ -5,7 +5,6 @@ export type HintsType = {
 }[];
 
 
-
 export type UserType = {
   userID: string,
   team: string,
@@ -13,6 +12,7 @@ export type UserType = {
   isHost: boolean,
   socketId: string,
 };
+
 
 export type DataType = {
   colors: string[],

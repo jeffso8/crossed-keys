@@ -7,14 +7,39 @@ import { Responsive } from '../shared/responsive';
 import Button from '../shared/Button';
 import {MUD_BROWN} from '../../constants';
 import ReactArcText from 'react-arc-text-fix';
+import {DataType, UserType} from '../../types';
 
-function Room(props) {
-  const [roomID, setRoomID] = useState('');
-  const [user, setUser] = useState({});
-  const [redTeam, setRedTeam] = useState([]);
-  const [blueTeam, setBlueTeam] = useState([]);
-  const [nullTeam, setNullTeam] = useState([]);
-  const [roomData, setRoomData] = useState({});
+type RoomPropType = {
+  location: {
+    state: {
+      data: DataType,
+      userID: string,
+    },
+  }, 
+  match: {
+    params: {
+      data: DataType,
+      userID: string,
+      roomID: string
+    },
+  }
+};
+
+function Room(props: RoomPropType) {
+  const emptyUser = {
+    userID: '',
+    team: '',
+    role: '',
+    isHost: false,
+    socketId: ''
+  };
+
+  const [roomID, setRoomID] = useState<String>('');
+  const [user, setUser] = useState<UserType>(emptyUser);
+  const [redTeam, setRedTeam] = useState<UserType[]>([]);
+  const [blueTeam, setBlueTeam] = useState<UserType[]>([]);
+  const [nullTeam, setNullTeam] = useState<UserType[]>([]);
+  const [roomData, setRoomData] = useState<DataType>();
   const history = useHistory();
   const { isMobile } = Responsive();
 
@@ -45,7 +70,7 @@ function Room(props) {
       fontWeight: 900,
       color: MUD_BROWN,
       width: '100%',
-      textAlign: 'center',
+      textAlign: "center" as "center",
       marginTop: 80,
     },
     body: {
@@ -59,7 +84,7 @@ function Room(props) {
       fontSize: 20,
       fontWeight: 900,
       letterSpacing: 1,
-      textAlign: 'center',
+      textAlign: "center" as "center",
     },
     containerStyle: {
       display: 'grid',
@@ -84,7 +109,7 @@ function Room(props) {
       fontWeight: 900,
       color: MUD_BROWN,
       width: '100%',
-      textAlign: 'center',
+      textAlign: "center" as "center",
       marginTop: 80,
     },
     body: {
@@ -95,12 +120,12 @@ function Room(props) {
       fontSize: 20,
       fontWeight: 900,
       letterSpacing: 1,
-      textAlign: 'center',
+      textAlign: "center" as "center"
     },
     containerStyle: {
       display: 'grid',
       width: '100%',
-      position: 'absolute',
+      position: "absolute" as "absolute",
       gridTemplateColumns: '1fr 1fr 1fr',
     },
     columnStyle: {
@@ -124,34 +149,37 @@ function Room(props) {
       userID: props.location.state.userID,
     });
 
-    socket.on('startGame', (data) => {
+    socket.on('startGame', (data: DataType) => {
       history.push(`/${data.roomID}/game`, {
         data,
         userID: props.location.state.userID,
       });
     });
-  }, '');
+    // @ts-ignore
+  }, "");
 
   useEffect(() => {
-    socket.on('updateTeams', (data) => {
+    socket.on('updateTeams', (data: DataType) => {
       const { redTeam, blueTeam, nullTeam } = organizeUsers(data.users);
       setRedTeam(redTeam);
       setBlueTeam(blueTeam);
       setNullTeam(nullTeam);
       setUser(
-        data.users.find((user) => user.userID === props.location.state.userID)
+        data.users.find((user) => user.userID === props.location.state.userID) || emptyUser
       );
       setRoomData(data);
     });
   }, []);
 
   const showClaimSpyMaster = () => {
-    if (user.team === 'RED' && roomData.redSpy) {
+    if (roomData) {
+    if (user.team === 'RED' && roomData.redSpy){
       return false;
     } else if (user.team === 'BLUE' && roomData.blueSpy) {
       return false;
     }
     return true;
+    }
   };
 
   const style = isMobile ? mobileStyle : webStyle;
@@ -175,7 +203,7 @@ function Room(props) {
                 <User
                   i={i}
                   name={user.userID}
-                  isSpyMaster={roomData.redSpy === user}
+                  isSpyMaster={roomData ? roomData.redSpy === user.role : null}
                 />
               );
             })}
@@ -187,7 +215,7 @@ function Room(props) {
                 <User
                   i={i}
                   name={user.userID}
-                  isSpyMaster={roomData.redSpy === user}
+                  isSpyMaster={roomData ? roomData.redSpy === user.role : null}
                 />
               );
             })}
@@ -199,7 +227,7 @@ function Room(props) {
                 <User
                   i={i}
                   name={user.userID}
-                  isSpyMaster={roomData.blueSpy === user}
+                  isSpyMaster={roomData ? roomData.blueSpy === user.role : null}
                 />
               );
             })}
