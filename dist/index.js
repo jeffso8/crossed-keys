@@ -412,9 +412,7 @@ io.on('connection', function (socket) {
       if (err) return;
       socket.nsp["in"](data.roomID).emit('startGame', res);
     });
-  }); 
-  
-  // socket.on('disconnect', () => {
+  }); // socket.on('disconnect', () => {
   //   setTimeout(() => {
   //     if (socket.userID && socket.roomID){
   //       Rooms.findOne({roomID: socket.roomID}, function(err, res) {
