@@ -142,7 +142,7 @@ function Game(props: GamePropsType) {
       <div>
         <ScoreBanner isRedTeam={true} score={redScore} />
         <div style={{textAlign: 'center'}}>
-          <Timer redTurn={redTurn} setTimerID={setTimerID}/>
+          <Timer setTimerID={setTimerID}/>
           <h2>{redTurn ? 'Red\'s Turn' : 'Blue\'s Turn'}</h2>
         </div>
         <ScoreBanner isRedTeam={false} score={blueScore} />
