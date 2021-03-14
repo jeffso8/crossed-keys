@@ -40,7 +40,7 @@ function Room(props: RoomPropType) {
   const [blueTeam, setBlueTeam] = useState<UserType[]>([]);
   const [nullTeam, setNullTeam] = useState<UserType[]>([]);
   const [roomData, setRoomData] = useState<DataType>();
-  const history = useHistory();
+  const history = useHistory<any>();
   const { isMobile } = Responsive();
 
   const handleSetRedTeamClick = () => {
