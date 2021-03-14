@@ -246,14 +246,16 @@ io.on('connection', (socket) => {
       if (err) return;
       if (data.currentTimer) {
         clearInterval(data.currentTimer);
+        data.currentTimer = undefined;
       }
       let time = 20;
-      const currentTimer = setInterval(() => {
+      let currentTimer = setInterval(() => {
         if (time === 1) {
           res.isRedTurn = (!res.isRedTurn);
           res.markModified('isRedTurn');
           res.save();
           clearInterval(currentTimer);
+          currentTimer = undefined;
           socket.nsp.in(data.roomID).emit('redTurn', {redTurn: res.isRedTurn});
           socket.nsp.in(data.roomID).emit('timerDone', {roomID: res.roomID});
         } else {

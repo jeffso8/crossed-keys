@@ -344,6 +344,7 @@ io.on('connection', function (socket) {
 
       if (data.currentTimer) {
         clearInterval(data.currentTimer);
+        data.currentTimer = undefined;
       }
 
       var time = 20;
@@ -353,6 +354,7 @@ io.on('connection', function (socket) {
           res.markModified('isRedTurn');
           res.save();
           clearInterval(currentTimer);
+          currentTimer = undefined;
           socket.nsp["in"](data.roomID).emit('redTurn', {
             redTurn: res.isRedTurn
           });
