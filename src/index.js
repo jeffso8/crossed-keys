@@ -247,7 +247,6 @@ io.on('connection', (socket) => {
       if (data.currentTimer) {
         clearInterval(data.currentTimer);
       }
-
       let time = 20;
       const currentTimer = setInterval(() => {
         if (time === 1) {
@@ -257,9 +256,10 @@ io.on('connection', (socket) => {
           clearInterval(currentTimer);
           socket.nsp.in(data.roomID).emit('redTurn', {redTurn: res.isRedTurn});
           socket.nsp.in(data.roomID).emit('timerDone', {roomID: res.roomID});
-        }
+        } else {
         time--;
         socket.nsp.in(data.roomID).emit('timer', {time:time, currentTimer: Number(currentTimer)});
+        }
       }, 1000);
     });
   });
@@ -290,32 +290,32 @@ io.on('connection', (socket) => {
     })
   });
 
-  socket.on('disconnect', () => {
-    setTimeout(() => {
-      if (socket.userID && socket.roomID){
-        Rooms.findOne({roomID: socket.roomID}, function(err, res) {
-          if (err) return;
-          const foundUser = res.users.find(user => user.userID === socket.userID);
-          const foundUserIdx = res.users.indexOf(foundUser);
+  // socket.on('disconnect', () => {
+  //   setTimeout(() => {
+  //     if (socket.userID && socket.roomID){
+  //       Rooms.findOne({roomID: socket.roomID}, function(err, res) {
+  //         if (err) return;
+  //         const foundUser = res.users.find(user => user.userID === socket.userID);
+  //         const foundUserIdx = res.users.indexOf(foundUser);
 
-          if(foundUser.socketId === socket.id) {
-            const users = res.users;
-            users.splice(foundUserIdx, 1);
-            res.users = users;
-            res.markModified('users');
-            res.save();
-            if(res && res.users.length === 0) {
-              console.log('no users left');
-              Rooms.findOneAndDelete({roomID: socket.roomID}, function(err, res) {
-                if (err) return;
-                console.log("Room deleted!");
-              });
-            }
-          }
-        });
-      }
-    }, 5000);
-  });
+  //         if(foundUser.socketId === socket.id) {
+  //           const users = res.users;
+  //           users.splice(foundUserIdx, 1);
+  //           res.users = users;
+  //           res.markModified('users');
+  //           res.save();
+  //           if(res && res.users.length === 0) {
+  //             console.log('no users left');
+  //             Rooms.findOneAndDelete({roomID: socket.roomID}, function(err, res) {
+  //               if (err) return;
+  //               console.log("Room deleted!");
+  //             });
+  //           }
+  //         }
+  //       });
+  //     }
+  //   }, 5000);
+  // });
 });
 
 // Handle React routing, return all requests to React app

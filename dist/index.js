@@ -133,7 +133,8 @@ io.on('connection', function (socket) {
             userID: data.userID,
             team: null,
             role: null,
-            isHost: true
+            isHost: true,
+            socketId: socket.id
           }]
         });
         if (err) return;
@@ -149,10 +150,12 @@ io.on('connection', function (socket) {
             userID: data.userID,
             team: null,
             role: null,
-            isHost: false
+            isHost: false,
+            socketId: socket.id
           });
         }
 
+        ;
         if (err) return;
         res.markModified('users');
         res.save();
@@ -261,11 +264,19 @@ io.on('connection', function (socket) {
   });
   socket.on('joinGame', function (data) {
     socket.join(data.roomID);
-    socket.userID = data.userID;
+    socket.userID = data.user.userID;
     socket.roomID = data.roomID;
 
-    _Rooms["default"].findOne({
-      roomID: data.roomID
+    _Rooms["default"].findOneAndUpdate({
+      roomID: data.roomID,
+      'users.userID': data.user.userID
+    }, {
+      $set: {
+        'users.$.socketId': socket.id
+      }
+    }, {
+      upsert: true,
+      "new": true
     }, function (err, res) {
       if (err) return;
       socket.nsp["in"](data.roomID).emit('refreshGame', res);
@@ -335,23 +346,26 @@ io.on('connection', function (socket) {
         clearInterval(data.currentTimer);
       }
 
-      var time = 180;
+      var time = 20;
       var currentTimer = setInterval(function () {
-        if (time === 0) {
-          res.redTurn = !res.redTurn;
+        if (time === 1) {
+          res.isRedTurn = !res.isRedTurn;
           res.markModified('isRedTurn');
           res.save();
           clearInterval(currentTimer);
           socket.nsp["in"](data.roomID).emit('redTurn', {
             redTurn: res.isRedTurn
           });
+          socket.nsp["in"](data.roomID).emit('timerDone', {
+            roomID: res.roomID
+          });
+        } else {
+          time--;
+          socket.nsp["in"](data.roomID).emit('timer', {
+            time: time,
+            currentTimer: Number(currentTimer)
+          });
         }
-
-        time--;
-        socket.nsp["in"](data.roomID).emit('timer', {
-          time: time,
-          currentTimer: Number(currentTimer)
-        });
       }, 1000);
     });
   });
@@ -398,34 +412,33 @@ io.on('connection', function (socket) {
       if (err) return;
       socket.nsp["in"](data.roomID).emit('startGame', res);
     });
-  });
-  socket.on('disconnect', function () {
-    if (socket.userID && socket.roomID) {
-      _Rooms["default"].findOneAndUpdate({
-        roomID: socket.roomID,
-        'users.userID': socket.userID
-      }, {
-        $pull: {
-          users: {
-            userID: socket.userID
-          }
-        }
-      }, {
-        "new": true
-      }, function (err, res) {
-        if (err) return;
-
-        if (res.users.length === 0) {
-          _Rooms["default"].findOneAndDelete({
-            roomID: socket.roomID
-          }, function (err, res) {
-            if (err) return;
-            console.log("Room deleted!");
-          });
-        }
-      });
-    }
-  });
+  }); 
+  
+  // socket.on('disconnect', () => {
+  //   setTimeout(() => {
+  //     if (socket.userID && socket.roomID){
+  //       Rooms.findOne({roomID: socket.roomID}, function(err, res) {
+  //         if (err) return;
+  //         const foundUser = res.users.find(user => user.userID === socket.userID);
+  //         const foundUserIdx = res.users.indexOf(foundUser);
+  //         if(foundUser.socketId === socket.id) {
+  //           const users = res.users;
+  //           users.splice(foundUserIdx, 1);
+  //           res.users = users;
+  //           res.markModified('users');
+  //           res.save();
+  //           if(res && res.users.length === 0) {
+  //             console.log('no users left');
+  //             Rooms.findOneAndDelete({roomID: socket.roomID}, function(err, res) {
+  //               if (err) return;
+  //               console.log("Room deleted!");
+  //             });
+  //           }
+  //         }
+  //       });
+  //     }
+  //   }, 5000);
+  // });
 }); // Handle React routing, return all requests to React app
 
 app.get('/*', function (req, res) {
