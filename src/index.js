@@ -234,7 +234,7 @@ io.on('connection', (socket) => {
   socket.on('updateTurn', (data) => {
     Rooms.findOne({roomID: data.roomID}, function(err, res) {
       if (err) return;
-      console.log("redTurn: ", res.isRedTurn);
+      // console.log("redTurn: ", res.isRedTurn);
       res.isRedTurn = data.redTurn;
       res.markModified('isRedTurn');
       res.save();
@@ -253,7 +253,7 @@ io.on('connection', (socket) => {
       let currentTimer = setInterval(() => {
         const timerID = currentTimer[Symbol.toPrimitive]();
         if (time === 0) {
-          console.log("zero Time redTurn: ", res.isRedTurn);
+          // console.log("zero Time redTurn: ", res.isRedTurn);
           res.isRedTurn = (!res.isRedTurn);
           res.markModified('isRedTurn');
           res.save();
