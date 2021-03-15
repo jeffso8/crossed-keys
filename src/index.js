@@ -234,6 +234,7 @@ io.on('connection', (socket) => {
   socket.on('updateTurn', (data) => {
     Rooms.findOne({roomID: data.roomID}, function(err, res) {
       if (err) return;
+      console.log("redTurn: ", res.isRedTurn);
       res.isRedTurn = data.redTurn;
       res.markModified('isRedTurn');
       res.save();
@@ -246,19 +247,22 @@ io.on('connection', (socket) => {
       if (err) return;
       if (data.currentTimer) {
         clearInterval(data.currentTimer);
+        console.log("first clear: ", data.currentTimer);
       }
-      let time = 20;
+      let time = 30;
       let currentTimer = setInterval(() => {
-        if (time === 1) {
+        const timerID = currentTimer[Symbol.toPrimitive]();
+        if (time === 0) {
+          console.log("zero Time redTurn: ", res.isRedTurn);
           res.isRedTurn = (!res.isRedTurn);
           res.markModified('isRedTurn');
           res.save();
-          clearInterval(currentTimer);
-          socket.nsp.in(data.roomID).emit('redTurn', {redTurn: res.isRedTurn});
-          socket.nsp.in(data.roomID).emit('timerDone', {roomID: res.roomID});
+          clearInterval(timerID);
+          // socket.nsp.in(data.roomID).emit('redTurn', {redTurn: res.isRedTurn});
+          socket.nsp.in(data.roomID).emit('timerDone', {roomID: res.roomID, redTurn: res.isRedTurn, users:res.users});
         } else {
         time--;
-        const timerID = currentTimer[Symbol.toPrimitive]();
+        // const timerID = currentTimer[Symbol.toPrimitive]();
         socket.nsp.in(data.roomID).emit('timer', {time:time, currentTimer: timerID});
         }
       }, 1000);

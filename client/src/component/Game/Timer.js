@@ -8,6 +8,7 @@ function Timer(props) {
   useEffect(() => {
     socket.on('timer', (data) => {
       setTime(data.time);
+      console.log("timer.js id: ", data.currentTimer);
       props.setTimerID(data.currentTimer);
     });
   }, []);

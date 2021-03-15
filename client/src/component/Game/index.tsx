@@ -87,7 +87,11 @@ function Game(props: GamePropsType) {
     setRoomID(props.location.state.data.roomID);
 
     socket.on('timerDone', (data: DataType) => {
-      socket.emit('startTimer', {roomID: data.roomID});
+      setRedTurn(data.redTurn);
+      // @ts-ignore
+      if (data.users.find((user) => user.userID === props.location.state.userID).isHost){
+        socket.emit('startTimer', {roomID: data.roomID});
+      }
     });
 
     socket.on('startGame', (data: DataType) => {
