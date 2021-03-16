@@ -338,42 +338,38 @@ io.on('connection', function (socket) {
     });
   });
   socket.on('startTimer', function (data) {
-    _Rooms["default"].findOne({
-      roomID: data.roomID
-    }, function (err, res) {
-      if (err) return;
+    if (data.currentTimer) {
+      clearInterval(data.currentTimer);
+    }
 
-      if (data.currentTimer) {
-        clearInterval(data.currentTimer);
-        console.log("first clear: ", data.currentTimer);
-      }
+    var time = 20;
+    var currentTimer = setInterval(function () {
+      var timerID = currentTimer[Symbol.toPrimitive]();
 
-      var time = 30;
-      var currentTimer = setInterval(function () {
-        var timerID = currentTimer[Symbol.toPrimitive]();
-
-        if (time === 0) {
-          // console.log("zero Time redTurn: ", res.isRedTurn);
+      if (time === 0) {
+        _Rooms["default"].findOne({
+          roomID: data.roomID
+        }, function (err, res) {
+          if (err) return;
           res.isRedTurn = !res.isRedTurn;
           res.markModified('isRedTurn');
           res.save();
-          clearInterval(timerID); // socket.nsp.in(data.roomID).emit('redTurn', {redTurn: res.isRedTurn});
-
           socket.nsp["in"](data.roomID).emit('timerDone', {
             roomID: res.roomID,
             redTurn: res.isRedTurn,
             users: res.users
           });
-        } else {
-          time--; // const timerID = currentTimer[Symbol.toPrimitive]();
+        });
 
-          socket.nsp["in"](data.roomID).emit('timer', {
-            time: time,
-            currentTimer: timerID
-          });
-        }
-      }, 1000);
-    });
+        clearInterval(timerID);
+      } else {
+        time--;
+        socket.nsp["in"](data.roomID).emit('timer', {
+          time: time,
+          currentTimer: timerID
+        });
+      }
+    }, 1000);
   });
   socket.on('gameOver', function (data) {
     _Rooms["default"].findOne({
