@@ -3,9 +3,10 @@ import http from 'http';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import Rooms from '../models/Rooms';
+import ErrorLog from '../models/ErrorLog';
 import database from '../database/index';
 import "regenerator-runtime/runtime.js";
-import {getWords, newUser} from './utils';
+import {getWords, logErrors, newUser} from './utils';
 import path from 'path';
 
 const socketIO = require('socket.io');
@@ -14,7 +15,6 @@ const port = process.env.PORT || 3001;
 let app = express();
 let server = http.Server(app);
 let io = socketIO(server);
-
 
 app.use(cors());
 app.use(express.json());
@@ -104,8 +104,10 @@ io.on('connection', (socket) => {
               isHost: true,
               socketId: socket.id
             }]
-          })
-        if (err) return;
+          });
+        if (err){
+          return;
+        };
         newRoom.save();
         io.in(data.roomID).emit('updateTeams', newRoom);
       } else {
@@ -118,7 +120,10 @@ io.on('connection', (socket) => {
         isHost: false,
         socketId: socket.id
       })};
-      if (err) return;
+      if (err) {
+        logErrors(err);
+        return;
+      }
       res.markModified('users');
       res.save();
       io.in(data.roomID).emit('updateTeams', res);
@@ -278,7 +283,7 @@ io.on('connection', (socket) => {
       socket.nsp.in(data.roomID).emit('updateGameOver', res);
     });
   });
-
+  
   socket.on('hostStartGame', (data) => {
     const colorSorted = colors.sort(() => Math.random() - 0.5);
     const words = getWords();
@@ -290,7 +295,7 @@ io.on('connection', (socket) => {
         socket.nsp.in(data.roomID).emit('startGame', res);
     })
   });
-
+  
   // socket.on('disconnect', () => {
   //   setTimeout(() => {
   //     if (socket.userID && socket.roomID){

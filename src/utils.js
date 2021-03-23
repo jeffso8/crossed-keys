@@ -26,6 +26,14 @@ export function getWords() {
   return shuffledArray.splice(0,25);
 }
 
+export function logErrors(err){
+  console.log(err);
+  let d = new Date();
+  var errorTime = d.toLocaleString();
+  const newError = new ErrorLog({foundErr: err.toString(), time: errorTime});
+  newError.save();
+}
+
 export const newUser = (userID, isHost = false) => {
   return {
     [userID]: {

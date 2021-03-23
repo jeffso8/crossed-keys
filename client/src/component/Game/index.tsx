@@ -114,13 +114,6 @@ function Game(props: GamePropsType) {
     }
   };
 
-  // const handleTimerEnd = () => {
-  //   if (timerEnd) {
-  //     socket.emit('startTimer', {roomID, currentTimer: timerID});
-  //     setTimerEnd(false);
-  //   }
-  // }
-
   const handleBlueScoreChange = (score: number) => {
     socket.emit('blueScoreChange', {roomID, blueScore: score});
     if (score === 0) {
