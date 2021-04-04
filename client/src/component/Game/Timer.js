@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import socket from '../../socket';
 import './Timer.scss';
-import moment from 'moment';
-
 
 function Timer(props) {
   const [time, setTime] = useState(0);
@@ -16,55 +14,46 @@ function Timer(props) {
         setPrevTime(data.time + 1);
       }
       setTime((time) => data.time);
-
-      // console.log("timer.js id: ", data.currentTimer);
       processClock(time, prevTime);
-
       props.setTimerID(data.currentTimer);
     });
   }, []);
 
-      const clockRef = useRef(null);
-      const processClock = (aTime, aPrevTime) => {
-             console.log('time', aTime);
-        console.log('prevTime', aPrevTime);
+  const clockRef = useRef(null);
+  const processClock = (aTime, aPrevTime) => {
+    if (
+      parseInt(time / 10) !==
+          parseInt(prevTime / 10) &&
+      clockRef.current
+    ) {
+      const section = clockRef.current.querySelector(
+          '.flip-countdown-card-sec.one'
+      );
+      section.classList.remove('flip');
+      void section.offsetWidth;
+      section.classList.add('flip');
+    }
 
-            if (
-                parseInt(time / 10) !==
-                    parseInt(prevTime / 10) &&
-                clockRef.current
-            ) {
-                const section = clockRef.current.querySelector(
-                    '.flip-countdown-card-sec.one'
-                );
-                section.classList.remove('flip');
-                void section.offsetWidth;
-                section.classList.add('flip');
-            }
-
-            if (
-                parseInt(time % 10) !==
-                    parseInt(prevTime % 10) &&
-                clockRef.current
-            ) {
-                const section = clockRef.current.querySelector(
-                    '.flip-countdown-card-sec.two'
-                );
-                section.classList.remove('flip');
-                void section.offsetWidth;
-                section.classList.add('flip');
-            }
-
-        // prev = value;
-    };
+    if (
+      parseInt(time % 10) !==
+          parseInt(prevTime % 10) &&
+      clockRef.current
+    ) {
+      const section = clockRef.current.querySelector(
+          '.flip-countdown-card-sec.two'
+      );
+      section.classList.remove('flip');
+      void section.offsetWidth;
+      section.classList.add('flip');
+  }
+};
 
 
 
-   const part1 = parseInt(time / 10);
-        const part2 = parseInt(time % 10);
-        let prev1 = parseInt(prevTime / 10);
-        let prev2 = parseInt(prevTime % 10);
-
+  const part1 = parseInt(time / 10);
+  const part2 = parseInt(time % 10);
+  let prev1 = parseInt(prevTime / 10);
+  let prev2 = parseInt(prevTime % 10);
 
   return(
     <>
@@ -89,9 +78,6 @@ function Timer(props) {
         </span>
       </div>
     </>
-    // <div>
-    //   <h1>Time Remaining: {minutes}:{seconds < 10 ? `0${seconds}` : seconds}</h1>
-    // </div>
   );
 }
 
