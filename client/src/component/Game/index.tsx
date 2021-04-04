@@ -5,6 +5,8 @@ import socket from '../../socket';
 import GameInfoModal from './GameInfoModal';
 import GameOverModal from './GameOverModal';
 import Timer from './Timer';
+// import Timer from './TimerTest';
+
 import Hint from './Hint';
 import HintDisplay from './HintDisplay';
 import {DataType, UserType} from '../../types';
@@ -140,13 +142,23 @@ function Game(props: GamePropsType) {
       );
     }
   };
-
+  
+    const endAt = new Date(
+                    Date.now() +
+                        1000 /*sec*/ *
+                        60 /*min*/ *
+                        60 /*hour*/ *
+                        24 /*day*/ *
+                        30 /*month*/ *
+                        12 /*year*/ *
+                            2
+                ).toUTCString();
   return (
     <div style={{width: '100%', height: '100%', display: 'flex', flexDirection: 'column'}}>
       <div>
         <ScoreBanner isRedTeam={true} score={redScore} />
         <div style={{textAlign: 'center'}}>
-          <Timer setTimerID={setTimerID}/>
+          <Timer setTimerID={setTimerID} endAt={endAt}/>
           <h2>{redTurn ? 'Red\'s Turn' : 'Blue\'s Turn'}</h2>
         </div>
         <ScoreBanner isRedTeam={false} score={blueScore} />
