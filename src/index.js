@@ -87,6 +87,13 @@ app.get('/game-stats', function(req,res){
     });
   });
 
+// app.get('/join', (req, res) => {
+//   Rooms.findOne({roomID: req.roomID}, function(err, foundRoom) {
+
+//   }
+//   ))
+// })
+
 io.on('connection', (socket) => {
   socket.on('joinRoom', (data) => {
     //data is an object with the roomID and the user that joined the room

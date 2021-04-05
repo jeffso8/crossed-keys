@@ -21,6 +21,7 @@ export default function TextInput(props) {
     <input
       className="login-input"
       style={style.input}
+      id = {props.id}
       type="text"
       placeholder={props.placeholder}
       name={props.name}
