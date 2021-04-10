@@ -69,14 +69,10 @@ function Home() {
 
   const [username, setUsername] = useState('');
   const [roomName, setRoomName] = useState('');
-  // const [joinRoomName, setJoinRoomName] = useState('');
-  // const [chckbox, setchckbox] = useState(false);
   const history = useHistory();
   const { isMobile } = Responsive();
   const handleUsernameChange = (event)  => setUsername(event.target.value);
-  // const handleJoinRoomNameChange = (event) => setJoinRoomName(event.target.value)
   const handleRoomNameChange = (event)  => setRoomName(event.target.value);
-  // const handleJoin = () => setchckbox(!chckbox);
 
   const createRoom = () => {
     //this potentially needs a join room name, gotta figure out when to emit which
