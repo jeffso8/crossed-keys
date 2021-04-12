@@ -5,6 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.shuffle = shuffle;
 exports.getWords = getWords;
+exports.logErrors = logErrors;
 exports.newUser = void 0;
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -34,6 +35,17 @@ function getWords() {
   var words = text.split("\n");
   var shuffledArray = shuffle(words);
   return shuffledArray.splice(0, 25);
+}
+
+function logErrors(err) {
+  console.log(err);
+  var d = new Date();
+  var errorTime = d.toLocaleString();
+  var newError = new ErrorLog({
+    foundErr: err.toString(),
+    time: errorTime
+  });
+  newError.save();
 }
 
 var newUser = function newUser(userID) {

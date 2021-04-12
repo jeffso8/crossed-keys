@@ -10,6 +10,8 @@ var _bodyParser = _interopRequireDefault(require("body-parser"));
 
 var _Rooms = _interopRequireDefault(require("../models/Rooms"));
 
+var _ErrorLog = _interopRequireDefault(require("../models/ErrorLog"));
+
 var _index = _interopRequireDefault(require("../database/index"));
 
 require("regenerator-runtime/runtime.js");
@@ -137,7 +139,12 @@ io.on('connection', function (socket) {
             socketId: socket.id
           }]
         });
-        if (err) return;
+
+        if (err) {
+          return;
+        }
+
+        ;
         newRoom.save();
         io["in"](data.roomID).emit('updateTeams', newRoom);
       } else {
@@ -156,7 +163,12 @@ io.on('connection', function (socket) {
         }
 
         ;
-        if (err) return;
+
+        if (err) {
+          (0, _utils.logErrors)(err);
+          return;
+        }
+
         res.markModified('users');
         res.save();
         io["in"](data.roomID).emit('updateTeams', res);
