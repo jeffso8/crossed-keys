@@ -5,7 +5,6 @@ import {BEIGE, BROWNISH, MUD_BROWN} from '../constants';
 import TextInput from './shared/TextInput';
 import ReactArcText from 'react-arc-text-fix';
 import {Responsive} from './shared/responsive';
-import { set } from 'react-ga';
 
 
 function Home() {
@@ -116,30 +115,30 @@ function Home() {
             CROSSED KEYS
           </div>
         </div>
-        <div>
-          <TextInput
-          name='username'
-          value={username}
-          placeholder={'Username'}
-          onChange={handleUsernameChange}
-          style={isMobile ? {width: '90%'} : {}}
-          /> 
-        </div>
-        <div>
-          <TextInput 
-            id="roomName" 
-            name="roomName"
-            value={roomName}
-            placeholder={'Room Name'}
-            onChange={handleRoomNameChange}
+          <div>
+            <TextInput
+            name='username'
+            value={username}
+            placeholder={'Username'}
+            onChange={handleUsernameChange}
             style={isMobile ? {width: '90%'} : {}}
-          />
-        </div>
-        <div>        
-         </div>
-        <button style={style.button} onClick={createRoom}>SUBMIT</button>
+            /> 
+          </div>
+          <div>
+            <TextInput 
+              id="roomName" 
+              name="roomName"
+              value={roomName}
+              placeholder={'Room Name'}
+              onChange={handleRoomNameChange}
+              style={isMobile ? {width: '90%'} : {}}
+            />
+          </div>
+          <div>        
+            <button style={style.button} onClick={createRoom}>SUBMIT</button>
+          </div>
       </div>
-    </div>
+    </div>  
   );
 }
 
