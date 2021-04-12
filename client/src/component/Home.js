@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
 import {BEIGE, BROWNISH, MUD_BROWN} from '../constants';
 import TextInput from './shared/TextInput';
 import ReactArcText from 'react-arc-text-fix';
 import {Responsive} from './shared/responsive';
+
 
 function Home() {
   const style = {
@@ -71,12 +72,24 @@ function Home() {
   const { isMobile } = Responsive();
   const handleUsernameChange = (event)  => setUsername(event.target.value);
   const handleRoomNameChange = (event)  => setRoomName(event.target.value);
+
   const createRoom = () => {
+    //this potentially needs a join room name, gotta figure out when to emit which
     axios.post('/create-room', {username, roomName}).then(
       res => {
         history.push(res.data.redirectUrl, {userID: username});
       });
   };
+
+  useEffect(()=> {
+    fetch('/words').then((res) => {
+      res.json().then((data) => {
+        setRoomName(data[0] + '-' + data[5]);
+      })
+    });
+  }, []);
+
+  
 
   return (
     <div style={style.container}>
@@ -102,26 +115,30 @@ function Home() {
             CROSSED KEYS
           </div>
         </div>
-        <div>
-          <TextInput
+          <div>
+            <TextInput
             name='username'
             value={username}
             placeholder={'Username'}
             onChange={handleUsernameChange}
             style={isMobile ? {width: '90%'} : {}}
-          />
-        </div>
-        <div>
-          <TextInput name="roomName"
-            value={roomName}
-            placeholder={'Room Name'}
-            onChange={handleRoomNameChange}
-            style={isMobile ? {width: '90%'} : {}}
-          />
-        </div>
-        <button style={style.button} onClick={createRoom}>SUBMIT</button>
+            /> 
+          </div>
+          <div>
+            <TextInput 
+              id="roomName" 
+              name="roomName"
+              value={roomName}
+              placeholder={'Room Name'}
+              onChange={handleRoomNameChange}
+              style={isMobile ? {width: '90%'} : {}}
+            />
+          </div>
+          <div>        
+            <button style={style.button} onClick={createRoom}>SUBMIT</button>
+          </div>
       </div>
-    </div>
+    </div>  
   );
 }
 
