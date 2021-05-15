@@ -32,24 +32,25 @@ async function getWords() {
 }
 
 function assembleList(){
-  assembled = []
-  filtered = set();
+  let assembled = []
+  let filtered = set();
 
   for (var i=0; i < 30; i++) {
     assembled.append(getWords());
-  }
+  };
+
   assembled.sort();
 
-  assembled.forEach(element => {
+  assembled.forEach((element) => {
     if (element.slice(-1) == 's'){
       singular = element.slice(0,-1);
       if (!filtered.has(singular)){
         filtered.add(element);
       }
     }
-  }
+  });
   
-  filtered.forEach(element => {
+  filtered.forEach((element) => {
     fs.appendFile('words.txt', element, function(err) {
       if (err){
         console.log("error thrown");
