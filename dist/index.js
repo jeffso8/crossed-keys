@@ -52,7 +52,8 @@ app.all('*', function (req, res, next) {
 console.log('process.env.NODE_ENV', process.env.NODE_ENV);
 app.use(function (req, res, next) {
   console.log('req header', req.header('x-forwarded-proto'));
-  console.log(req.header('host'));
+  console.log('req.header(host)', req.header('host'));
+  console.log(req.header('x-forwarded-proto'));
   if (req.header('x-forwarded-proto') !== 'https') res.redirect("https://".concat(req.header('host')).concat(req.url));else next();
 }); // enable ssl redirect
 

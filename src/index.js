@@ -37,7 +37,9 @@ console.log('process.env.NODE_ENV', process.env.NODE_ENV);
 
   app.use((req, res, next) => {
     console.log('req header', req.header('x-forwarded-proto'));
-    console.log(req.header('host'));
+    console.log('req.header(host)', req.header('host'));
+    console.log(req.header('x-forwarded-proto'));
+    
     if (req.header('x-forwarded-proto') !== 'https')
       res.redirect(`https://${req.header('host')}${req.url}`)
     else
