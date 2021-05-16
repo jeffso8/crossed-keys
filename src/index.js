@@ -33,6 +33,16 @@ app.all('*', function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   next();
 });
+console.log('process.env.NODE_ENV', process.env.NODE_ENV);
+
+  app.use((req, res, next) => {
+    console.log('req header', req.header('x-forwarded-proto'));
+    console.log(req.header('host'));
+    if (req.header('x-forwarded-proto') !== 'https')
+      res.redirect(`https://${req.header('host')}${req.url}`)
+    else
+      next();
+  })
 
 // enable ssl redirect
 app.use(sslRedirect());
