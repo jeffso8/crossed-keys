@@ -20,6 +20,8 @@ var _utils = require("./utils");
 
 var _path = _interopRequireDefault(require("path"));
 
+var _herokuSslRedirect = _interopRequireDefault(require("heroku-ssl-redirect"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
@@ -46,7 +48,9 @@ app.options("/*", function (req, res, next) {
 app.all('*', function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   next();
-});
+}); // enable ssl redirect
+
+app.use((0, _herokuSslRedirect["default"])());
 /*
  roomMap: {
   roomID: {
