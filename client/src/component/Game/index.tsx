@@ -8,6 +8,7 @@ import Timer from './Timer';
 import Hint from './Hint';
 import HintDisplay from './HintDisplay';
 import {DataType, UserType} from '../../types';
+import { Responsive } from '../shared/responsive';
 
 type GamePropsType = {
   location: {
@@ -37,6 +38,32 @@ function Game(props: GamePropsType) {
   const [gameOver, setGameOver] = useState(props.location.state.data.gameOver);
   const [timerID, setTimerID] = useState(0);
   const [timerEnd, setTimerEnd] = useState(false);
+
+  const { isMobile } = Responsive();
+  
+  const webStyle = {
+    container: {
+      display: 'flex',
+      justifyContent: 'center',
+      position: 'relative' as 'relative',
+      marginTop: 50,
+      marginBottom: 50
+    },
+  };
+
+  const mobileStyle = {
+    container: {
+      display: 'flex',
+      justifyContent: 'center',
+      flexDirection: 'column' as 'column',
+      position: 'relative' as 'relative',
+      marginTop: 50,
+      marginBottom: 50
+    },
+  };
+
+  const style = isMobile ? mobileStyle : webStyle;
+
 
   useEffect(() => {
     socket.emit('joinGame', {roomID: props.location.state.data.roomID, user: props.location.state.data.users.find((user) => user.userID === props.location.state.userID)});
@@ -144,7 +171,7 @@ function Game(props: GamePropsType) {
         </div>
         <ScoreBanner isRedTeam={false} score={blueScore} />
       </div>
-      <div style={{display: 'flex', justifyContent: 'center', position: 'relative', marginTop: 50, marginBottom: 50}}>
+      <div style={style.container}>
         <Grid
           gameOver={gameOver}
           redTurn={redTurn}

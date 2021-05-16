@@ -52,12 +52,10 @@ export default function Grid(props) {
   const mobileCardStyle = {
     container: {
       display: 'grid',
-      position: 'fixed',
-      left: '50%',
-      top: '35%',
-      transform: 'translate(-50%, -50%)',
-      gridGap: 2,
+      gridGap: 12,
       gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr',
+      maxWidth: 'min-content',
+      margin: 'auto',
     },
     columns: {
       margin: 0,
@@ -166,22 +164,11 @@ export default function Grid(props) {
 
           return (
             <Card
-              // roomID={roomID}
               word={wordColumn[index]}
-              // idx={index + clickedColumn * 5}
               clicked={isClicked}
-              // handleCardClick={handleCardClick}
               color={realColor}
               user={user}
-              // isDisabled={isDisabled}
-              // redScore={redScore}
-              // setRedScore={handleRedScoreChange}
-              // blueScore={blueScore}
-              // setBlueScore={handleBlueScoreChange}
               rotate={randDeg}
-              // redTurn={redTurn}
-              // bombClicked={handleBombClick}
-              // timerID={timerID}
               handleClick={handleClick}
             />
           );

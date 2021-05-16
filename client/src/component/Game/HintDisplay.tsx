@@ -7,8 +7,25 @@ import {DataType, HintsType} from '../../types';
 export default function HintDisplay() {
   const [hints, setHints] = useState<HintsType>([]);
   const [redTurn, setRedTurn] = useState<boolean>(true);
-  // const { isMobile } = Responsive();
+  const { isMobile } = Responsive();
 
+  const webStyle = {
+    hintDisplay: {
+      alignContent: 'center',
+      width: 100,
+      position: 'absolute',
+      right:'3.8%'
+    }
+  };
+
+  const mobileStyle = {
+    hintDisplay: {
+      alignContent: 'center',
+      width: 100,
+    }
+  };
+
+  const style = isMobile ? mobileStyle : webStyle;
   useEffect(() => {
     socket.on('sendHint', (data: DataType) => {
       setHints(data.hints);
@@ -17,16 +34,16 @@ export default function HintDisplay() {
   }, []);
 
   return (
-    <div style={{alignContent: 'center', width: 100, position: 'absolute', right:'3.8%'}}>
+    <div style={style.hintDisplay}>
       <h1>HINTS</h1>
-    <div style={{width: 100, position: 'absolute', right: '2%'}}>
-      {hints.map(hint => {
-        return (
-        <div style={{color: redTurn ? RED_CARD : BLUE_CARD, marginBottom:'10px', right:'20%'}}>
-          {hint.hint} for {hint.hintCount}
-        </div>)
-      })}
-    </div>
+      <div style={{width: 100, position: 'absolute', right: '2%'}}>
+        {hints.map(hint => {
+          return (
+          <div style={{color: redTurn ? RED_CARD : BLUE_CARD, marginBottom:'10px', right:'20%'}}>
+            {hint.hint} for {hint.hintCount}
+          </div>)
+        })}
+      </div>
     </div>
   )
 }
