@@ -18,6 +18,22 @@ let server = http.Server(app);
 let io = socketIO(server);
 
 
+  app.use((req, res, next) => {   
+     if (process.env.NODE_ENV === 'production') {
+
+    console.log('req header', req.header('x-forwarded-proto'));
+    console.log('req.header(host)', req.header('host'));
+    console.log(req.header('x-forwarded-proto'));
+
+    if (req.header('x-forwarded-proto') !== 'https') {
+      res.redirect(`https://${req.header('host')}${req.url}`)
+    } else {
+      next();
+    }
+     } else {
+       next();
+     }
+  })
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../client/build')));
@@ -35,16 +51,6 @@ app.all('*', function(req, res, next) {
 });
 console.log('process.env.NODE_ENV', process.env.NODE_ENV);
 
-  app.use((req, res, next) => {
-    console.log('req header', req.header('x-forwarded-proto'));
-    console.log('req.header(host)', req.header('host'));
-    console.log(req.header('x-forwarded-proto'));
-    
-    if (req.header('x-forwarded-proto') !== 'https')
-      res.redirect(`https://${req.header('host')}${req.url}`)
-    else
-      next();
-  })
 
 // enable ssl redirect
 app.use(sslRedirect());

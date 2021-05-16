@@ -36,6 +36,21 @@ var app = (0, _express["default"])();
 var server = _http["default"].Server(app);
 
 var io = socketIO(server);
+app.use(function (req, res, next) {
+  if (process.env.NODE_ENV === 'production') {
+    console.log('req header', req.header('x-forwarded-proto'));
+    console.log('req.header(host)', req.header('host'));
+    console.log(req.header('x-forwarded-proto'));
+
+    if (req.header('x-forwarded-proto') !== 'https') {
+      res.redirect("https://".concat(req.header('host')).concat(req.url));
+    } else {
+      next();
+    }
+  } else {
+    next();
+  }
+});
 app.use((0, _cors["default"])());
 app.use(_express["default"].json());
 app.use(_express["default"]["static"](_path["default"].join(__dirname, '../client/build')));
@@ -49,13 +64,7 @@ app.all('*', function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   next();
 });
-console.log('process.env.NODE_ENV', process.env.NODE_ENV);
-app.use(function (req, res, next) {
-  console.log('req header', req.header('x-forwarded-proto'));
-  console.log('req.header(host)', req.header('host'));
-  console.log(req.header('x-forwarded-proto'));
-  if (req.header('x-forwarded-proto') !== 'https') res.redirect("https://".concat(req.header('host')).concat(req.url));else next();
-}); // enable ssl redirect
+console.log('process.env.NODE_ENV', process.env.NODE_ENV); // enable ssl redirect
 
 app.use((0, _herokuSslRedirect["default"])());
 /*
