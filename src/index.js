@@ -8,6 +8,7 @@ import database from '../database/index';
 import "regenerator-runtime/runtime.js";
 import {getWords, logErrors, newUser} from './utils';
 import path from 'path';
+import sslRedirect from 'heroku-ssl-redirect';
 
 const socketIO = require('socket.io');
 const port = process.env.PORT || 3001;
@@ -15,6 +16,9 @@ const port = process.env.PORT || 3001;
 let app = express();
 let server = http.Server(app);
 let io = socketIO(server);
+
+// enable ssl redirect
+app.use(sslRedirect());
 
 app.use(cors());
 app.use(express.json());
