@@ -16,7 +16,7 @@ function Home() {
       justifyContent: 'center',
     },
     content: {
-      width: 800,
+      width: 650,
       alignSelf:'center',
       textAlign: 'center',
     },
@@ -68,17 +68,29 @@ function Home() {
 
   const [username, setUsername] = useState('');
   const [roomName, setRoomName] = useState('');
+  const [error, setError] = useState(false);
+
   const history = useHistory();
   const { isMobile } = Responsive();
-  const handleUsernameChange = (event)  => setUsername(event.target.value);
+  const handleUsernameChange = (event)  => {
+    if(error) {
+      setError(false);
+    }
+    setUsername(event.target.value);
+  }; 
   const handleRoomNameChange = (event)  => setRoomName(event.target.value);
 
   const createRoom = () => {
+    if (username === '') {
+      setError(true);
+    } else {
     //this potentially needs a join room name, gotta figure out when to emit which
-    axios.post('/create-room', {username, roomName}).then(
-      res => {
-        history.push(res.data.redirectUrl, {userID: username});
-      });
+      axios.post('/create-room', {username, roomName}).then(
+        res => {
+          history.push(res.data.redirectUrl, {userID: username});
+        }
+      );
+    }
   };
 
   useEffect(()=> {
@@ -117,14 +129,14 @@ function Home() {
         </div>
           <div>
             <TextInput
-            name='username'
-            value={username}
-            placeholder={'Username'}
-            onChange={handleUsernameChange}
-            style={isMobile ? {width: '90%'} : {}}
+              name='username'
+              value={username}
+              placeholder={'Username'}
+              onChange={handleUsernameChange}
+              style={isMobile ? {width: '90%'} : {}}
+              error={error}
+              errorText={"Username can't be empty"}
             /> 
-          </div>
-          <div>
             <TextInput 
               id="roomName" 
               name="roomName"

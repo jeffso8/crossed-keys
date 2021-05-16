@@ -5,9 +5,9 @@ import User from './User';
 import { organizeUsers } from '../shared/utils';
 import { Responsive } from '../shared/responsive';
 import Button from '../shared/Button';
-import {MUD_BROWN} from '../../constants';
 import ReactArcText from 'react-arc-text-fix';
 import {DataType, UserType} from '../../types';
+import { MUD_BROWN, BOMB_CARD, CAMEL, MAIZE, BLUE_CARD, RED_CARD } from '../../constants';
 
 type RoomPropType = {
   location: {
@@ -74,8 +74,8 @@ function Room(props: RoomPropType) {
       marginTop: 80,
     },
     body: {
-      width: '100%',
-      paddingTop: 50,
+      width: '80%',
+      margin: '120px auto',
     },
     columnStyle: {
       height: 'auto',
@@ -99,6 +99,8 @@ function Room(props: RoomPropType) {
     },
     button: {
       margin: 'auto',
+      padding: '12px',
+      color: MAIZE,
     }
   };
 
@@ -114,6 +116,7 @@ function Room(props: RoomPropType) {
     },
     body: {
       width: '100%',
+      margin: '0 auto',
       paddingTop: 50,
     },
     columnTitle: {
@@ -139,7 +142,10 @@ function Room(props: RoomPropType) {
     },
     button: {
       margin: 'auto',
-    }
+      padding: '12px',
+      color: MAIZE,
+    },
+
   };
 
   useEffect(() => {
@@ -188,11 +194,8 @@ function Room(props: RoomPropType) {
       <div style={style.title}>
         <div style={{fontSize: 34}}>WELCOME</div>
         <div style={{textAlign: 'center', fontSize: 28}}>TO</div>
-        <ReactArcText
-          text={`THE ${roomID} HOTEL`}
-          direction={1}
-          arc={420}
-        />
+        <div style={{fontSize: 50}}>THE {roomID} HOTEL</div>
+
       </div>
       <div className="body" style={style.body}>
         <div className="teamChooseContainer" style={style.containerStyle}>
@@ -235,11 +238,11 @@ function Room(props: RoomPropType) {
         </div>
 
         <div className="pickTeamButtons" style={style.teamButton}>
-          <Button style={style.button} onClick={handleSetRedTeamClick} text={'Red Team'} />
+          <Button style={{...style.button, backgroundColor: RED_CARD}} onClick={handleSetRedTeamClick} text={'Red Team'} />
           {user.isHost ? (
-            <Button style={style.button} onClick={startGame} text={'Start Game'} />
+            <Button style={{...style.button, backgroundColor: '#496F5D'}} onClick={startGame} text={'Start Game'} />
           ) : null}
-          <Button style={style.button} onClick={handleSetBlueTeamClick} text={'Blue Team'} />
+          <Button style={{...style.button, backgroundColor: BLUE_CARD}} onClick={handleSetBlueTeamClick} text={'Blue Team'} />
           {showClaimSpyMaster() ? (
             <Button style={style.button} onClick={handleClaimSpyMasterClick} text={'Claim Spy'} />
           ) : null}

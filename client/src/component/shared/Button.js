@@ -3,7 +3,6 @@ import {BROWNISH, MUD_BROWN} from '../../constants';
 
 export default function Button (props) {
   const style = {
-    width: 100,
     height: 50,
     border: 'none',
     fontSize: 16,
