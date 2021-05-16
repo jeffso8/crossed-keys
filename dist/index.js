@@ -20,8 +20,6 @@ var _utils = require("./utils");
 
 var _path = _interopRequireDefault(require("path"));
 
-var _herokuSslRedirect = _interopRequireDefault(require("heroku-ssl-redirect"));
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
@@ -35,13 +33,10 @@ var app = (0, _express["default"])();
 
 var server = _http["default"].Server(app);
 
-var io = socketIO(server);
+var io = socketIO(server); // Redirect to https
+
 app.use(function (req, res, next) {
   if (process.env.NODE_ENV === 'production') {
-    console.log('req header', req.header('x-forwarded-proto'));
-    console.log('req.header(host)', req.header('host'));
-    console.log(req.header('x-forwarded-proto'));
-
     if (req.header('x-forwarded-proto') !== 'https') {
       res.redirect("https://".concat(req.header('host')).concat(req.url));
     } else {
@@ -64,9 +59,6 @@ app.all('*', function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   next();
 });
-console.log('process.env.NODE_ENV', process.env.NODE_ENV); // enable ssl redirect
-
-app.use((0, _herokuSslRedirect["default"])());
 /*
  roomMap: {
   roomID: {
