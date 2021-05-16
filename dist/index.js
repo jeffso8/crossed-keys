@@ -48,6 +48,12 @@ app.options("/*", function (req, res, next) {
 app.all('*', function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   next();
+});
+console.log('process.env.NODE_ENV', process.env.NODE_ENV);
+app.use(function (req, res, next) {
+  console.log('req header', req.header('x-forwarded-proto'));
+  console.log(req.header('host'));
+  if (req.header('x-forwarded-proto') !== 'https') res.redirect("https://".concat(req.header('host')).concat(req.url));else next();
 }); // enable ssl redirect
 
 app.use((0, _herokuSslRedirect["default"])());
