@@ -17,8 +17,6 @@ let app = express();
 let server = http.Server(app);
 let io = socketIO(server);
 
-// enable ssl redirect
-app.use(sslRedirect());
 
 app.use(cors());
 app.use(express.json());
@@ -35,6 +33,9 @@ app.all('*', function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   next();
 });
+
+// enable ssl redirect
+app.use(sslRedirect());
 
 /*
  roomMap: {
