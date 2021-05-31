@@ -8,6 +8,7 @@ export default function Grid(props) {
   const [words, setWords] = useState([]);
   const [colors, setColors] = useState([]);
   const [clicked, setClicked] = useState([]);
+  const [rotDeg, setRotDeg] = useState([]);
 
   const {
     gameOver,
@@ -52,7 +53,7 @@ export default function Grid(props) {
   const mobileCardStyle = {
     container: {
       display: 'grid',
-      gridGap: 12,
+      gridGap: 6,
       gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr',
       maxWidth: 'min-content',
       margin: 'auto',
@@ -65,6 +66,13 @@ export default function Grid(props) {
   const style = isMobile ? mobileCardStyle : cardStyle;
 
   useEffect(() => {
+    let degrees = [];
+    for (let i = 0; i < 25; i++) {
+      degrees.push(degree => (Math.random() + 0.09) * (Math.round(Math.random()) ? 1 : -1));
+    }
+
+    setRotDeg(degrees);
+     
     socket.on('refreshGame', (data) => {
       console.log('data', data);
       setWords(data.words);
@@ -117,10 +125,8 @@ export default function Grid(props) {
           }
 
           //TODO: clicked and index, figure out a way to store these as states, and emitted to all clients
-          const randDeg =
-            (Math.random() + 0.09) * (Math.round(Math.random()) ? 1 : -1);
           const isClicked = clicked[index + clickedColumn * 5];
-
+          const randDeg = rotDeg[index + clickedColumn * 5];
           const isDisabled =
             (user.team === 'RED' && !redTurn) ||
             (user.team === 'BLUE' && redTurn) ||

@@ -5,9 +5,8 @@ import User from './User';
 import { organizeUsers } from '../shared/utils';
 import { Responsive } from '../shared/responsive';
 import Button from '../shared/Button';
-import ReactArcText from 'react-arc-text-fix';
 import {DataType, UserType} from '../../types';
-import { MUD_BROWN, BOMB_CARD, CAMEL, MAIZE, BLUE_CARD, RED_CARD } from '../../constants';
+import { MUD_BROWN, MAIZE, BLUE_CARD, RED_CARD } from '../../constants';
 
 type RoomPropType = {
   location: {
@@ -73,6 +72,16 @@ function Room(props: RoomPropType) {
       textAlign: "center" as "center",
       marginTop: 80,
     },
+    roomName: {
+      fontSize: 50,
+    },
+    welcome: {
+      fontSize: 34,
+    },
+    to: {
+      textAlign: "center" as "center",
+      fontSize: 28
+    },
     body: {
       width: '80%',
       margin: '120px auto',
@@ -106,7 +115,7 @@ function Room(props: RoomPropType) {
 
   const mobileStyle = {
     title: {
-      fontSize: 52,
+      fontSize: 46,
       letterSpacing: 3,
       fontWeight: 900,
       color: MUD_BROWN,
@@ -114,13 +123,23 @@ function Room(props: RoomPropType) {
       textAlign: "center" as "center",
       marginTop: 80,
     },
+    roomName: {
+      fontSize: 38,
+    },
+    welcome: {
+      fontSize: 28,
+    },
+    to: {
+      textAlign: "center" as "center",
+      fontSize: 22,
+    },
     body: {
       width: '100%',
       margin: '0 auto',
       paddingTop: 50,
     },
     columnTitle: {
-      fontSize: 20,
+      fontSize: 16,
       fontWeight: 900,
       letterSpacing: 1,
       textAlign: "center" as "center"
@@ -136,14 +155,15 @@ function Room(props: RoomPropType) {
     },
     teamButton: {
       display: 'grid',
-      gridGap: '25px',
+      gridGap: '8px',
       marginTop: 100,
       gridTemplateColumns: '1fr 1fr 1fr',
     },
     button: {
       margin: 'auto',
-      padding: '12px',
+      padding: '8px',
       color: MAIZE,
+      fontSize: 14,
     },
 
   };
@@ -179,22 +199,23 @@ function Room(props: RoomPropType) {
 
   const showClaimSpyMaster = () => {
     if (roomData) {
-    if (user.team === 'RED' && roomData.redSpy){
-      return false;
-    } else if (user.team === 'BLUE' && roomData.blueSpy) {
-      return false;
-    }
+      if (user.team === 'RED' && roomData.redSpy){
+        return false;
+      } else if (user.team === 'BLUE' && roomData.blueSpy) {
+        return false;
+      }
     return true;
     }
   };
 
   const style = isMobile ? mobileStyle : webStyle;
+  
   return (
     <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
       <div style={style.title}>
-        <div style={{fontSize: 34}}>WELCOME</div>
-        <div style={{textAlign: 'center', fontSize: 28}}>TO</div>
-        <div style={{fontSize: 50}}>THE {roomID} HOTEL</div>
+        <div style={style.welcome}>WELCOME</div>
+        <div style={style.to}>TO</div>
+        <div style={style.roomName}>THE {roomID} HOTEL</div>
 
       </div>
       <div className="body" style={style.body}>
@@ -206,7 +227,7 @@ function Room(props: RoomPropType) {
                 <User
                   i={i}
                   name={user.userID}
-                  isSpyMaster={roomData ? roomData.redSpy === user.role : null}
+                  isSpyMaster={roomData ? roomData.redSpy === user.userID : null}
                 />
               );
             })}
@@ -218,8 +239,7 @@ function Room(props: RoomPropType) {
                 <User
                   i={i}
                   name={user.userID}
-                  isSpyMaster={roomData ? roomData.redSpy === user.role : null}
-                />
+                 />
               );
             })}
           </div>
@@ -230,7 +250,7 @@ function Room(props: RoomPropType) {
                 <User
                   i={i}
                   name={user.userID}
-                  isSpyMaster={roomData ? roomData.blueSpy === user.role : null}
+                  isSpyMaster={roomData ? roomData.blueSpy === user.userID : null}
                 />
               );
             })}
@@ -243,8 +263,16 @@ function Room(props: RoomPropType) {
             <Button style={{...style.button, backgroundColor: '#496F5D'}} onClick={startGame} text={'Start Game'} />
           ) : null}
           <Button style={{...style.button, backgroundColor: BLUE_CARD}} onClick={handleSetBlueTeamClick} text={'Blue Team'} />
+        </div>
+        <div> 
           {showClaimSpyMaster() ? (
-            <Button style={style.button} onClick={handleClaimSpyMasterClick} text={'Claim Spy'} />
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              marginTop: '16px',
+            }}> 
+              <Button style={{...style.button, backgroundColor: 'BLACK', marginTop: '16px'}} onClick={handleClaimSpyMasterClick} text={'Claim Spy'} />
+            </div>
           ) : null}
         </div>
       </div>

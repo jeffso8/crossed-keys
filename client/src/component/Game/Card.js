@@ -47,16 +47,16 @@ function Card(props) {
   const mobileStyle = {
     container: {
       backgroundColor: props.clicked || visible ? props.color : CAMEL,
-      width: 90,
-      height: 46,
-      marginTop: 10,
-      marginBottom: 10,
+      width: 68,
+      height: 42,
+      marginTop: 6,
+      marginBottom: 6,
       display: 'flex',
       justifyContent: 'center',
       boxShadow: '0 2px 4px 0 rgba(0,0,0,0.2)',
     },
     word: {
-      fontSize: 8,
+      fontSize: 7,
       textTransform: 'uppercase',
       letterSpacing: 1,
       fontWeight: 900,

@@ -11,17 +11,25 @@ export default function HintDisplay() {
 
   const webStyle = {
     hintDisplay: {
-      alignContent: 'center',
+      alignContent: 'center' as 'center',
       width: 100,
-      position: 'absolute',
+      position: 'absolute' as 'absolute',
       right:'3.8%'
+    },
+    title: {
+      fontSize: "34px",   
     }
   };
 
   const mobileStyle = {
     hintDisplay: {
-      alignContent: 'center',
+      alignContent: 'center' as 'center',
       width: 100,
+    },
+    title: {
+      fontSize: "24px",   
+      fontWeight: 700,  
+      margin: 12,
     }
   };
 
@@ -35,7 +43,7 @@ export default function HintDisplay() {
 
   return (
     <div style={style.hintDisplay}>
-      <h1>HINTS</h1>
+      <div style={style.title}>HINTS</div>
       <div style={{width: 100, position: 'absolute', right: '2%'}}>
         {hints.map(hint => {
           return (
