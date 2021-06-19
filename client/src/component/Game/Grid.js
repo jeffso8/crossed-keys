@@ -74,7 +74,6 @@ export default function Grid(props) {
     setRotDeg(degrees);
      
     socket.on('refreshGame', (data) => {
-      console.log('data', data);
       setWords(data.words);
       setColors(data.colors);
       setClicked(data.clicked);
@@ -130,6 +129,7 @@ export default function Grid(props) {
           const isDisabled =
             (user.team === 'RED' && !redTurn) ||
             (user.team === 'BLUE' && redTurn) ||
+            (user.role === 'MASTER') ||
             isClicked ||
             gameOver;
 

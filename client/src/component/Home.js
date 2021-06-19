@@ -76,9 +76,9 @@ function Home() {
     if(error) {
       setError(false);
     }
-    setUsername(event.target.value);
+    setUsername(event.target.value.toUpperCase());
   }; 
-  const handleRoomNameChange = (event)  => setRoomName(event.target.value);
+  const handleRoomNameChange = (event)  => setRoomName(event.target.value.toUpperCase());
 
   const createRoom = () => {
     if (username === '') {

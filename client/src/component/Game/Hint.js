@@ -9,7 +9,6 @@ export default function Hint(props) {
 
   const handleHintChange = (event)  => setHint((event.target.value).toUpperCase());
   const handleHintCountChange = (event)  => {
-    console.log("eventTarget", event.target.value);
     setHintCount(event.target.value)
   }
 

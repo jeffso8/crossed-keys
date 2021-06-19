@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import socket from '../../socket';
-import './Timer.scss';
-
+ 
 function Timer(props) {
   const [time, setTime] = useState(0);
   const [prevTime, setPrevTime] = useState(0);
