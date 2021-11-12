@@ -3,10 +3,10 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.shuffle = shuffle;
 exports.getWords = getWords;
 exports.logErrors = logErrors;
 exports.newUser = void 0;
+exports.shuffle = shuffle;
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
