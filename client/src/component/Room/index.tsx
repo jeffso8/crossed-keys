@@ -59,7 +59,6 @@ function Room(props: RoomPropType) {
 
   const startGame = () => {
     socket.emit('hostStartGame', {roomID});
-    socket.emit('startTimer', {roomID});
   };
 
   const webStyle = {
@@ -175,7 +174,7 @@ function Room(props: RoomPropType) {
       userID: props.location.state.userID,
     });
 
-    socket.on('startGame', (data: DataType) => {
+    socket.on('startGame', (data: DataType) => {      
       history.push(`/${data.roomID}/game`, {
         data,
         userID: props.location.state.userID,

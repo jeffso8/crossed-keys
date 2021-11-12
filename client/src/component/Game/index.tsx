@@ -29,15 +29,18 @@ function Game(props: GamePropsType) {
     isHost: false,
     socketId: ''
   };
-  const [roomID, setRoomID] = useState('');
+  const [roomID, setRoomID] = useState(props.location.state.data.roomID);
   const [users, setUsers] = useState<UserType[]>([]);
   const [user, setUser] = useState<UserType>(emptyUser);
   const [redTurn, setRedTurn] = useState(props.location.state.data.isRedTurn);
   const [showModal, setShowModal] = useState(false);
   const [gameScore, setGameScore] = useState(props.location.state.data.totalGameScore);
   const [gameOver, setGameOver] = useState(props.location.state.data.gameOver);
-  const [timerID, setTimerID] = useState(0);
-  const [timerEnd, setTimerEnd] = useState(false);
+  const [turnStartedAt, setTurnStartedAt] = useState(null);
+  const [mounted, setMounted] = useState(false);
+  const [words, setWords] = useState([]);
+  const [colors, setColors] = useState([]);
+  const [clicked, setClicked] = useState([]);
 
   const { isMobile } = Responsive();
   
@@ -65,15 +68,10 @@ function Game(props: GamePropsType) {
   const style = isMobile ? mobileStyle : webStyle;
 
 
-  useEffect(() => {
+  useEffect(() => {    
     socket.emit('joinGame', {roomID: props.location.state.data.roomID, user: props.location.state.data.users.find((user) => user.userID === props.location.state.userID)});
 
-    setRoomID(props.location.state.data.roomID);
-    setUsers(props.location.state.data.users);
-    setRedTurn(props.location.state.data.isRedTurn);
-
-
-    socket.on('refreshGame', (data: DataType) => {
+    socket.on('refreshGame', (data: DataType) => {      
       setBlueScore(data.blueScore);
       setRedScore(data.redScore);
       setGameScore(data.totalGameScore);
@@ -81,6 +79,23 @@ function Game(props: GamePropsType) {
       setRedTurn(data.isRedTurn);
       setUsers(data.users);
       setUser(data.users.find((user) => user.userID === props.location.state.userID) || emptyUser);
+      // @ts-ignore
+      setTurnStartedAt(data.turnStartedAt);
+      // @ts-ignore
+      setWords(data.words);
+      // @ts-ignore
+      setColors(data.colors);
+      // @ts-ignore
+      setClicked(data.clicked);
+
+
+      setMounted(true);
+
+    });
+
+    socket.on('updateFlipCard', (data: DataType) => {
+      // @ts-ignore
+      setClicked(data.clicked);
     });
 
     socket.on('updateTeams', (data: DataType) => {
@@ -88,8 +103,10 @@ function Game(props: GamePropsType) {
       setUser(data.users.find((user) => user.userID === props.location.state.userID) || emptyUser);
     });
 
-    socket.on('redTurn', (data: DataType) => {
+    socket.on('redTurn', (data: DataType) => {      
       setRedTurn(data.redTurn);
+          // @ts-ignore
+      setTurnStartedAt(data.turnStartedAt);
     });
 
     socket.on('updateRedScore', (data: DataType) => {
@@ -111,16 +128,6 @@ function Game(props: GamePropsType) {
       setRedTurn(data.isRedTurn);
     });
 
-    setRoomID(props.location.state.data.roomID);
-
-    socket.on('timerDone', (data: DataType) => {
-      setRedTurn(data.redTurn);
-      // @ts-ignore
-      if (data.users.find((user) => user.userID === props.location.state.userID).isHost){
-        socket.emit('startTimer', {roomID: data.roomID});
-      }
-    });
-
     socket.on('startGame', (data: DataType) => {
       setGameScore(data.totalGameScore);
       setGameOver(data.gameOver);
@@ -128,9 +135,13 @@ function Game(props: GamePropsType) {
       setBlueScore(data.blueScore);
       setRedTurn(data.isRedTurn);
       setUsers(data.users);
+      // @ts-ignore
+      setTurnStartedAt(data.turnStartedAt)
       setUser(data.users.find((user) => user.userID === props.location.state.userID) || emptyUser);
-      socket.emit('startTimer', {roomID: data.roomID});
+      // socket.emit('startTimer', {roomID: data.roomID});
     });
+
+    // setMounted(true);
 
   }, []);
 
@@ -144,57 +155,65 @@ function Game(props: GamePropsType) {
   const handleBlueScoreChange = (score: number) => {
     socket.emit('blueScoreChange', {roomID, blueScore: score});
     if (score === 0) {
-      socket.emit('gameOver', {gameScore: [gameScore[0], gameScore[1] + 1], gameOver: true, redScore: redScore, blueScore: score, timerID});
+      socket.emit('gameOver', {gameScore: [gameScore[0], gameScore[1] + 1], gameOver: true, redScore: redScore, blueScore: score});
     }
   };
 
-  const handleTurnClick = (turn: boolean) => {
+  const handleEndTurn = (turn: boolean) => {    
     socket.emit('updateTurn', {roomID, redTurn: turn});
-    socket.emit('startTimer', {roomID, currentTimer: timerID});
+    // socket.emit('startTimer', {roomID, currentTimer: timerID});
   };
 
   const renderEndTurn = () => {
     if ((user.team === 'RED' && redTurn) || (user.team === 'BLUE' && !redTurn)) {
       return (
-        <button onClick={() => handleTurnClick(!redTurn)}>End Turn</button>
+        <button onClick={() => handleEndTurn(!redTurn)}>End Turn</button>
       );
     }
   };
 
   return (
-    <div style={{width: '100%', height: '100%', display: 'flex', flexDirection: 'column'}}>
-      <div>
-        <ScoreBanner isRedTeam={true} score={redScore} />
-        <div style={{textAlign: 'center'}}>
-          <Timer setTimerID={setTimerID}/>
-          <h2>{redTurn ? 'Red\'s Turn' : 'Blue\'s Turn'}</h2>
+    <>
+    {mounted &&
+      <div style={{width: '100%', height: '100%', display: 'flex', flexDirection: 'column'}}>
+        <div>
+          <ScoreBanner isRedTeam={true} score={redScore} />
+          <div style={{textAlign: 'center'}}>
+            {turnStartedAt && <Timer turnStartedAt={turnStartedAt} handleEndTurn={handleEndTurn} redTurn={redTurn}/>}
+            <h2>{redTurn ? 'Red\'s Turn' : 'Blue\'s Turn'}</h2>
+          </div>
+          <ScoreBanner isRedTeam={false} score={blueScore} />
         </div>
-        <ScoreBanner isRedTeam={false} score={blueScore} />
-      </div>
-      <div style={style.container}>
-        <Grid
-          gameOver={gameOver}
-          redTurn={redTurn}
-          roomID={roomID}
-          redScore={redScore}
-          blueScore={blueScore}
-          user={user}
-          handleRedScoreChange={handleRedScoreChange}
-          handleBlueScoreChange={handleBlueScoreChange}
-          timerID={timerID}
-          gameScore={gameScore}
-        />
-        <HintDisplay />
+        <div style={style.container}>
+          <Grid
+            gameOver={gameOver}
+            redTurn={redTurn}
+            handleEndTurn={handleEndTurn}
+            roomID={roomID}
+            redScore={redScore}
+            blueScore={blueScore}
+            user={user}
+            handleRedScoreChange={handleRedScoreChange}
+            handleBlueScoreChange={handleBlueScoreChange}
+            gameScore={gameScore}
+            words={words}
+            colors={colors}
+            clicked={clicked}
+          />
+          <HintDisplay />
+          </div>
+        {user.role === 'MASTER' ? <Hint roomID={roomID}/> : null}
+        <div style={{position:'absolute', top:'90%', right: '20px'}}>
+          {renderEndTurn()}
         </div>
-      {user.role === 'MASTER' ? <Hint roomID={roomID}/> : null}
-      <div style={{position:'absolute', top:'90%', right: '20px'}}>
-        {renderEndTurn()}
+        <button style={{position:'absolute', top:'93%', right: '20px'}} onMouseEnter={() => setShowModal(true)} onMouseLeave={()=> setShowModal(false)}>Show Modal</button>
+        {showModal ? <GameInfoModal  users={users} show={showModal} roomID={roomID} gameScore={gameScore} /> : null}
+        {gameOver ? <GameOverModal gameScore={gameScore} user={user} roomID={roomID} /> : null}
       </div>
-      <button style={{position:'absolute', top:'93%', right: '20px'}} onMouseEnter={() => setShowModal(true)} onMouseLeave={()=> setShowModal(false)}>Show Modal</button>
-      {showModal ? <GameInfoModal  users={users} show={showModal} roomID={roomID} gameScore={gameScore} /> : null}
-      {gameOver ? <GameOverModal gameScore={gameScore} user={user} roomID={roomID} /> : null}
-    </div>
-  );
+}
+    </>
+  )
+
 }
 
 export default Game;

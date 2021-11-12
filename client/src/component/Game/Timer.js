@@ -1,79 +1,39 @@
-import React, { useState, useEffect, useRef } from 'react';
-import socket from '../../socket';
+import React, { useEffect } from 'react';
  
+
+function getTimeRemaining(endTime) {
+  const diff = endTime - Date.now();
+  return Math.floor(diff / 1000);
+}
 function Timer(props) {
-  const [time, setTime] = useState(0);
-  const [prevTime, setPrevTime] = useState(0);
+  const endTime = new Date(props.turnStartedAt).getTime() + 10000 + 1000;
 
+  const [time, setTime] = React.useState(undefined);
+
+  
   useEffect(() => {
-    socket.on('timer', (data) => {
-      if(data.time === 19) {
-        setPrevTime(0);
-      } else {
-        setPrevTime(data.time + 1);
-      }
-      setTime((time) => data.time);
-      processClock(time, prevTime);
-      props.setTimerID(data.currentTimer);
-    });
-  }, []);
-
-  const clockRef = useRef(null);
-  const processClock = (aTime, aPrevTime) => {
-    if (
-      parseInt(time / 10) !==
-          parseInt(prevTime / 10) &&
-      clockRef.current
-    ) {
-      const section = clockRef.current.querySelector(
-          '.flip-countdown-card-sec.one'
-      );
-      section.classList.remove('flip');
-      void section.offsetWidth;
-      section.classList.add('flip');
+    const countdown = Math.floor((endTime - Date.now())/1000);
+    if (countdown < 0) {
+      props.handleEndTurn(!props.redTurn);
     }
+    const timeout = setTimeout(() => {
+      setTime(countdown);
+    }, 1000);
 
-    if (
-      parseInt(time % 10) !==
-          parseInt(prevTime % 10) &&
-      clockRef.current
-    ) {
-      const section = clockRef.current.querySelector(
-          '.flip-countdown-card-sec.two'
-      );
-      section.classList.remove('flip');
-      void section.offsetWidth;
-      section.classList.add('flip');
-  }
-};
+
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [time]);
 
 
 
-  const part1 = parseInt(time / 10);
-  const part2 = parseInt(time % 10);
-  let prev1 = parseInt(prevTime / 10);
-  let prev2 = parseInt(prevTime % 10);
 
   return(
     <>
       <div style={{marginTop: '16px'}} className={`flip-countdown theme-light size-medium`}>
-        <span className='flip-countdown-piece' ref={clockRef}>
-          <span className='flip-countdown-card'>
-            <span className={`flip-countdown-card-sec one`}>
-                  <span className='card__top'>{part1}</span>
-                  <span className='card__bottom' data-value={prev1} />
-                  <span className='card__back' data-value={prev1}>
-                      <span className='card__bottom' data-value={part1} />
-                  </span>
-              </span>
-              <span className={`flip-countdown-card-sec two`}>
-                  <span className='card__top'>{part2}</span>
-                  <span className='card__bottom' data-value={prev2} />
-                  <span className='card__back' data-value={prev2}>
-                      <span className='card__bottom' data-value={part2} />
-                  </span>
-              </span>
-          </span>
+        <span className='flip-countdown-piece'>
+          {time}
         </span>
       </div>
     </>

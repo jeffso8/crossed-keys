@@ -30,6 +30,7 @@ export type DataType = {
   blueSpy: string,
   users: UserType[],
   userID: string,
-  currentTimer: number
+  currentTimer: number,
+  turnStartedAt: Date,
 };
 

@@ -5,9 +5,9 @@ import { Responsive } from '../shared/responsive';
 import socket from '../../socket';
 
 export default function Grid(props) {
-  const [words, setWords] = useState([]);
-  const [colors, setColors] = useState([]);
-  const [clicked, setClicked] = useState([]);
+  // const [words, setWords] = useState([]);
+  // const [colors, setColors] = useState([]);
+  // const [clicked, setClicked] = useState([]);
   const [rotDeg, setRotDeg] = useState([]);
 
   const {
@@ -16,11 +16,15 @@ export default function Grid(props) {
     redTurn,
     roomID,
     redScore,
+    handleEndTurn,
     handleRedScoreChange,
     handleBlueScoreChange,
     blueScore,
     timerID,
-    gameScore
+    gameScore,
+    words,
+    clicked,
+    colors,
   } = props;
 
   const { isMobile } = Responsive();
@@ -66,32 +70,22 @@ export default function Grid(props) {
   const style = isMobile ? mobileCardStyle : cardStyle;
 
   useEffect(() => {
-    let degrees = [];
-    for (let i = 0; i < 25; i++) {
-      degrees.push(degree => (Math.random() + 0.09) * (Math.round(Math.random()) ? 1 : -1));
-    }
+    // socket.on('refreshGame', (data) => {
+    //   console.log('refreshGame');
+    //   setWords(data.words);
+    //   setColors(data.colors);
+    //   setClicked(data.clicked);
+    // });
 
-    setRotDeg(degrees);
-     
-    socket.on('refreshGame', (data) => {
-      setWords(data.words);
-      setColors(data.colors);
-      setClicked(data.clicked);
-    });
+    // socket.on('updateFlipCard', (data) => {
+    //   setClicked(data.clicked);
+    // });
 
-    socket.on('updateFlipCard', (data) => {
-      setClicked(data.clicked);
-    });
-
-    socket.on('nextGameStart', (data) => {
-      setClicked(data.clicked);
-      setColors(data.colors);
-      setWords(data.words);
-    });
-
-    socket.on('nextGameStart', (data) => {
-      setClicked(data.clicked);
-    });
+    // socket.on('nextGameStart', (data) => {
+    //   setClicked(data.clicked);
+    //   setColors(data.colors);
+    //   setWords(data.words);
+    // });
   }, []);
 
   const handleCardClick = (index, turn) => {
@@ -147,10 +141,11 @@ export default function Grid(props) {
                 } else {
                   if (realColor === BLUE_CARD) {
                     handleBlueScoreChange(blueScore - 1);
-                    socket.emit('startTimer', {roomID: roomID, currentTimer: timerID});
+                    handleEndTurn(!redTurn)
                   }
                   handleCardClick((index + clickedColumn * 5), false);
-                  socket.emit('startTimer', {roomID: roomID, currentTimer: timerID});
+                  handleEndTurn(!redTurn)
+
                 }
               } else {
                 if (BLUE_CARD === realColor) {
@@ -159,10 +154,10 @@ export default function Grid(props) {
                 } else {
                   if (realColor === RED_CARD) {
                     handleRedScoreChange(redScore - 1);
-                    socket.emit('startTimer', {roomID: roomID, currentTimer: timerID});
+                    handleEndTurn(!redTurn)
                   }
                   handleCardClick((index + clickedColumn * 5), true);
-                  socket.emit('startTimer', {roomID: roomID, currentTimer: timerID});
+                  handleEndTurn(!redTurn)
                 }
               }
             }
