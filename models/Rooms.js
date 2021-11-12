@@ -39,7 +39,8 @@ const RoomSchema = new mongoose.Schema({
       hints: [
        {hint: String,
         hintCount: Number
-      }]
+      }],
+      turnStartedAt: Date
     },{
       versionKey: false
     });

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "codenames inspired game",
   "engines": {
-    "node": "15.x"
+    "node": "17.x"
   },
   "main": "index.js",
   "scripts": {
@@ -33,7 +33,6 @@
     "mongoose": "^5.11.8",
     "nodemon": "^2.0.6",
     "path": "^0.12.7",
-    "puppeteer": "^8.0.0",
     "react-responsive": "^8.2.0",
     "regenerator-runtime": "^0.13.7",
     "rimraff": "0.0.1-security",
