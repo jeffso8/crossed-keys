@@ -1,11 +1,12 @@
 var fs = require("fs");
 
 export function shuffle(array) {
-  var currentIndex = array.length, temporaryValue, randomIndex;
+  var currentIndex = array.length,
+    temporaryValue,
+    randomIndex;
 
   // While there remain elements to shuffle...
   while (0 !== currentIndex) {
-
     // Pick a remaining element...
     randomIndex = Math.floor(Math.random() * currentIndex);
     currentIndex -= 1;
@@ -20,17 +21,17 @@ export function shuffle(array) {
 }
 
 export function getWords() {
-  const text = fs.readFileSync(__dirname + '/WORDS.txt', "utf-8");
+  const text = fs.readFileSync(__dirname + "/WORDS.txt", "utf-8");
   const words = text.split("\n");
   const shuffledArray = shuffle(words);
-  return shuffledArray.splice(0,25);
+  return shuffledArray.splice(0, 25);
 }
 
-export function logErrors(err){
+export function logErrors(err) {
   console.log(err);
   let d = new Date();
   var errorTime = d.toLocaleString();
-  const newError = new ErrorLog({foundErr: err.toString(), time: errorTime});
+  const newError = new ErrorLog({ foundErr: err.toString(), time: errorTime });
   newError.save();
 }
 
@@ -40,6 +41,6 @@ export const newUser = (userID, isHost = false) => {
       team: null,
       role: null,
       host: isHost,
-    }
+    },
   };
-}
+};

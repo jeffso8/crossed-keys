@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { NEUTRAL_CARD, BLUE_CARD, RED_CARD, BOMB_CARD } from '../../constants';
-import Card from './Card';
-import { Responsive } from '../shared/responsive';
-import socket from '../../socket';
+import React, { useState, useEffect } from "react";
+import { NEUTRAL_CARD, BLUE_CARD, RED_CARD, BOMB_CARD } from "../../constants";
+import Card from "./Card";
+import { Responsive } from "../shared/responsive";
+import socket from "../../socket";
 
 export default function Grid(props) {
   // const [words, setWords] = useState([]);
@@ -43,11 +43,11 @@ export default function Grid(props) {
 
   const cardStyle = {
     container: {
-      display: 'grid',
-      gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr',
+      display: "grid",
+      gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr",
       gridGap: 40,
-      justifyContent: 'center',
-      maxWidth: 'min-content'
+      justifyContent: "center",
+      maxWidth: "min-content",
     },
     columns: {
       margin: 0,
@@ -56,11 +56,11 @@ export default function Grid(props) {
 
   const mobileCardStyle = {
     container: {
-      display: 'grid',
+      display: "grid",
       gridGap: 6,
-      gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr',
-      maxWidth: 'min-content',
-      margin: 'auto',
+      gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr",
+      maxWidth: "min-content",
+      margin: "auto",
     },
     columns: {
       margin: 0,
@@ -76,11 +76,9 @@ export default function Grid(props) {
     //   setColors(data.colors);
     //   setClicked(data.clicked);
     // });
-
     // socket.on('updateFlipCard', (data) => {
     //   setClicked(data.clicked);
     // });
-
     // socket.on('nextGameStart', (data) => {
     //   setClicked(data.clicked);
     //   setColors(data.colors);
@@ -89,29 +87,41 @@ export default function Grid(props) {
   }, []);
 
   const handleCardClick = (index, turn) => {
-    socket.emit('flipCard', {roomID, index, isRedTurn: turn});
+    socket.emit("flipCard", { roomID, index, isRedTurn: turn });
   };
 
   const handleBombClick = (team) => {
-    if (team === 'RED') {
-      socket.emit('gameOver', {roomID, gameScore: [gameScore[0], gameScore[1] + 1], gameOver: true, redScore:redScore, blueScore:blueScore, timerID});
+    if (team === "RED") {
+      socket.emit("gameOver", {
+        roomID,
+        gameScore: [gameScore[0], gameScore[1] + 1],
+        gameOver: true,
+        redScore: redScore,
+        blueScore: blueScore,
+        timerID,
+      });
     } else {
-      socket.emit('gameOver', {roomID, gameScore: [gameScore[0] + 1, gameScore[1]], gameOver: true, redScore:redScore, blueScore:blueScore, timerID});
+      socket.emit("gameOver", {
+        roomID,
+        gameScore: [gameScore[0] + 1, gameScore[1]],
+        gameOver: true,
+        redScore: redScore,
+        blueScore: blueScore,
+        timerID,
+      });
     }
   };
-
-
 
   const renderColumns = (rowColor, wordColumn, clickedColumn, className) => {
     return (
       <div className={className} style={style.columns}>
         {rowColor.map((color, index) => {
-          let realColor = '';
-          if (color === 'blue') {
+          let realColor = "";
+          if (color === "blue") {
             realColor = BLUE_CARD;
-          } else if (color === 'red') {
+          } else if (color === "red") {
             realColor = RED_CARD;
-          } else if (color === 'black') {
+          } else if (color === "black") {
             realColor = BOMB_CARD;
           } else {
             realColor = NEUTRAL_CARD;
@@ -121,9 +131,9 @@ export default function Grid(props) {
           const isClicked = clicked[index + clickedColumn * 5];
           const randDeg = rotDeg[index + clickedColumn * 5];
           const isDisabled =
-            (user.team === 'RED' && !redTurn) ||
-            (user.team === 'BLUE' && redTurn) ||
-            (user.role === 'MASTER') ||
+            (user.team === "RED" && !redTurn) ||
+            (user.team === "BLUE" && redTurn) ||
+            user.role === "MASTER" ||
             isClicked ||
             gameOver;
 
@@ -137,31 +147,30 @@ export default function Grid(props) {
               if (redTurn) {
                 if (realColor === RED_CARD) {
                   handleRedScoreChange(redScore - 1);
-                  handleCardClick((index + clickedColumn * 5), true);
+                  handleCardClick(index + clickedColumn * 5, true);
                 } else {
                   if (realColor === BLUE_CARD) {
                     handleBlueScoreChange(blueScore - 1);
-                    handleEndTurn(!redTurn)
+                    handleEndTurn(!redTurn);
                   }
-                  handleCardClick((index + clickedColumn * 5), false);
-                  handleEndTurn(!redTurn)
-
+                  handleCardClick(index + clickedColumn * 5, false);
+                  handleEndTurn(!redTurn);
                 }
               } else {
                 if (BLUE_CARD === realColor) {
                   handleBlueScoreChange(blueScore - 1);
-                  handleCardClick((index + clickedColumn * 5), false);
+                  handleCardClick(index + clickedColumn * 5, false);
                 } else {
                   if (realColor === RED_CARD) {
                     handleRedScoreChange(redScore - 1);
-                    handleEndTurn(!redTurn)
+                    handleEndTurn(!redTurn);
                   }
-                  handleCardClick((index + clickedColumn * 5), true);
-                  handleEndTurn(!redTurn)
+                  handleCardClick(index + clickedColumn * 5, true);
+                  handleEndTurn(!redTurn);
                 }
               }
             }
-          }
+          };
 
           return (
             <Card
@@ -179,12 +188,12 @@ export default function Grid(props) {
   };
 
   return (
-      <div style={style.container}>
-        {renderColumns(rowColor1, wordsColumn1, 0, 'Column1')}
-        {renderColumns(rowColor2, wordsColumn2, 1, 'Column2')}
-        {renderColumns(rowColor3, wordsColumn3, 2, 'Column3')}
-        {renderColumns(rowColor4, wordsColumn4, 3, 'Column4')}
-        {renderColumns(rowColor5, wordsColumn5, 4, 'Column5')}
-      </div>
+    <div style={style.container}>
+      {renderColumns(rowColor1, wordsColumn1, 0, "Column1")}
+      {renderColumns(rowColor2, wordsColumn2, 1, "Column2")}
+      {renderColumns(rowColor3, wordsColumn3, 2, "Column3")}
+      {renderColumns(rowColor4, wordsColumn4, 3, "Column4")}
+      {renderColumns(rowColor5, wordsColumn5, 4, "Column5")}
+    </div>
   );
 }
