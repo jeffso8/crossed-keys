@@ -4,9 +4,9 @@ export const organizeUsers = (users) => {
   const nullTeam = [];
 
   users.forEach((user) => {
-    if (user.team === 'RED') {
+    if (user.team === "RED") {
       redTeam.push(user);
-    } else if (user.team === 'BLUE') {
+    } else if (user.team === "BLUE") {
       blueTeam.push(user);
     } else {
       nullTeam.push(user);

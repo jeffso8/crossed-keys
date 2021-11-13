@@ -1,39 +1,39 @@
-import React, { useState, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
-import socket from '../../socket';
-import User from './User';
-import { organizeUsers } from '../shared/utils';
-import { Responsive } from '../shared/responsive';
-import Button from '../shared/Button';
-import {DataType, UserType} from '../../types';
-import { MUD_BROWN, MAIZE, BLUE_CARD, RED_CARD } from '../../constants';
+import React, { useState, useEffect } from "react";
+import { useHistory } from "react-router-dom";
+import socket from "../../socket";
+import User from "./User";
+import { organizeUsers } from "../shared/utils";
+import { Responsive } from "../shared/responsive";
+import Button from "../shared/Button";
+import { DataType, UserType } from "../../types";
+import { MUD_BROWN, MAIZE, BLUE_CARD, RED_CARD } from "../../constants";
 
 type RoomPropType = {
   location: {
     state: {
-      data: DataType,
-      userID: string,
-    },
-  }, 
+      data: DataType;
+      userID: string;
+    };
+  };
   match: {
     params: {
-      data: DataType,
-      userID: string,
-      roomID: string
-    },
-  }
+      data: DataType;
+      userID: string;
+      roomID: string;
+    };
+  };
 };
 
 function Room(props: RoomPropType) {
   const emptyUser = {
-    userID: '',
-    team: '',
-    role: '',
+    userID: "",
+    team: "",
+    role: "",
     isHost: false,
-    socketId: ''
+    socketId: "",
   };
 
-  const [roomID, setRoomID] = useState<String>('');
+  const [roomID, setRoomID] = useState<String>("");
   const [user, setUser] = useState<UserType>(emptyUser);
   const [redTeam, setRedTeam] = useState<UserType[]>([]);
   const [blueTeam, setBlueTeam] = useState<UserType[]>([]);
@@ -43,22 +43,22 @@ function Room(props: RoomPropType) {
   const { isMobile } = Responsive();
 
   const handleSetRedTeamClick = () => {
-    socket.emit('setRedTeam', { roomID, userID: props.location.state.userID });
+    socket.emit("setRedTeam", { roomID, userID: props.location.state.userID });
   };
 
   const handleSetBlueTeamClick = () => {
-    socket.emit('setBlueTeam', { roomID, userID: props.location.state.userID });
+    socket.emit("setBlueTeam", { roomID, userID: props.location.state.userID });
   };
 
   const handleClaimSpyMasterClick = () => {
-    socket.emit('claimSpyMaster', {
+    socket.emit("claimSpyMaster", {
       roomID,
       userID: props.location.state.userID,
     });
   };
 
   const startGame = () => {
-    socket.emit('hostStartGame', {roomID});
+    socket.emit("hostStartGame", { roomID });
   };
 
   const webStyle = {
@@ -67,7 +67,7 @@ function Room(props: RoomPropType) {
       letterSpacing: 3,
       fontWeight: 900,
       color: MUD_BROWN,
-      width: '100%',
+      width: "100%",
       textAlign: "center" as "center",
       marginTop: 80,
     },
@@ -79,14 +79,14 @@ function Room(props: RoomPropType) {
     },
     to: {
       textAlign: "center" as "center",
-      fontSize: 28
+      fontSize: 28,
     },
     body: {
-      width: '80%',
-      margin: '120px auto',
+      width: "80%",
+      margin: "120px auto",
     },
     columnStyle: {
-      height: 'auto',
+      height: "auto",
     },
     columnTitle: {
       fontSize: 20,
@@ -95,21 +95,21 @@ function Room(props: RoomPropType) {
       textAlign: "center" as "center",
     },
     containerStyle: {
-      display: 'grid',
-      gridGap: '25px',
-      gridTemplateColumns: '1fr 1fr 1fr',
+      display: "grid",
+      gridGap: "25px",
+      gridTemplateColumns: "1fr 1fr 1fr",
     },
     teamButton: {
-      display: 'grid',
-      gridGap: '25px',
+      display: "grid",
+      gridGap: "25px",
       marginTop: 100,
-      gridTemplateColumns: '1fr 1fr 1fr',
+      gridTemplateColumns: "1fr 1fr 1fr",
     },
     button: {
-      margin: 'auto',
-      padding: '12px',
+      margin: "auto",
+      padding: "12px",
       color: MAIZE,
-    }
+    },
   };
 
   const mobileStyle = {
@@ -118,7 +118,7 @@ function Room(props: RoomPropType) {
       letterSpacing: 3,
       fontWeight: 900,
       color: MUD_BROWN,
-      width: '100%',
+      width: "100%",
       textAlign: "center" as "center",
       marginTop: 80,
     },
@@ -133,48 +133,47 @@ function Room(props: RoomPropType) {
       fontSize: 22,
     },
     body: {
-      width: '100%',
-      margin: '0 auto',
+      width: "100%",
+      margin: "0 auto",
       paddingTop: 50,
     },
     columnTitle: {
       fontSize: 16,
       fontWeight: 900,
       letterSpacing: 1,
-      textAlign: "center" as "center"
+      textAlign: "center" as "center",
     },
     containerStyle: {
-      display: 'grid',
-      width: '100%',
+      display: "grid",
+      width: "100%",
       position: "absolute" as "absolute",
-      gridTemplateColumns: '1fr 1fr 1fr',
+      gridTemplateColumns: "1fr 1fr 1fr",
     },
     columnStyle: {
-      height: 'auto',
+      height: "auto",
     },
     teamButton: {
-      display: 'grid',
-      gridGap: '8px',
+      display: "grid",
+      gridGap: "8px",
       marginTop: 100,
-      gridTemplateColumns: '1fr 1fr 1fr',
+      gridTemplateColumns: "1fr 1fr 1fr",
     },
     button: {
-      margin: 'auto',
-      padding: '8px',
+      margin: "auto",
+      padding: "8px",
       color: MAIZE,
       fontSize: 14,
     },
-
   };
 
   useEffect(() => {
     setRoomID(props.match.params.roomID);
-    socket.emit('joinRoom', {
+    socket.emit("joinRoom", {
       roomID: props.match.params.roomID,
       userID: props.location.state.userID,
     });
 
-    socket.on('startGame', (data: DataType) => {      
+    socket.on("startGame", (data: DataType) => {
       history.push(`/${data.roomID}/game`, {
         data,
         userID: props.location.state.userID,
@@ -184,13 +183,15 @@ function Room(props: RoomPropType) {
   }, "");
 
   useEffect(() => {
-    socket.on('updateTeams', (data: DataType) => {
+    socket.on("updateTeams", (data: DataType) => {
       const { redTeam, blueTeam, nullTeam } = organizeUsers(data.users);
       setRedTeam(redTeam);
       setBlueTeam(blueTeam);
       setNullTeam(nullTeam);
       setUser(
-        data.users.find((user) => user.userID === props.location.state.userID) || emptyUser
+        data.users.find(
+          (user) => user.userID === props.location.state.userID
+        ) || emptyUser
       );
       setRoomData(data);
     });
@@ -198,24 +199,30 @@ function Room(props: RoomPropType) {
 
   const showClaimSpyMaster = () => {
     if (roomData) {
-      if (user.team === 'RED' && roomData.redSpy){
+      if (user.team === "RED" && roomData.redSpy) {
         return false;
-      } else if (user.team === 'BLUE' && roomData.blueSpy) {
+      } else if (user.team === "BLUE" && roomData.blueSpy) {
         return false;
       }
-    return true;
+      return true;
     }
   };
 
   const style = isMobile ? mobileStyle : webStyle;
-  
+
   return (
-    <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
       <div style={style.title}>
         <div style={style.welcome}>WELCOME</div>
         <div style={style.to}>TO</div>
         <div style={style.roomName}>THE {roomID} HOTEL</div>
-
       </div>
       <div className="body" style={style.body}>
         <div className="teamChooseContainer" style={style.containerStyle}>
@@ -226,7 +233,9 @@ function Room(props: RoomPropType) {
                 <User
                   i={i}
                   name={user.userID}
-                  isSpyMaster={roomData ? roomData.redSpy === user.userID : null}
+                  isSpyMaster={
+                    roomData ? roomData.redSpy === user.userID : null
+                  }
                 />
               );
             })}
@@ -234,12 +243,7 @@ function Room(props: RoomPropType) {
           <div className="mainColumn" style={style.columnStyle}>
             <div style={style.columnTitle}></div>
             {nullTeam.map((user, i) => {
-              return (
-                <User
-                  i={i}
-                  name={user.userID}
-                 />
-              );
+              return <User i={i} name={user.userID} />;
             })}
           </div>
           <div className="blueColumn" style={style.columnStyle}>
@@ -249,7 +253,9 @@ function Room(props: RoomPropType) {
                 <User
                   i={i}
                   name={user.userID}
-                  isSpyMaster={roomData ? roomData.blueSpy === user.userID : null}
+                  isSpyMaster={
+                    roomData ? roomData.blueSpy === user.userID : null
+                  }
                 />
               );
             })}
@@ -257,20 +263,42 @@ function Room(props: RoomPropType) {
         </div>
 
         <div className="pickTeamButtons" style={style.teamButton}>
-          <Button style={{...style.button, backgroundColor: RED_CARD}} onClick={handleSetRedTeamClick} text={'Red Team'} />
+          <Button
+            style={{ ...style.button, backgroundColor: RED_CARD }}
+            onClick={handleSetRedTeamClick}
+            text={"Red Team"}
+          />
           {user.isHost ? (
-            <Button style={{...style.button, backgroundColor: '#496F5D'}} onClick={startGame} text={'Start Game'} />
+            <Button
+              style={{ ...style.button, backgroundColor: "#496F5D" }}
+              onClick={startGame}
+              text={"Start Game"}
+            />
           ) : null}
-          <Button style={{...style.button, backgroundColor: BLUE_CARD}} onClick={handleSetBlueTeamClick} text={'Blue Team'} />
+          <Button
+            style={{ ...style.button, backgroundColor: BLUE_CARD }}
+            onClick={handleSetBlueTeamClick}
+            text={"Blue Team"}
+          />
         </div>
-        <div> 
+        <div>
           {showClaimSpyMaster() ? (
-            <div style={{
-              display: 'flex',
-              justifyContent: 'center',
-              marginTop: '16px',
-            }}> 
-              <Button style={{...style.button, backgroundColor: 'BLACK', marginTop: '16px'}} onClick={handleClaimSpyMasterClick} text={'Claim Spy'} />
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                marginTop: "16px",
+              }}
+            >
+              <Button
+                style={{
+                  ...style.button,
+                  backgroundColor: "BLACK",
+                  marginTop: "16px",
+                }}
+                onClick={handleClaimSpyMasterClick}
+                text={"Claim Spy"}
+              />
             </div>
           ) : null}
         </div>

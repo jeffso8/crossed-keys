@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "codenames inspired game",
   "engines": {
-    "node": "17.x"
+    "node": "16.13.0"
   },
   "main": "index.js",
   "scripts": {

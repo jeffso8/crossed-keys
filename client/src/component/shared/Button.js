@@ -1,10 +1,10 @@
-import React from 'react';
-import {BROWNISH, MUD_BROWN} from '../../constants';
+import React from "react";
+import { BROWNISH, MUD_BROWN } from "../../constants";
 
-export default function Button (props) {
+export default function Button(props) {
   const style = {
     height: 50,
-    border: 'none',
+    border: "none",
     fontSize: 16,
     fontWeight: 900,
     letterSpacing: 1,
@@ -12,7 +12,7 @@ export default function Button (props) {
     margin: 5,
     backgroundColor: BROWNISH,
     color: MUD_BROWN,
-    cursor: 'pointer',
+    cursor: "pointer",
     ...props.style,
   };
 
@@ -21,5 +21,4 @@ export default function Button (props) {
       {props.text}
     </button>
   );
-
 }

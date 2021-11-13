@@ -186,16 +186,15 @@ export function loadSockets(server) {
     });
 
     socket.on("updateTurn", (data) => {
-      console.log("data", data);
       Rooms.findOne({ roomID: data.roomID }, function (err, res) {
         if (err) return;
         res.isRedTurn = data.redTurn;
-        res.turnStartedAt = new Date();
-        res.markModified("isRedTurn", "turnStartedAt");
+        res.turnEndTime = new Date().getTime() + 10000 + 1000;
+        res.markModified("isRedTurn", "turnEndTime");
         res.save();
         socket.nsp.in(data.roomID).emit("redTurn", {
           redTurn: res.isRedTurn,
-          turnStartedAt: res.turnStartedAt,
+          turnEndTime: res.turnEndTime,
         });
       });
     });
@@ -215,7 +214,6 @@ export function loadSockets(server) {
     });
 
     socket.on("hostStartGame", (data) => {
-      console.log("hoststartgame");
       const colorSorted = colors.sort(() => Math.random() - 0.5);
       const words = getWords();
       const clicked = new Array(25).fill(false);
@@ -232,7 +230,7 @@ export function loadSockets(server) {
             blueScore: 8,
             gameOver: false,
             hints: [],
-            turnStartedAt: new Date(),
+            turnEndTime: new Date().getTime() + 10000 + 1000,
           },
         },
         { upsert: true, new: true },

@@ -1,34 +1,34 @@
-import React, { useState, useEffect } from 'react';
-import { organizeUsers } from '../shared/utils';
-import { BLUE_CARD, RED_CARD } from '../../constants';
-import Modal from '../shared/Modal';
+import React, { useState, useEffect } from "react";
+import { organizeUsers } from "../shared/utils";
+import { BLUE_CARD, RED_CARD } from "../../constants";
+import Modal from "../shared/Modal";
 
 function GameInfoModal(props) {
   const style = {
     container: {
       width: 600,
       height: 500,
-      backgroundColor: 'white',
+      backgroundColor: "white",
       zIndex: 1,
-      position: 'absolute',
-      top: '5%',
-      textAlign: 'center',
-      borderRadius: '1em',
-      boxShadow: '5px 15px 20px #686963',
+      position: "absolute",
+      top: "5%",
+      textAlign: "center",
+      borderRadius: "1em",
+      boxShadow: "5px 15px 20px #686963",
     },
     teamContainer: {
       width: 550,
       height: 450,
-      top: '5%',
-      display: 'grid',
-      gridGap: '10px',
-      gridTemplateColumns: '1fr 1fr 1fr',
-      margin: '10px',
+      top: "5%",
+      display: "grid",
+      gridGap: "10px",
+      gridTemplateColumns: "1fr 1fr 1fr",
+      margin: "10px",
     },
     columns: {
-      margin: '2px',
-      height: 'auto',
-      width: 'auto',
+      margin: "2px",
+      height: "auto",
+      width: "auto",
     },
   };
   const [redTeam, setRedTeam] = useState([]);
@@ -44,7 +44,7 @@ function GameInfoModal(props) {
     return blueTeam.map((user) => {
       return (
         <div
-          style={{ color: BLUE_CARD, marginTop: '5px', marginBottom: '10px' }}
+          style={{ color: BLUE_CARD, marginTop: "5px", marginBottom: "10px" }}
         >
           {user.userID}
         </div>
@@ -56,7 +56,7 @@ function GameInfoModal(props) {
     return redTeam.map((user) => {
       return (
         <div
-          style={{ color: RED_CARD, marginTop: '5px', marginBottom: '10px' }}
+          style={{ color: RED_CARD, marginTop: "5px", marginBottom: "10px" }}
         >
           {user.userID}
         </div>
@@ -71,11 +71,11 @@ function GameInfoModal(props) {
         <div className="redTeam" style={style.columns}>
           <div
             style={{
-              position: 'relative',
-              top: '35%',
-              fontSize: '30px',
-              fontWeight: '880',
-              alignItems: 'center'
+              position: "relative",
+              top: "35%",
+              fontSize: "30px",
+              fontWeight: "880",
+              alignItems: "center",
             }}
           >
             <h1>

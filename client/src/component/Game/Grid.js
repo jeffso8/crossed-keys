@@ -69,23 +69,6 @@ export default function Grid(props) {
 
   const style = isMobile ? mobileCardStyle : cardStyle;
 
-  useEffect(() => {
-    // socket.on('refreshGame', (data) => {
-    //   console.log('refreshGame');
-    //   setWords(data.words);
-    //   setColors(data.colors);
-    //   setClicked(data.clicked);
-    // });
-    // socket.on('updateFlipCard', (data) => {
-    //   setClicked(data.clicked);
-    // });
-    // socket.on('nextGameStart', (data) => {
-    //   setClicked(data.clicked);
-    //   setColors(data.colors);
-    //   setWords(data.words);
-    // });
-  }, []);
-
   const handleCardClick = (index, turn) => {
     socket.emit("flipCard", { roomID, index, isRedTurn: turn });
   };

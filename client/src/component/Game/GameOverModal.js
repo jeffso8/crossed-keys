@@ -1,27 +1,27 @@
-import React, { useState } from 'react';
-import Modal from '../shared/Modal';
-import socket from '../../socket';
+import React, { useState } from "react";
+import Modal from "../shared/Modal";
+import socket from "../../socket";
 
 function GameOverModal(props) {
   const style = {
     content: {
-      position: 'relative',
-      top: '25%',
-      margin: '10px',
+      position: "relative",
+      top: "25%",
+      margin: "10px",
     },
   };
   const { gameScore, roomID, user } = props;
   const [claimVisible, setClaimVisible] = useState(false);
 
   const handleNextGame = () => {
-    socket.emit('hostStartGame', { roomID });
+    socket.emit("hostStartGame", { roomID });
   };
 
   const handleClaimSpyMasterClick = () => {
-    socket.emit('claimSpyMaster', { roomID, userID: user.userID });
-    if (user.team === 'RED') {
+    socket.emit("claimSpyMaster", { roomID, userID: user.userID });
+    if (user.team === "RED") {
       setClaimVisible(false);
-    } else if (user.team === 'BLUE') {
+    } else if (user.team === "BLUE") {
       setClaimVisible(false);
     }
   };
@@ -31,7 +31,7 @@ function GameOverModal(props) {
   };
 
   return (
-    <Modal title={'New Game'}>
+    <Modal title={"New Game"}>
       <div>
         <div style={style.content}>
           Game Over:

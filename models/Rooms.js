@@ -23,27 +23,27 @@ const { Schema } = require("../database");
   }
  }
 */
-const RoomSchema = new mongoose.Schema({
-      roomID: String,
-      colors:Array,
-      words: Array,
-      clicked: Array,
-      isRedTurn: Boolean,
-      gameOver: Boolean,
-      totalGameScore: Array,
-      redScore: Number,
-      blueScore: Number,
-      redSpy: String,
-      blueSpy: String,
-      users: Array,
-      hints: [
-       {hint: String,
-        hintCount: Number
-      }],
-      turnStartedAt: Date
-    },{
-      versionKey: false
-    });
+const RoomSchema = new mongoose.Schema(
+  {
+    roomID: String,
+    colors: Array,
+    words: Array,
+    clicked: Array,
+    isRedTurn: Boolean,
+    gameOver: Boolean,
+    totalGameScore: Array,
+    redScore: Number,
+    blueScore: Number,
+    redSpy: String,
+    blueSpy: String,
+    users: Array,
+    hints: [{ hint: String, hintCount: Number }],
+    turnEndTime: Number,
+  },
+  {
+    versionKey: false,
+  }
+);
 
 const Rooms = mongoose.model("Rooms", RoomSchema);
 module.exports = Rooms;

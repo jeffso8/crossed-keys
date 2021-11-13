@@ -1,39 +1,36 @@
-import React, { useEffect } from 'react';
- 
+import React, { useEffect } from "react";
 
-function getTimeRemaining(endTime) {
-  const diff = endTime - Date.now();
-  return Math.floor(diff / 1000);
-}
 function Timer(props) {
-  const endTime = new Date(props.turnStartedAt).getTime() + 10000 + 1000;
+  const [countdown, setCountdown] = React.useState(undefined);
 
-  const [time, setTime] = React.useState(undefined);
-
-  
   useEffect(() => {
-    const countdown = Math.floor((endTime - Date.now())/1000);
-    if (countdown < 0) {
+    if (countdown <= 0) {
       props.handleEndTurn(!props.redTurn);
+    } else {
+      const timeout = setTimeout(() => {
+        setCountdown(Math.floor((props.turnEndTime - Date.now()) / 1000));
+      }, 1000);
+
+      return () => {
+        clearTimeout(timeout);
+      };
     }
-    const timeout = setTimeout(() => {
-      setTime(countdown);
-    }, 1000);
+  }, [countdown]);
 
+  useEffect(() => {
+    setCountdown(Math.floor((props.turnEndTime - Date.now()) / 1000));
+  }, [props.turnEndTime]);
 
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, [time]);
+  if (!countdown && countdown !== 0) return null;
 
-
-
-
-  return(
+  return (
     <>
-      <div style={{marginTop: '16px'}} className={`flip-countdown theme-light size-medium`}>
-        <span className='flip-countdown-piece'>
-          {time}
+      <div
+        style={{ marginTop: "16px" }}
+        className={`flip-countdown theme-light size-medium`}
+      >
+        <span className="flip-countdown-piece">
+          {countdown && countdown == -1 ? 0 : countdown}
         </span>
       </div>
     </>
