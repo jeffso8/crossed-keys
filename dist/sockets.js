@@ -11,14 +11,13 @@ var _utils = require("./utils");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-var socketIO = require('socket.io');
+var socketIO = require("socket.io");
 
 function loadSockets(server) {
   var io = socketIO(server);
   var colors = ["red", "red", "red", "red", "red", "red", "red", "red", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "white", "white", "white", "white", "white", "white", "white", "white", "black"];
-  var timerMap = {};
-  io.on('connection', function (socket) {
-    socket.on('joinRoom', function (data) {
+  io.on("connection", function (socket) {
+    socket.on("joinRoom", function (data) {
       //data is an object with the roomID and the user that joined the room
       socket.join(data.roomID);
 
@@ -42,9 +41,8 @@ function loadSockets(server) {
             return;
           }
 
-          ;
           newRoom.save();
-          io["in"](data.roomID).emit('updateTeams', newRoom);
+          io["in"](data.roomID).emit("updateTeams", newRoom);
         } else {
           var foundUser = res.users.find(function (user) {
             return user.userID === data.userID;
@@ -60,20 +58,18 @@ function loadSockets(server) {
             });
           }
 
-          ;
-
           if (err) {
             (0, _utils.logErrors)(err);
             return;
           }
 
-          res.markModified('users');
+          res.markModified("users");
           res.save();
-          io["in"](data.roomID).emit('updateTeams', res);
+          io["in"](data.roomID).emit("updateTeams", res);
         }
       });
     });
-    socket.on('newHint', function (data) {
+    socket.on("newHint", function (data) {
       _Rooms["default"].findOneAndUpdate({
         roomID: data.roomID
       }, {
@@ -88,48 +84,48 @@ function loadSockets(server) {
         "new": true
       }, function (err, res) {
         if (err) return;
-        socket.nsp["in"](data.roomID).emit('sendHint', res);
+        socket.nsp["in"](data.roomID).emit("sendHint", res);
       });
     });
-    socket.on('setRedTeam', function (data) {
+    socket.on("setRedTeam", function (data) {
       _Rooms["default"].findOne({
         roomID: data.roomID
       }, function (err, res) {
         var foundUser = res.users.find(function (user) {
           return user.userID === data.userID;
         });
-        foundUser.team = 'RED';
+        foundUser.team = "RED";
         foundUser.role = null;
 
         if (res.blueSpy == data.userID) {
           res.blueSpy = null;
         }
 
-        res.markModified('users', 'blueSpy');
+        res.markModified("users", "blueSpy");
         res.save();
-        socket.nsp["in"](data.roomID).emit('updateTeams', res);
+        socket.nsp["in"](data.roomID).emit("updateTeams", res);
       });
     });
-    socket.on('setBlueTeam', function (data) {
+    socket.on("setBlueTeam", function (data) {
       _Rooms["default"].findOne({
         roomID: data.roomID
       }, function (err, res) {
         var foundUser = res.users.find(function (user) {
           return user.userID === data.userID;
         });
-        foundUser.team = 'BLUE';
+        foundUser.team = "BLUE";
         foundUser.role = null;
 
         if (res.redSpy == data.userID) {
           res.redSpy = null;
         }
 
-        res.markModified('users', 'redSpy');
+        res.markModified("users", "redSpy");
         res.save();
-        socket.nsp["in"](data.roomID).emit('updateTeams', res);
+        socket.nsp["in"](data.roomID).emit("updateTeams", res);
       });
     });
-    socket.on('claimSpyMaster', function (data) {
+    socket.on("claimSpyMaster", function (data) {
       _Rooms["default"].findOne({
         roomID: data.roomID
       }, function (err, res) {
@@ -152,74 +148,72 @@ function loadSockets(server) {
           res.blueSpy = foundUser.userID;
         }
 
-        res.markModified('users', 'redSpy', 'blueSpy');
+        res.markModified("users", "redSpy", "blueSpy");
         res.save();
-        socket.nsp["in"](data.roomID).emit('updateTeams', res);
+        socket.nsp["in"](data.roomID).emit("updateTeams", res);
       });
     });
-    socket.on('joinGame', function (data) {
+    socket.on("joinGame", function (data) {
       socket.join(data.roomID); // socket.userID = data.user.userID;
       // socket.roomID = data.roomID;
 
       _Rooms["default"].findOneAndUpdate({
         roomID: data.roomID,
-        'users.userID': data.user.userID
+        "users.userID": data.user.userID
       }, {
         $set: {
-          'users.$.socketId': socket.id
+          "users.$.socketId": socket.id
         }
       }, {
         upsert: true,
         "new": true
       }, function (err, res) {
         if (err) return;
-        socket.nsp["in"](data.roomID).emit('refreshGame', res);
+        socket.nsp["in"](data.roomID).emit("refreshGame", res);
       });
     });
-    socket.on('redScoreChange', function (data) {
+    socket.on("redScoreChange", function (data) {
       _Rooms["default"].findOne({
         roomID: data.roomID
       }, function (err, res) {
         if (err) return;
         res.redScore = data.redScore;
-        res.markModified('redScore');
+        res.markModified("redScore");
         res.save();
-        socket.nsp["in"](data.roomID).emit('updateRedScore', {
+        socket.nsp["in"](data.roomID).emit("updateRedScore", {
           redScore: res.redScore
         });
       });
     });
-    socket.on('blueScoreChange', function (data) {
+    socket.on("blueScoreChange", function (data) {
       _Rooms["default"].findOne({
         roomID: data.roomID
       }, function (err, res) {
         if (err) return;
         res.blueScore = data.blueScore;
-        res.markModified('blueScore');
+        res.markModified("blueScore");
         res.save();
-        socket.nsp["in"](data.roomID).emit('updateBlueScore', {
+        socket.nsp["in"](data.roomID).emit("updateBlueScore", {
           blueScore: res.blueScore
         });
       });
     });
-    socket.on('updateTurn', function (data) {
-      console.log('data', data);
-
+    socket.on("updateTurn", function (data) {
       _Rooms["default"].findOne({
         roomID: data.roomID
       }, function (err, res) {
         if (err) return;
         res.isRedTurn = data.redTurn;
-        res.turnStartedAt = new Date();
-        res.markModified('isRedTurn', 'turnStartedAt');
+        res.turnEndTime = new Date().getTime() + 10000 + 1000;
+        res.markModified("isRedTurn", "turnEndTime");
         res.save();
-        socket.nsp["in"](data.roomID).emit('redTurn', {
+        socket.nsp["in"](data.roomID).emit("redTurn", {
           redTurn: res.isRedTurn,
-          turnStartedAt: res.turnStartedAt
+          turnEndTime: res.turnEndTime
         });
       });
     });
-    socket.on('gameOver', function (data) {
+    socket.on("gameOver", function (data) {
       _Rooms["default"].findOne({
         roomID: data.roomID
       }, function (err, res) {
@@ -229,13 +223,12 @@ function loadSockets(server) {
         res.gameOver = data.gameOver;
         res.redScore = data.redScore;
         res.blueScore = data.blueScore;
-        res.markModified('gameScore', 'gameOver', 'redScore', 'blueScore');
+        res.markModified("gameScore", "gameOver", "redScore", "blueScore");
         res.save();
-        socket.nsp["in"](data.roomID).emit('updateGameOver', res);
+        socket.nsp["in"](data.roomID).emit("updateGameOver", res);
       });
     });
-    socket.on('hostStartGame', function (data) {
-      console.log('hoststartgame');
+    socket.on("hostStartGame", function (data) {
       var colorSorted = colors.sort(function () {
         return Math.random() - 0.5;
       });
@@ -255,32 +248,32 @@ function loadSockets(server) {
           blueScore: 8,
           gameOver: false,
           hints: [],
-          turnStartedAt: new Date()
+          turnEndTime: new Date().getTime() + 10000 + 1000
         }
       }, {
         upsert: true,
         "new": true
       }, function (err, res) {
         if (err) return;
-        socket.nsp["in"](data.roomID).emit('startGame', res);
+        socket.nsp["in"](data.roomID).emit("startGame", res);
       });
     });
-    socket.on('flipCard', function (data) {
+    socket.on("flipCard", function (data) {
       _Rooms["default"].findOne({
         roomID: data.roomID
       }, function (err, res) {
         if (err) return;
         res.clicked[data.index] = true;
         res.isRedTurn = data.isRedTurn;
-        res.markModified('clicked', 'isRedTurn');
+        res.markModified("clicked", "isRedTurn");
         res.save();
-        socket.nsp["in"](data.roomID).emit('updateFlipCard', {
+        socket.nsp["in"](data.roomID).emit("updateFlipCard", {
           isRedTurn: res.isRedTurn,
           clicked: res.clicked
         });
       });
     });
-    socket.on('getWords', function (data) {
+    socket.on("getWords", function (data) {
       _Rooms["default"].findOneAndUpdate({
         roomID: data.roomID
       }, {
@@ -292,7 +285,7 @@ function loadSockets(server) {
         "new": true
       }, function (err, result) {
         if (err) return;
-        socket.nsp["in"](data.roomID).emit('sendWords', result);
+        socket.nsp["in"](data.roomID).emit("sendWords", result);
       });
     });
   });

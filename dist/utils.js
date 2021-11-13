@@ -31,7 +31,7 @@ function shuffle(array) {
 }
 
 function getWords() {
-  var text = fs.readFileSync(__dirname + '/WORDS.txt', "utf-8");
+  var text = fs.readFileSync(__dirname + "/WORDS.txt", "utf-8");
   var words = text.split("\n");
   var shuffledArray = shuffle(words);
   return shuffledArray.splice(0, 25);
