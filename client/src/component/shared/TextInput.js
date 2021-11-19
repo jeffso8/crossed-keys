@@ -28,7 +28,18 @@ export default function TextInput(props) {
         onChange={props.onChange}
         autoComplete="off"
       />
-      {props.error && <div>{props.errorText}</div>}
+      {props.error && (
+        <div
+          style={{
+            marginTop: "2px",
+            fontSize: "14px",
+            fontStyle: "italic",
+            color: `${MUD_BROWN}`,
+          }}
+        >
+          {props.errorText}
+        </div>
+      )}
     </div>
   );
 }

@@ -39,6 +39,8 @@ function Room(props: RoomPropType) {
   const [blueTeam, setBlueTeam] = useState<UserType[]>([]);
   const [nullTeam, setNullTeam] = useState<UserType[]>([]);
   const [roomData, setRoomData] = useState<DataType>();
+  const [error, setError] = useState<Boolean>(false);
+
   const history = useHistory<any>();
   const { isMobile } = Responsive();
 
@@ -58,21 +60,27 @@ function Room(props: RoomPropType) {
   };
 
   const startGame = () => {
-    socket.emit("hostStartGame", { roomID });
+    if (nullTeam.length > 0) {
+      setError(true);
+    } else {
+      socket.emit("hostStartGame", { roomID });
+    }
   };
 
   const webStyle = {
     title: {
       fontSize: 52,
-      letterSpacing: 3,
-      fontWeight: 900,
+      // letterSpacing: 3,
       color: MUD_BROWN,
       width: "100%",
       textAlign: "center" as "center",
       marginTop: 80,
+      fontFamily: "Cleanface",
     },
     roomName: {
       fontSize: 50,
+      fontWeight: 900,
+      fontFamily: "Cleanface",
     },
     welcome: {
       fontSize: 34,
@@ -89,9 +97,8 @@ function Room(props: RoomPropType) {
       height: "auto",
     },
     columnTitle: {
-      fontSize: 20,
-      fontWeight: 900,
-      letterSpacing: 1,
+      fontSize: 24,
+      fontFamily: "Cleanface",
       textAlign: "center" as "center",
     },
     containerStyle: {
@@ -109,6 +116,8 @@ function Room(props: RoomPropType) {
       margin: "auto",
       padding: "12px",
       color: MAIZE,
+      fontStyle: "italic",
+      fontWeight: 400,
     },
   };
 
@@ -127,10 +136,6 @@ function Room(props: RoomPropType) {
     },
     welcome: {
       fontSize: 28,
-    },
-    to: {
-      textAlign: "center" as "center",
-      fontSize: 22,
     },
     body: {
       width: "100%",
@@ -220,14 +225,13 @@ function Room(props: RoomPropType) {
       }}
     >
       <div style={style.title}>
-        <div style={style.welcome}>WELCOME</div>
-        <div style={style.to}>TO</div>
-        <div style={style.roomName}>THE {roomID} HOTEL</div>
+        <div style={style.welcome}>Welcome to</div>
+        <div style={style.roomName}>The {roomID} Hotel</div>
       </div>
       <div className="body" style={style.body}>
         <div className="teamChooseContainer" style={style.containerStyle}>
           <div className="redColumn" style={style.columnStyle}>
-            <div style={style.columnTitle}>RED TEAM</div>
+            <div style={style.columnTitle}>Red Team</div>
             {redTeam.map((user, i) => {
               return (
                 <User
@@ -247,7 +251,7 @@ function Room(props: RoomPropType) {
             })}
           </div>
           <div className="blueColumn" style={style.columnStyle}>
-            <div style={style.columnTitle}>BLUE TEAM</div>
+            <div style={style.columnTitle}>Blue Team</div>
             {blueTeam.map((user, i) => {
               return (
                 <User
@@ -264,21 +268,21 @@ function Room(props: RoomPropType) {
 
         <div className="pickTeamButtons" style={style.teamButton}>
           <Button
-            style={{ ...style.button, backgroundColor: RED_CARD }}
+            style={{ ...style.button, width: 100, backgroundColor: RED_CARD }}
             onClick={handleSetRedTeamClick}
-            text={"Red Team"}
+            text={"JOIN"}
           />
           {user.isHost ? (
             <Button
               style={{ ...style.button, backgroundColor: "#496F5D" }}
               onClick={startGame}
-              text={"Start Game"}
+              text={"START GAME"}
             />
           ) : null}
           <Button
-            style={{ ...style.button, backgroundColor: BLUE_CARD }}
+            style={{ ...style.button, width: 100, backgroundColor: BLUE_CARD }}
             onClick={handleSetBlueTeamClick}
-            text={"Blue Team"}
+            text={"JOIN"}
           />
         </div>
         <div>
@@ -297,11 +301,12 @@ function Room(props: RoomPropType) {
                   marginTop: "16px",
                 }}
                 onClick={handleClaimSpyMasterClick}
-                text={"Claim Spy"}
+                text={"CLAIM SPY"}
               />
             </div>
           ) : null}
         </div>
+        {error && <div>Everyone must be in teams</div>}
       </div>
     </div>
   );

@@ -10,7 +10,7 @@ export default function User(props) {
       fontSize: 24,
       margin: 12,
       textTransform: "uppercase",
-      fontWeight: 900,
+      fontWeight: 500,
       textAlign: "center",
       alignSelf: "center",
       color: BROWNISH,

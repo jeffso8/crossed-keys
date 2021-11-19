@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
 import { BEIGE, BROWNISH, MUD_BROWN } from "../constants";
 import TextInput from "./shared/TextInput";
-import ReactArcText from "react-arc-text-fix";
 import { Responsive } from "./shared/responsive";
+import Button from "./shared/Button";
 
 function Home() {
   const style = {
@@ -29,23 +29,16 @@ function Home() {
     },
     title: {
       color: MUD_BROWN,
+      fontFamily: "Clearface",
       fontSize: 62,
-      fontWeight: 900,
+      fontWeight: 500,
       marginBottom: 20,
       textAlign: "center",
       letterSpacing: 4,
     },
     button: {
       width: 120,
-      height: 50,
-      border: "none",
-      fontSize: 18,
-      fontWeight: 900,
-      letterSpacing: 2,
       marginTop: 20,
-      backgroundColor: BROWNISH,
-      color: MUD_BROWN,
-      cursor: "pointer",
     },
   };
 
@@ -67,23 +60,35 @@ function Home() {
 
   const [username, setUsername] = useState("");
   const [roomName, setRoomName] = useState("");
-  const [error, setError] = useState(false);
+  const [usernameError, setUsernameError] = useState(false);
+  const [roomnameError, setRoomNameError] = useState(false);
 
   const history = useHistory();
   const { isMobile } = Responsive();
+
   const handleUsernameChange = (event) => {
-    if (error) {
-      setError(false);
+    if (usernameError) {
+      setUsernameError(false);
     }
     setUsername(event.target.value.toUpperCase());
   };
-  const handleRoomNameChange = (event) =>
+  const handleRoomNameChange = (event) => {
+    if (roomnameError) {
+      setRoomNameError(false);
+    }
     setRoomName(event.target.value.toUpperCase());
+  };
 
   const createRoom = () => {
     if (username === "") {
-      setError(true);
-    } else {
+      setUsernameError(true);
+    }
+
+    if (roomName === "") {
+      setRoomNameError(true);
+    }
+
+    if (roomName && username) {
       //this potentially needs a join room name, gotta figure out when to emit which
       axios.post("/create-room", { username, roomName }).then((res) => {
         history.push(res.data.redirectUrl, { userID: username });
@@ -107,16 +112,15 @@ function Home() {
       >
         <div style={{ marginBottom: "40px" }}>
           <div style={style.by}>
-            <div style={{ marginBottom: "4px" }}>A</div>
-            <div style={{ fontWeight: 900 }}>
-              <ReactArcText
-                text={"CODENAME INSPIRED"}
-                direction={1}
-                arc={360}
-                class={""}
-              />
+            <div
+              style={{
+                marginBottom: "2px",
+                fontFamily: "Clearface",
+              }}
+            >
+              A Codename Inspired
             </div>
-            <div style={{ marginTop: "-10px" }}>CARD GAME</div>
+            <div style={{ fontFamily: "Clearface" }}>Card Game</div>
           </div>
           <div style={isMobile ? mobileStyle.title : style.title}>
             CROSSED KEYS
@@ -129,7 +133,7 @@ function Home() {
             placeholder={"Username"}
             onChange={handleUsernameChange}
             style={isMobile ? { width: "90%" } : {}}
-            error={error}
+            error={usernameError}
             errorText={"Username can't be empty"}
           />
           <TextInput
@@ -139,12 +143,12 @@ function Home() {
             placeholder={"Room Name"}
             onChange={handleRoomNameChange}
             style={isMobile ? { width: "90%" } : {}}
+            error={roomnameError}
+            errorText={"Room name can't be empty"}
           />
         </div>
         <div>
-          <button style={style.button} onClick={createRoom}>
-            SUBMIT
-          </button>
+          <Button style={style.button} onClick={createRoom} text={"SUBMIT"} />
         </div>
       </div>
     </div>

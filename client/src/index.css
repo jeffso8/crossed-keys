@@ -1,35 +1,41 @@
+@font-face {
+  font-family: "Clearface";
+  src: local("ClearfaceStd"), url(./ClearfaceStd-Regular.otf) format("opentype");
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
 
-html, body, div#root {
+html,
+body,
+div#root {
   height: 100%;
   background-color: #f3eae0;
 }
 
 *::-webkit-input-placeholder {
-  color: #A35E60;
+  color: #a35e60;
   font-size: 14px;
   letter-spacing: 2px;
 }
-
 
 .red-flag {
   position: absolute;
   top: 0px;
   left: 90px;
   z-index: 1;
-  background-color: #A71D31;
+  background-color: #a71d31;
   width: 85px;
   height: 130px;
   clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 50% 70%, 0% 100%);
@@ -40,7 +46,7 @@ html, body, div#root {
   top: 0px;
   right: 90px;
   z-index: 1;
-  background-color: #33658A;
+  background-color: #33658a;
   width: 85px;
   height: 130px;
   clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 50% 70%, 0% 100%);
@@ -49,7 +55,3 @@ html, body, div#root {
 *:focus {
   outline: none;
 }
-
-
-
-
