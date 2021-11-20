@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
 import Grid from "./Grid";
-import ScoreBanner from "./ScoreBanner";
 import socket from "../../socket";
 import GameInfoModal from "./GameInfoModal";
 import GameOverModal from "./GameOverModal";
-import Timer from "./Timer";
 import Hint from "./Hint";
 import HintDisplay from "./HintDisplay";
+import GameHeader from "./GameHeader";
 import { DataType, UserType } from "../../types";
 import { Responsive } from "../shared/responsive";
 
@@ -51,8 +50,7 @@ function Game(props: GamePropsType) {
       display: "flex",
       justifyContent: "center",
       position: "relative" as "relative",
-      marginTop: 50,
-      marginBottom: 50,
+      marginBottom: "20px",
     },
   };
 
@@ -156,10 +154,7 @@ function Game(props: GamePropsType) {
           (user) => user.userID === props.location.state.userID
         ) || emptyUser
       );
-      // socket.emit('startTimer', {roomID: data.roomID});
     });
-
-    // setMounted(true);
   }, []);
 
   const handleRedScoreChange = (score: number) => {
@@ -197,7 +192,24 @@ function Game(props: GamePropsType) {
       (user.team === "RED" && redTurn) ||
       (user.team === "BLUE" && !redTurn)
     ) {
-      return <button onClick={() => handleEndTurn(!redTurn)}>End Turn</button>;
+      return (
+        <button
+          className="hover-underline-animation"
+          style={{
+            border: "none",
+            background: "none",
+            color: "black",
+            fontFamily: "Clearface",
+            fontStyle: "italic",
+            fontSize: "20px",
+            cursor: "pointer",
+            marginRight: "80px",
+          }}
+          onClick={() => handleEndTurn(!redTurn)}
+        >
+          End Turn
+        </button>
+      );
     }
   };
 
@@ -212,20 +224,14 @@ function Game(props: GamePropsType) {
             flexDirection: "column",
           }}
         >
-          <div>
-            <ScoreBanner isRedTeam={true} score={redScore} />
-            <div style={{ textAlign: "center" }}>
-              {turnEndTime && (
-                <Timer
-                  turnEndTime={turnEndTime}
-                  handleEndTurn={handleEndTurn}
-                  redTurn={redTurn}
-                />
-              )}
-              <h2>{redTurn ? "Red's Turn" : "Blue's Turn"}</h2>
-            </div>
-            <ScoreBanner isRedTeam={false} score={blueScore} />
-          </div>
+          <GameHeader
+            redScore={redScore}
+            blueScore={blueScore}
+            turnEndTime={turnEndTime}
+            handleEndTurn={handleEndTurn}
+            redTurn={redTurn}
+            user={user}
+          />
           <div style={style.container}>
             <Grid
               gameOver={gameOver}
@@ -244,17 +250,21 @@ function Game(props: GamePropsType) {
             />
             <HintDisplay />
           </div>
-          {user.role === "MASTER" ? <Hint roomID={roomID} /> : null}
-          <div style={{ position: "absolute", top: "90%", right: "20px" }}>
-            {renderEndTurn()}
+          <div style={{ height: "100%" }}>
+            {user.role === "MASTER" ? (
+              <Hint roomID={roomID} isRedTurn={redTurn} user={user} />
+            ) : null}
+            <div style={{ float: "right", marginTop: "40px" }}>
+              {renderEndTurn()}
+            </div>
+            {/* <button
+              style={{ position: "absolute", top: "93%", right: "20px" }}
+              onMouseEnter={() => setShowModal(true)}
+              onMouseLeave={() => setShowModal(false)}
+            >
+              Show Modal
+            </button> */}
           </div>
-          <button
-            style={{ position: "absolute", top: "93%", right: "20px" }}
-            onMouseEnter={() => setShowModal(true)}
-            onMouseLeave={() => setShowModal(false)}
-          >
-            Show Modal
-          </button>
           {showModal ? (
             <GameInfoModal
               users={users}

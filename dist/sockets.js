@@ -76,7 +76,8 @@ function loadSockets(server) {
         $addToSet: {
           hints: {
             hint: data.hint,
-            hintCount: data.hintCount
+            hintCount: data.hintCount,
+            isRedTurn: data.isRedTurn
           }
         }
       }, {

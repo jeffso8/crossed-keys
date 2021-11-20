@@ -18,7 +18,10 @@ export default function Button(props) {
   };
 
   return (
-    <button onClick={props.onClick} style={style}>
+    <button
+      onClick={!props.disabled && props.onClick}
+      style={props.disabled ? { ...style, opacity: 0.5 } : style}
+    >
       {props.text}
     </button>
   );

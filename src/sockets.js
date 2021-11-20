@@ -89,7 +89,13 @@ export function loadSockets(server) {
       Rooms.findOneAndUpdate(
         { roomID: data.roomID },
         {
-          $addToSet: { hints: { hint: data.hint, hintCount: data.hintCount } },
+          $addToSet: {
+            hints: {
+              hint: data.hint,
+              hintCount: data.hintCount,
+              isRedTurn: data.isRedTurn,
+            },
+          },
         },
         { upsert: true, new: true },
         function (err, res) {

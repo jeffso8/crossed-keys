@@ -1,6 +1,7 @@
 export type HintsType = {
   hint: string;
   hintCount: number;
+  isRedTurn: boolean;
 }[];
 
 export type UserType = {

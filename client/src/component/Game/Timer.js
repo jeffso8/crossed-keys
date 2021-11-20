@@ -26,10 +26,10 @@ function Timer(props) {
   return (
     <>
       <div
-        style={{ marginTop: "16px" }}
+        style={{ marginTop: "28px" }}
         className={`flip-countdown theme-light size-medium`}
       >
-        <span className="flip-countdown-piece">
+        <span style={{ fontSize: "30px", fontFamily: "Clearface" }}>
           {countdown && countdown == -1 ? 0 : countdown}
         </span>
       </div>

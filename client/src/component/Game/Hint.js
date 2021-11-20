@@ -4,6 +4,7 @@ import Button from "../shared/Button";
 import socket from "../../socket";
 
 export default function Hint(props) {
+  console.log(props.user);
   const [hint, setHint] = useState("");
   const [hintCount, setHintCount] = useState(1);
 
@@ -13,11 +14,21 @@ export default function Hint(props) {
   };
 
   const handleSubmit = () => {
-    socket.emit("newHint", { roomID: props.roomID, hint, hintCount });
+    socket.emit("newHint", {
+      roomID: props.roomID,
+      hint,
+      hintCount,
+      isRedTurn: props.isRedTurn,
+    });
   };
 
+  const isSubmitDisabled = !(
+    (props.isRedTurn && props.user.team === "RED") ||
+    (!props.isRedTurn && props.user.team === "BLUE")
+  );
+
   return (
-    <div style={{ alignSelf: "center" }}>
+    <div style={{ alignSelf: "center", display: "inherit" }}>
       <TextInput value={hint} onChange={handleHintChange} />
       <select value={hintCount} onChange={handleHintCountChange}>
         <option value="1">1</option>
@@ -29,7 +40,12 @@ export default function Hint(props) {
         <option value="7">7</option>
         <option value="8">8</option>
       </select>
-      <Button onClick={handleSubmit} text={"SEND"} />
+      <Button
+        disabled={isSubmitDisabled}
+        onClick={handleSubmit}
+        text={"SEND"}
+        style={{ width: 100 }}
+      />
     </div>
   );
 }

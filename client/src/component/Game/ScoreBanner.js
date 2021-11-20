@@ -1,26 +1,27 @@
-import React from 'react';
-import { BLUE_CARD, RED_CARD, MAIZE } from '../../constants';
-import { Responsive } from '../shared/responsive';
+import React from "react";
+import { BLUE_CARD, RED_CARD, MAIZE } from "../../constants";
+import { Responsive } from "../shared/responsive";
+import "./Game.scss";
 
 export default function ScoreBanner(props) {
   const { isMobile } = Responsive();
 
   const webStyle = {
     container: {
-      position: 'absolute',
+      position: "absolute",
       top: 0,
-      left: props.isRedTeam ? '90px' : 'initial',
-      right: !props.isRedTeam ? '90px' : 'initial',
+      left: props.isRedTeam ? "90px" : "initial",
+      right: !props.isRedTeam ? "90px" : "initial",
       zIndex: 1,
       backgroundColor: props.isRedTeam ? RED_CARD : BLUE_CARD,
-      width: '75px',
-      height: '110px',
-      clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 50% 70%, 0% 100%)',
+      width: "75px",
+      height: "110px",
+      clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 50% 70%, 0% 100%)",
     },
     score: {
       color: MAIZE,
-      fontSize: 36,
-      textAlign: 'center',
+      fontSize: 32,
+      textAlign: "center",
       marginTop: 20,
       fontWeight: 900,
     },
@@ -28,20 +29,20 @@ export default function ScoreBanner(props) {
 
   const mobileStyle = {
     container: {
-      position: 'absolute',
+      position: "absolute",
       top: 0,
-      left: props.isRedTeam ? '20px' : 'initial',
-      right: !props.isRedTeam ? '20px' : 'initial',
+      left: props.isRedTeam ? "20px" : "initial",
+      right: !props.isRedTeam ? "20px" : "initial",
       zIndex: 1,
       backgroundColor: props.isRedTeam ? RED_CARD : BLUE_CARD,
-      width: '55px',
-      height: '90px',
-      clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 50% 70%, 0% 100%)',
+      width: "55px",
+      height: "90px",
+      clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 50% 70%, 0% 100%)",
     },
     score: {
       color: MAIZE,
       fontSize: 30,
-      textAlign: 'center',
+      textAlign: "center",
       marginTop: 20,
       fontWeight: 900,
     },

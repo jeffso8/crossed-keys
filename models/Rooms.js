@@ -37,7 +37,7 @@ const RoomSchema = new mongoose.Schema(
     redSpy: String,
     blueSpy: String,
     users: Array,
-    hints: [{ hint: String, hintCount: Number }],
+    hints: [{ hint: String, hintCount: Number, isRedTurn: Boolean }],
     turnEndTime: Number,
   },
   {
