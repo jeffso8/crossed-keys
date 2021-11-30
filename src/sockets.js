@@ -153,6 +153,7 @@ export function loadSockets(server) {
     });
 
     socket.on("joinGame", (data) => {
+      console.log("joinGame");
       socket.join(data.roomID);
       // socket.userID = data.user.userID;
       // socket.roomID = data.roomID;

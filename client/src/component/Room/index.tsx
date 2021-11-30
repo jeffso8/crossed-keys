@@ -7,6 +7,7 @@ import { Responsive } from "../shared/responsive";
 import Button from "../shared/Button";
 import { DataType, UserType } from "../../types";
 import { MUD_BROWN, MAIZE, BLUE_CARD, RED_CARD } from "../../constants";
+import { useCookies } from "react-cookie";
 
 type RoomPropType = {
   location: {
@@ -42,6 +43,8 @@ function Room(props: RoomPropType) {
   const [error, setError] = useState<Boolean>(false);
 
   const history = useHistory<any>();
+  const [cookies, setCookie] = useCookies();
+
   const { isMobile } = Responsive();
 
   const handleSetRedTeamClick = () => {
@@ -172,6 +175,9 @@ function Room(props: RoomPropType) {
   };
 
   useEffect(() => {
+    setCookie("name", props.location.state.userID, { path: "/" });
+    setCookie("room", props.match.params.roomID, { path: "/" });
+
     setRoomID(props.match.params.roomID);
     socket.emit("joinRoom", {
       roomID: props.match.params.roomID,

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useCookies } from "react-cookie";
 import Grid from "./Grid";
 import socket from "../../socket";
 import GameInfoModal from "./GameInfoModal";
@@ -42,6 +43,8 @@ function Game(props: GamePropsType) {
   const [words, setWords] = useState([]);
   const [colors, setColors] = useState([]);
   const [clicked, setClicked] = useState([]);
+
+  const [cookies, setCookie, getCookie] = useCookies();
 
   const { isMobile } = Responsive();
 

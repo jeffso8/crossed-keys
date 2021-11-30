@@ -73,6 +73,7 @@ function Card(props) {
       style={{
         ...style.container,
         opacity: isMaster && props.clicked ? 0.3 : 1,
+        cursor: "pointer",
       }}
       onClick={props.handleClick}
     >
