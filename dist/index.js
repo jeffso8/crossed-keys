@@ -22,6 +22,8 @@ var _sockets = require("./sockets");
 
 var _path = _interopRequireDefault(require("path"));
 
+var _cookieParser = _interopRequireDefault(require("cookie-parser"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
@@ -49,6 +51,7 @@ app.use(function (req, res, next) {
   }
 });
 app.use((0, _cors["default"])());
+app.use((0, _cookieParser["default"])());
 app.use(_express["default"].json());
 app.use(_express["default"]["static"](_path["default"].join(__dirname, "../client/build")));
 app.options("/*", function (req, res, next) {
@@ -114,7 +117,7 @@ app.get("/words", /*#__PURE__*/function () {
 app.post("/create-room", function (req, res) {
   return res.status(200).json({
     success: true,
-    redirectUrl: "/".concat(req.body.roomName)
+    redirectUrl: "/room/".concat(req.body.roomName)
   });
 });
 app.get("/game-stats", function (req, res) {

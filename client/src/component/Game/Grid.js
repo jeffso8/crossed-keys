@@ -5,11 +5,6 @@ import { Responsive } from "../shared/responsive";
 import socket from "../../socket";
 
 export default function Grid(props) {
-  // const [words, setWords] = useState([]);
-  // const [colors, setColors] = useState([]);
-  // const [clicked, setClicked] = useState([]);
-  const [rotDeg, setRotDeg] = useState([]);
-
   const {
     gameOver,
     user,
@@ -112,7 +107,6 @@ export default function Grid(props) {
 
           //TODO: clicked and index, figure out a way to store these as states, and emitted to all clients
           const isClicked = clicked[index + clickedColumn * 5];
-          const randDeg = rotDeg[index + clickedColumn * 5];
           const isDisabled =
             (user.team === "RED" && !redTurn) ||
             (user.team === "BLUE" && redTurn) ||
@@ -161,7 +155,6 @@ export default function Grid(props) {
               clicked={isClicked}
               color={realColor}
               user={user}
-              rotate={randDeg}
               handleClick={handleClick}
             />
           );

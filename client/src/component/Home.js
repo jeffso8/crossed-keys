@@ -5,6 +5,8 @@ import { BEIGE, BROWNISH, MUD_BROWN } from "../constants";
 import TextInput from "./shared/TextInput";
 import { Responsive } from "./shared/responsive";
 import Button from "./shared/Button";
+import { useCookies } from "react-cookie";
+import useTextField from "../hooks/useTextField";
 
 function Home() {
   const style = {
@@ -57,27 +59,16 @@ function Home() {
       letterSpacing: 4,
     },
   };
+  const [_, setCookie] = useCookies();
 
-  const [username, setUsername] = useState("");
-  const [roomName, setRoomName] = useState("");
-  const [usernameError, setUsernameError] = useState(false);
-  const [roomnameError, setRoomNameError] = useState(false);
+  const [username, usernameError, handleUsernameChange, setUsernameError] =
+    useTextField("");
+
+  const [roomName, roomnameError, handleRoomNameChange, setRoomNameError] =
+    useTextField("");
 
   const history = useHistory();
   const { isMobile } = Responsive();
-
-  const handleUsernameChange = (event) => {
-    if (usernameError) {
-      setUsernameError(false);
-    }
-    setUsername(event.target.value.toUpperCase());
-  };
-  const handleRoomNameChange = (event) => {
-    if (roomnameError) {
-      setRoomNameError(false);
-    }
-    setRoomName(event.target.value.toUpperCase());
-  };
 
   const createRoom = () => {
     if (username === "") {
@@ -91,6 +82,7 @@ function Home() {
     if (roomName && username) {
       //this potentially needs a join room name, gotta figure out when to emit which
       axios.post("/create-room", { username, roomName }).then((res) => {
+        setCookie("room", roomName, { path: "/" });
         history.push(res.data.redirectUrl, { userID: username });
       });
     }
@@ -99,7 +91,7 @@ function Home() {
   useEffect(() => {
     fetch("/words").then((res) => {
       res.json().then((data) => {
-        setRoomName(data[0] + "-" + data[5]);
+        handleRoomNameChange(data[0] + "-" + data[5]);
       });
     });
   }, []);

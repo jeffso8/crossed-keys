@@ -1,7 +1,6 @@
 import React from "react";
 import { BLUE_CARD, RED_CARD, MAIZE } from "../../constants";
 import { Responsive } from "../shared/responsive";
-import "./Game.scss";
 
 export default function ScoreBanner(props) {
   const { isMobile } = Responsive();

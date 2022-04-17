@@ -4,7 +4,6 @@ import Button from "../shared/Button";
 import socket from "../../socket";
 
 export default function Hint(props) {
-  console.log(props.user);
   const [hint, setHint] = useState("");
   const [hintCount, setHintCount] = useState(1);
 

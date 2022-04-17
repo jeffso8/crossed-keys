@@ -85,7 +85,7 @@ app.get("/words", async (req, res) => {
 app.post("/create-room", (req, res) => {
   return res.status(200).json({
     success: true,
-    redirectUrl: `/${req.body.roomName}`,
+    redirectUrl: `/room/${req.body.roomName}`,
   });
 });
 

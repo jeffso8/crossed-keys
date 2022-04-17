@@ -79,8 +79,6 @@ function Game(props: GamePropsType) {
     });
 
     socket.on("refreshGame", (data: DataType) => {
-      console.log("refreshGame", data.turnEndTime);
-
       setBlueScore(data.blueScore);
       setRedScore(data.redScore);
       setGameScore(data.totalGameScore);

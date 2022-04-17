@@ -43,7 +43,7 @@ function Room(props: RoomPropType) {
   const [error, setError] = useState<Boolean>(false);
 
   const history = useHistory<any>();
-  const [cookies, setCookie] = useCookies();
+  const [_, setCookie] = useCookies();
 
   const { isMobile } = Responsive();
 
@@ -185,13 +185,13 @@ function Room(props: RoomPropType) {
     });
 
     socket.on("startGame", (data: DataType) => {
-      history.push(`/${data.roomID}/game`, {
+      history.push(`/game/${data.roomID}`, {
         data,
         userID: props.location.state.userID,
       });
     });
     // @ts-ignore
-  }, "");
+  }, []);
 
   useEffect(() => {
     socket.on("updateTeams", (data: DataType) => {
@@ -311,6 +311,24 @@ function Room(props: RoomPropType) {
               />
             </div>
           ) : null}
+        </div>
+        <div
+          style={{
+            width: "300px",
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "50px",
+          }}
+        >
+          <div style={{ backgroundColor: "white" }}>
+            {document.location.href}
+          </div>
+          <Button
+            onClick={() => {
+              return navigator.clipboard.writeText(document.location.href);
+            }}
+            text={"Share Room"}
+          />
         </div>
         {error && <div>Everyone must be in teams</div>}
       </div>
