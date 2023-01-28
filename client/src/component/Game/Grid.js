@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { NEUTRAL_CARD, BLUE_CARD, RED_CARD, BOMB_CARD } from "../../constants";
 import Card from "./Card";
 import { Responsive } from "../shared/responsive";
 import socket from "../../socket";
+import { GameContext } from "../../context/GameContext";
 
 export default function Grid(props) {
   const {
     gameOver,
     user,
     redTurn,
-    roomID,
+    // roomID,
     redScore,
     handleEndTurn,
     handleRedScoreChange,
@@ -17,12 +18,21 @@ export default function Grid(props) {
     blueScore,
     timerID,
     gameScore,
-    words,
     clicked,
     colors,
   } = props;
 
+  const { gameData, updateGameData } = useContext(GameContext);
+
+  const { words, cards } = gameData;
+  // console.log("words", words);
   const { isMobile } = Responsive();
+
+  const cards1 = cards.slice(0, 5);
+  const cards2 = cards.slice(5, 10);
+  const cards3 = cards.slice(10, 15);
+  const cards4 = cards.slice(15, 20);
+  const cards5 = cards.slice(20, 25);
 
   const rowColor1 = colors.slice(0, 5);
   const rowColor2 = colors.slice(5, 10);
@@ -65,13 +75,17 @@ export default function Grid(props) {
   const style = isMobile ? mobileCardStyle : cardStyle;
 
   const handleCardClick = (index, turn) => {
-    socket.emit("flipCard", { roomID, index, isRedTurn: turn });
+    socket.emit("flipCard", {
+      roomID: gameData.roomId,
+      index,
+      isRedTurn: turn,
+    });
   };
 
   const handleBombClick = (team) => {
     if (team === "RED") {
       socket.emit("gameOver", {
-        roomID,
+        roomID: gameData.roomId,
         gameScore: [gameScore[0], gameScore[1] + 1],
         gameOver: true,
         redScore: redScore,
@@ -80,7 +94,7 @@ export default function Grid(props) {
       });
     } else {
       socket.emit("gameOver", {
-        roomID,
+        roomID: gameData.roomId,
         gameScore: [gameScore[0] + 1, gameScore[1]],
         gameOver: true,
         redScore: redScore,
@@ -88,6 +102,63 @@ export default function Grid(props) {
         timerID,
       });
     }
+  };
+
+  const renderCardColumns = (cardColumn, clickedColumn) => {
+    // const handleClick = (isClicked, idx, color) => {
+    //   if (isClicked) {
+    //     return;
+    //   }
+    //   if (color === BOMB_CARD) {
+    //     handleBombClick(user.team);
+    //   } else {
+    //     if (redTurn) {
+    //       if (color === RED_CARD) {
+    //         handleRedScoreChange(redScore - 1);
+    //         handleCardClick(idx + clickedColumn * 5, true);
+    //       } else {
+    //         if (color === BLUE_CARD) {
+    //           handleBlueScoreChange(blueScore - 1);
+    //           handleEndTurn(!redTurn);
+    //         }
+    //         handleCardClick(idx + clickedColumn * 5, false);
+    //         handleEndTurn(!redTurn);
+    //       }
+    //     } else {
+    //       if (color === BLUE_CARD) {
+    //         handleBlueScoreChange(blueScore - 1);
+    //         handleCardClick(idx + clickedColumn * 5, false);
+    //       } else {
+    //         if (color === RED_CARD) {
+    //           handleRedScoreChange(redScore - 1);
+    //           handleEndTurn(!redTurn);
+    //         }
+    //         handleCardClick(idx + clickedColumn * 5, true);
+    //         handleEndTurn(!redTurn);
+    //       }
+    //     }
+    //   }
+    // };
+
+    return (
+      <div style={style.columns}>
+        {cardColumn.map((card, index) => {
+          const { isClicked, color, word } = card;
+          return (
+            <Card
+              word={word}
+              isClicked={isClicked}
+              color={color}
+              user={user}
+              clickedColumn={clickedColumn}
+              index={index}
+              // handleClick={handleClick}
+              // handleClick={handleClick}
+            />
+          );
+        })}
+      </div>
+    );
   };
 
   const renderColumns = (rowColor, wordColumn, clickedColumn, className) => {
@@ -165,11 +236,17 @@ export default function Grid(props) {
 
   return (
     <div style={style.container}>
-      {renderColumns(rowColor1, wordsColumn1, 0, "Column1")}
+      {renderCardColumns(cards1, 0)}
+      {renderCardColumns(cards2, 1)}
+      {renderCardColumns(cards3, 2)}
+      {renderCardColumns(cards4, 3)}
+      {renderCardColumns(cards5, 4)}
+
+      {/* {renderColumns(rowColor1, wordsColumn1, 0, "Column1")}
       {renderColumns(rowColor2, wordsColumn2, 1, "Column2")}
       {renderColumns(rowColor3, wordsColumn3, 2, "Column3")}
       {renderColumns(rowColor4, wordsColumn4, 3, "Column4")}
-      {renderColumns(rowColor5, wordsColumn5, 4, "Column5")}
+      {renderColumns(rowColor5, wordsColumn5, 4, "Column5")} */}
     </div>
   );
 }

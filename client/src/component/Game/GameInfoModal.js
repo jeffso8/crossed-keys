@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { organizeUsers } from "../shared/utils";
 import { BLUE_CARD, RED_CARD } from "../../constants";
 import Modal from "../shared/Modal";
+import { GameContext } from "../../context/GameContext";
 
 function GameInfoModal(props) {
   const style = {
@@ -33,12 +34,13 @@ function GameInfoModal(props) {
   };
   const [redTeam, setRedTeam] = useState([]);
   const [blueTeam, setBlueTeam] = useState([]);
+  const { gameData, updateGameData } = useContext(GameContext);
 
   useEffect(() => {
-    const { redTeam, blueTeam } = organizeUsers(props.users);
+    const { redTeam, blueTeam } = organizeUsers(gameData.users);
     setRedTeam(redTeam);
     setBlueTeam(blueTeam);
-  }, [props.users]);
+  }, [gameData.users]);
 
   const blueTeamColumn = () => {
     return blueTeam.map((user) => {
@@ -66,7 +68,7 @@ function GameInfoModal(props) {
 
   //Currently the score is hard coded, so we need to update that with the total game score stored in the database
   return (
-    <Modal title={`Your Current Room: ${props.roomID}`}>
+    <Modal title={`Your Current Room: ${gameData.roomId}`}>
       <div>
         <div className="redTeam" style={style.columns}>
           <div

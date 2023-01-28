@@ -12,7 +12,14 @@ export type UserType = {
   socketId: string;
 };
 
+export type CardType = {
+  word: string;
+  color: string;
+  isClicked: boolean;
+};
+
 export type DataType = {
+  cards: CardType[];
   colors: string[];
   words: string[];
   clicked: Boolean[];

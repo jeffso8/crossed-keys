@@ -1,5 +1,5 @@
 import Rooms from "../models/Rooms";
-import { getWords, logErrors, newUser } from "./utils";
+import { generateCards, getWords, logErrors, newUser } from "./utils";
 
 const socketIO = require("socket.io");
 
@@ -153,6 +153,7 @@ export function loadSockets(server) {
     });
 
     socket.on("joinGame", (data) => {
+      console.log("join");
       socket.join(data.roomID);
       Rooms.findOneAndUpdate(
         { roomID: data.roomID, "users.userID": data.user.userID },
@@ -220,12 +221,16 @@ export function loadSockets(server) {
     socket.on("hostStartGame", (data) => {
       const colorSorted = colors.sort(() => Math.random() - 0.5);
       const words = getWords();
+
+      const cards = generateCards(words, colorSorted);
+
       const clicked = new Array(25).fill(false);
       socket.roomID = data.roomID;
       Rooms.findOneAndUpdate(
         { roomID: data.roomID },
         {
           $set: {
+            cards,
             colors: colorSorted,
             words: words,
             clicked: clicked,
@@ -239,24 +244,43 @@ export function loadSockets(server) {
         },
         { upsert: true, new: true },
         function (err, res) {
+          console.log("err", err);
           if (err) return;
+          console.log("startgame", res);
           socket.nsp.in(data.roomID).emit("startGame", res);
         }
       );
     });
 
-    socket.on("flipCard", (data) => {
-      Rooms.findOne({ roomID: data.roomID }, function (err, res) {
-        if (err) return;
-        res.clicked[data.index] = true;
-        res.isRedTurn = data.isRedTurn;
-        res.markModified("clicked", "isRedTurn");
-        res.save();
-        socket.nsp.in(data.roomID).emit("updateFlipCard", {
-          isRedTurn: res.isRedTurn,
-          clicked: res.clicked,
-        });
+    socket.on("flipCard", async (data) => {
+      console.log("flipCard", data);
+      const { cards } = await Rooms.findOne({ roomID: data.roomID }, "cards")
+        .lean()
+        .exec();
+
+      cards[data.index].isClicked = true;
+      await Rooms.updateOne({ roomID: data.roomID }, { $set: { cards } });
+
+      socket.nsp.in(data.roomID).emit("updateFlipCard", {
+        isRedTurn: data.isRedTurn,
+        // clicked: res.clicked,
+        cards,
       });
+
+      // Rooms.findOne({ roomID: data.roomID }, function (err, res) {
+      //   if (err) return;
+      //   console.log("res", res.cards, res.cards[0]);
+      //   res.cards[data.index].isClicked = true;
+      //   // res.clicked[data.index] = true;
+      //   res.isRedTurn = data.isRedTurn;
+      //   res.markModified("cards", "isRedTurn");
+      //   res.save();
+      //   socket.nsp.in(data.roomID).emit("updateFlipCard", {
+      //     isRedTurn: res.isRedTurn,
+      //     clicked: res.clicked,
+      //     cards: res.cards,
+      //   });
+      // });
     });
 
     socket.on("getWords", (data) => {

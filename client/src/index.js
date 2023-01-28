@@ -5,17 +5,20 @@ import App from "./app/App";
 import reportWebVitals from "./reportWebVitals";
 import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
 import { CookiesProvider } from "react-cookie";
+import { GameContextProvider } from "./context/GameContext";
 
 ReactDOM.render(
   <React.StrictMode>
     <CookiesProvider>
-      <App />
+      <GameContextProvider>
+        <App />
+      </GameContextProvider>
     </CookiesProvider>
   </React.StrictMode>,
   document.getElementById("root")
 );
 
-serviceWorkerRegistration.register();
+// serviceWorkerRegistration.register();
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

@@ -26,6 +26,11 @@ const { Schema } = require("../database");
 const RoomSchema = new mongoose.Schema(
   {
     roomID: String,
+    cards: {
+      word: String,
+      color: String,
+      isClicked: Boolean,
+    },
     colors: Array,
     words: Array,
     clicked: Array,

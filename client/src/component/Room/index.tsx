@@ -66,6 +66,7 @@ function Room(props: RoomPropType) {
     if (nullTeam.length > 0) {
       setError(true);
     } else {
+      console.log("stargtgame");
       socket.emit("hostStartGame", { roomID });
     }
   };

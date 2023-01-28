@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import { useCookies } from "react-cookie";
+import React, { useState, useEffect, useContext } from "react";
 import Grid from "./Grid";
 import socket from "../../socket";
 import GameInfoModal from "./GameInfoModal";
@@ -9,6 +8,7 @@ import HintDisplay from "./HintDisplay";
 import GameHeader from "./GameHeader";
 import { DataType, UserType } from "../../types";
 import { Responsive } from "../shared/responsive";
+import { GameContext } from "../../context/GameContext";
 
 type GamePropsType = {
   location: {
@@ -20,6 +20,8 @@ type GamePropsType = {
 };
 
 function Game(props: GamePropsType) {
+  const { gameData, updateGameData } = useContext(GameContext);
+
   let [redScore, setRedScore] = useState(8);
   let [blueScore, setBlueScore] = useState(8);
   const emptyUser = {
@@ -29,8 +31,8 @@ function Game(props: GamePropsType) {
     isHost: false,
     socketId: "",
   };
-  const [roomID, setRoomID] = useState(props.location.state.data.roomID);
-  const [users, setUsers] = useState<UserType[]>([]);
+  // const [roomID, setRoomID] = useState(props.location.state.data.roomID);
+  // const [users, setUsers] = useState<UserType[]>([]);
   const [user, setUser] = useState<UserType>(emptyUser);
   const [redTurn, setRedTurn] = useState(props.location.state.data.isRedTurn);
   const [showModal, setShowModal] = useState(false);
@@ -40,11 +42,8 @@ function Game(props: GamePropsType) {
   const [gameOver, setGameOver] = useState(props.location.state.data.gameOver);
   const [turnEndTime, setTurnEndTime] = useState(null);
   const [mounted, setMounted] = useState(false);
-  const [words, setWords] = useState([]);
   const [colors, setColors] = useState([]);
   const [clicked, setClicked] = useState([]);
-
-  const [cookies, setCookie, getCookie] = useCookies();
 
   const { isMobile } = Responsive();
 
@@ -71,6 +70,11 @@ function Game(props: GamePropsType) {
   const style = isMobile ? mobileStyle : webStyle;
 
   useEffect(() => {
+    updateGameData({ roomId: props.location.state.data.roomID });
+  }, []);
+
+  useEffect(() => {
+    console.log("effect");
     socket.emit("joinGame", {
       roomID: props.location.state.data.roomID,
       user: props.location.state.data.users.find(
@@ -79,12 +83,18 @@ function Game(props: GamePropsType) {
     });
 
     socket.on("refreshGame", (data: DataType) => {
+      console.log("refreshGame", data);
       setBlueScore(data.blueScore);
       setRedScore(data.redScore);
       setGameScore(data.totalGameScore);
       setGameOver(data.gameOver);
       setRedTurn(data.isRedTurn);
-      setUsers(data.users);
+      // setUsers(data.users);
+      updateGameData({
+        cards: data.cards,
+        users: data.users,
+        words: data.words,
+      });
       setUser(
         data.users.find(
           (user) => user.userID === props.location.state.userID
@@ -92,8 +102,6 @@ function Game(props: GamePropsType) {
       );
       // @ts-ignore
       setTurnEndTime(data.turnEndTime);
-      // @ts-ignore
-      setWords(data.words);
       // @ts-ignore
       setColors(data.colors);
       // @ts-ignore
@@ -104,11 +112,14 @@ function Game(props: GamePropsType) {
 
     socket.on("updateFlipCard", (data: DataType) => {
       // @ts-ignore
-      setClicked(data.clicked);
+      // setClicked(data.clicked);
+      console.log("updateFlipCard", data);
+      updateGameData({ cards: data.cards });
     });
 
     socket.on("updateTeams", (data: DataType) => {
-      setUsers(data.users);
+      // setUsers(data.users);
+      updateGameData({ users: data.users });
       setUser(
         data.users.find(
           (user) => user.userID === props.location.state.userID
@@ -140,29 +151,13 @@ function Game(props: GamePropsType) {
     socket.on("updateFlipCard", (data: DataType) => {
       setRedTurn(data.isRedTurn);
     });
-
-    socket.on("startGame", (data: DataType) => {
-      setGameScore(data.totalGameScore);
-      setGameOver(data.gameOver);
-      setRedScore(data.redScore);
-      setBlueScore(data.blueScore);
-      setRedTurn(data.isRedTurn);
-      setUsers(data.users);
-      // @ts-ignore
-      setTurnEndTime(data.turnEndTime);
-      setUser(
-        data.users.find(
-          (user) => user.userID === props.location.state.userID
-        ) || emptyUser
-      );
-    });
   }, []);
 
   const handleRedScoreChange = (score: number) => {
-    socket.emit("redScoreChange", { roomID, redScore: score });
+    socket.emit("redScoreChange", { roomID: gameData.roomId, redScore: score });
     if (score === 0) {
       socket.emit("gameOver", {
-        roomID,
+        roomID: gameData.roomId,
         gameScore: [gameScore[0] + 1, gameScore[1]],
         gameOver: true,
         redScore: score,
@@ -172,7 +167,10 @@ function Game(props: GamePropsType) {
   };
 
   const handleBlueScoreChange = (score: number) => {
-    socket.emit("blueScoreChange", { roomID, blueScore: score });
+    socket.emit("blueScoreChange", {
+      roomID: gameData.roomId,
+      blueScore: score,
+    });
     if (score === 0) {
       socket.emit("gameOver", {
         gameScore: [gameScore[0], gameScore[1] + 1],
@@ -184,7 +182,7 @@ function Game(props: GamePropsType) {
   };
 
   const handleEndTurn = (turn: boolean) => {
-    socket.emit("updateTurn", { roomID, redTurn: turn });
+    socket.emit("updateTurn", { roomID: gameData.roomId, redTurn: turn });
     // socket.emit('startTimer', {roomID, currentTimer: timerID});
   };
 
@@ -238,14 +236,14 @@ function Game(props: GamePropsType) {
               gameOver={gameOver}
               redTurn={redTurn}
               handleEndTurn={handleEndTurn}
-              roomID={roomID}
+              // roomID={roomID}
               redScore={redScore}
               blueScore={blueScore}
               user={user}
               handleRedScoreChange={handleRedScoreChange}
               handleBlueScoreChange={handleBlueScoreChange}
               gameScore={gameScore}
-              words={words}
+              // words={words}
               colors={colors}
               clicked={clicked}
             />
@@ -253,7 +251,7 @@ function Game(props: GamePropsType) {
           </div>
           <div style={{ height: "100%" }}>
             {user.role === "MASTER" ? (
-              <Hint roomID={roomID} isRedTurn={redTurn} user={user} />
+              <Hint roomID={gameData.roomId} isRedTurn={redTurn} user={user} />
             ) : null}
             <div style={{ float: "right", marginTop: "40px" }}>
               {renderEndTurn()}
@@ -267,15 +265,10 @@ function Game(props: GamePropsType) {
             </button> */}
           </div>
           {showModal ? (
-            <GameInfoModal
-              users={users}
-              show={showModal}
-              roomID={roomID}
-              gameScore={gameScore}
-            />
+            <GameInfoModal show={showModal} gameScore={gameScore} />
           ) : null}
           {gameOver ? (
-            <GameOverModal gameScore={gameScore} user={user} roomID={roomID} />
+            <GameOverModal gameScore={gameScore} user={user} />
           ) : null}
         </div>
       )}

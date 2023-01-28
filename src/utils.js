@@ -20,6 +20,13 @@ export function shuffle(array) {
   return array;
 }
 
+export function generateCards(words, colors) {
+  const cards = [];
+  return words.map((word, i) => {
+    return { word, color: colors[i], isClicked: false };
+  });
+}
+
 export function getWords() {
   const text = fs.readFileSync(__dirname + "/WORDS.txt", "utf-8");
   const words = text.split("\n");
