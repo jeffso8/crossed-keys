@@ -36,5 +36,5 @@ export type DataType = {
   users: UserType[];
   userID: string;
   currentTimer: number;
-  turnEndTime: Date;
+  turnEndTime: number;
 };

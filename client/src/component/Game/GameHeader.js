@@ -1,30 +1,28 @@
+import React, { useContext, useState, useEffect } from "react";
 import Timer from "./Timer";
 import ScoreBanner from "./ScoreBanner";
+import { GameContext } from "../../context/GameContext";
 
 export default function GameHeader(props) {
-  const { redScore, blueScore, turnEndTime, handleEndTurn, redTurn, user } =
-    props;
+  const { gameData, updateGameData } = useContext(GameContext);
+  const { blueScore, redScore, isRedTurn, turnEndTime } = gameData;
+  const { user } = props;
   return (
     <div style={{ height: "100%" }}>
       <ScoreBanner isRedTeam={true} score={redScore} />
       <div style={{ textAlign: "center" }}>
-        {turnEndTime && (
-          <Timer
-            turnEndTime={turnEndTime}
-            handleEndTurn={handleEndTurn}
-            redTurn={redTurn}
-          />
-        )}
+        {turnEndTime && <Timer turnEndTime={turnEndTime} redTurn={isRedTurn} />}
         <div
           style={{
             marginTop: "10px",
             fontSize: "26px",
           }}
         >
-          {redTurn ? "Red's Turn" : "Blue's Turn"}
+          {isRedTurn ? "Red's Turn" : "Blue's Turn"}
         </div>
         <div style={{ fontFamily: "Clearface" }}>
-          {(redTurn && user.team === "RED") || (redTurn && user.team === "BLUE")
+          {(isRedTurn && user.team === "RED") ||
+          (isRedTurn && user.team === "BLUE")
             ? "(aka your turn)"
             : null}
         </div>

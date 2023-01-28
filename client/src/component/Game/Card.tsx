@@ -1,38 +1,32 @@
 import React, { useContext, useState, useEffect } from "react";
 import { CAMEL, MAIZE } from "../../constants";
-import GameMaster from "../../hooks/useGameMaster";
 import { Responsive } from "../shared/responsive";
-import socket from "../../socket";
 import { GameContext } from "../../context/GameContext";
 
 import { NEUTRAL_CARD, BLUE_CARD, RED_CARD, BOMB_CARD } from "../../constants";
 import useGameMaster from "../../hooks/useGameMaster";
+import { isRedirect } from "node-fetch";
+type CardPropsType = {
+  word: string;
+  color: string;
+  isClicked: boolean;
+  user: any;
+  clickedColumn: number;
+  index: number;
+};
 
-function Card(props: any) {
-  const { gameData, updateGameData } = useContext(GameContext);
+function Card(props: CardPropsType) {
+  const { gameData } = useContext(GameContext);
   const gameMaster = useGameMaster();
-  const { user } = gameData;
-  const [visible, setVisible] = useState(props.clicked);
-  // const [isDisabled, setIsDisabled] = useState(false);
-  const [isMaster, setIsMaster] = useState(false);
-  // const redTurn = props.redTurn;
+  const { user, isRedTurn } = gameData;
+  const { clickedColumn, isClicked, index, color } = props;
 
   const { isMobile } = Responsive();
-
-  const { clickedColumn, isClicked, index } = props;
-  useEffect(() => {
-    // setIsDisabled(props.isDisabled);
-
-    if (props.user.role === "MASTER") {
-      setVisible(true);
-      // setIsDisabled(true);
-      setIsMaster(true);
-    }
-  }, [props.isDisabled, props.user.role]);
+  const isMaster = user?.role === "MASTER";
 
   const webStyle = {
     container: {
-      backgroundColor: props.clicked || visible ? props.color : CAMEL,
+      backgroundColor: isClicked || isMaster ? color : CAMEL,
       width: 165,
       height: 80,
       marginTop: 12,
@@ -54,7 +48,7 @@ function Card(props: any) {
 
   const mobileStyle = {
     container: {
-      backgroundColor: props.clicked || visible ? props.color : CAMEL,
+      backgroundColor: isClicked || isMaster ? color : CAMEL,
       width: 68,
       height: 42,
       marginTop: 6,
@@ -97,39 +91,24 @@ function Card(props: any) {
     //   });
   };
   const handleClick = (isClicked: any, index: number, color: string) => {
-    if (isClicked) {
+    console.log("user", user, isRedTurn);
+    if (
+      isClicked ||
+      (user?.team === "RED" && !isRedTurn) ||
+      (user?.team === "BLUE" && isRedTurn) ||
+      isMaster
+    ) {
       return;
     }
     if (color === BOMB_CARD) {
       handleBombClick(user?.team);
     } else {
-      if (true) {
-        if (color === RED_CARD) {
-          // handleRedScoreChange(redScore - 1);
-          gameMaster.handleCardClick(index + clickedColumn * 5, true);
-        } else {
-          if (color === BLUE_CARD) {
-            // handleBlueScoreChange(blueScore - 1);
-            // handleEndTurn(!redTurn);
-          }
-          gameMaster.handleCardClick(index + clickedColumn * 5, false);
-          // handleEndTurn(!redTurn);
-        }
-      } else {
-        if (color === BLUE_CARD) {
-          // handleBlueScoreChange(blueScore - 1);
-          gameMaster.handleCardClick(index + clickedColumn * 5, false);
-        } else {
-          if (color === RED_CARD) {
-            // handleRedScoreChange(redScore - 1);
-            // handleEndTurn(!redTurn);
-          }
-          gameMaster.handleCardClick(index + clickedColumn * 5, true);
-          // handleEndTurn(!redTurn);
-        }
-      }
+      gameMaster.handleCardClick({
+        index: index + clickedColumn * 5,
+      });
     }
   };
+
   return (
     <div
       className="card-container"

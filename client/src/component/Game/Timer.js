@@ -1,11 +1,15 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useContext } from "react";
+import useGameMaster from "../../hooks/useGameMaster";
+import { GameContext } from "../../context/GameContext";
 
 function Timer(props) {
-  const [countdown, setCountdown] = React.useState(undefined);
+  const { gameData, updateGameData } = useContext(GameContext);
 
+  const [countdown, setCountdown] = React.useState(undefined);
+  const { handleEndTurn } = useGameMaster();
   useEffect(() => {
-    if (countdown <= 0) {
-      props.handleEndTurn(!props.redTurn);
+    if (!gameData.gameOver && countdown <= 0) {
+      handleEndTurn();
     } else {
       const timeout = setTimeout(() => {
         setCountdown(Math.floor((props.turnEndTime - Date.now()) / 1000));
@@ -18,7 +22,9 @@ function Timer(props) {
   }, [countdown]);
 
   useEffect(() => {
-    setCountdown(Math.floor((props.turnEndTime - Date.now()) / 1000));
+    if (!gameData.gameOver) {
+      setCountdown(Math.floor((props.turnEndTime - Date.now()) / 1000));
+    }
   }, [props.turnEndTime]);
 
   if (!countdown && countdown !== 0) return null;

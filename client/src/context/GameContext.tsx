@@ -8,11 +8,15 @@ export const GameContext = React.createContext<{
 }>({
   gameData: {
     roomId: "",
-    gameScore: [0, 0],
+    redScore: 8,
+    blueScore: 8,
     words: [],
     users: [],
     user: null,
     cards: [],
+    isRedTurn: false,
+    turnEndTime: new Date().getTime(),
+    gameOver: false,
   },
   updateGameData: () => {},
 });
@@ -20,11 +24,15 @@ export const GameContext = React.createContext<{
 export const GameContextProvider: React.FC = ({ children }) => {
   const [gameData, setGameData] = useState<GameData>({
     roomId: "",
-    gameScore: [0, 0],
+    redScore: 8,
+    blueScore: 8,
     cards: [],
     words: [],
     users: [],
     user: null,
+    isRedTurn: false,
+    turnEndTime: new Date().getTime(),
+    gameOver: false,
   });
 
   return (

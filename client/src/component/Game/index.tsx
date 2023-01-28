@@ -9,6 +9,7 @@ import GameHeader from "./GameHeader";
 import { DataType, UserType } from "../../types";
 import { Responsive } from "../shared/responsive";
 import { GameContext } from "../../context/GameContext";
+import useGameMaster from "../../hooks/useGameMaster";
 
 type GamePropsType = {
   location: {
@@ -21,9 +22,8 @@ type GamePropsType = {
 
 function Game(props: GamePropsType) {
   const { gameData, updateGameData } = useContext(GameContext);
-
-  let [redScore, setRedScore] = useState(8);
-  let [blueScore, setBlueScore] = useState(8);
+  const { handleEndTurn } = useGameMaster();
+  const { roomId, isRedTurn, gameOver } = gameData;
   const emptyUser = {
     userID: "",
     team: "",
@@ -34,16 +34,13 @@ function Game(props: GamePropsType) {
   // const [roomID, setRoomID] = useState(props.location.state.data.roomID);
   // const [users, setUsers] = useState<UserType[]>([]);
   const [user, setUser] = useState<UserType>(emptyUser);
-  const [redTurn, setRedTurn] = useState(props.location.state.data.isRedTurn);
+  // const [redTurn, setRedTurn] = useState(props.location.state.data.isRedTurn);
   const [showModal, setShowModal] = useState(false);
   const [gameScore, setGameScore] = useState(
     props.location.state.data.totalGameScore
   );
-  const [gameOver, setGameOver] = useState(props.location.state.data.gameOver);
-  const [turnEndTime, setTurnEndTime] = useState(null);
+  // const [gameOver, setGameOver] = useState(props.location.state.data.gameOver);
   const [mounted, setMounted] = useState(false);
-  const [colors, setColors] = useState([]);
-  const [clicked, setClicked] = useState([]);
 
   const { isMobile } = Responsive();
 
@@ -84,16 +81,16 @@ function Game(props: GamePropsType) {
 
     socket.on("refreshGame", (data: DataType) => {
       console.log("refreshGame", data);
-      setBlueScore(data.blueScore);
-      setRedScore(data.redScore);
       setGameScore(data.totalGameScore);
-      setGameOver(data.gameOver);
-      setRedTurn(data.isRedTurn);
-      // setUsers(data.users);
+      // setGameOver(data.gameOver);
       updateGameData({
         cards: data.cards,
         users: data.users,
         words: data.words,
+        redScore: data.redScore,
+        blueScore: data.blueScore,
+        isRedTurn: data.isRedTurn,
+        turnEndTime: data.turnEndTime,
       });
       setUser(
         data.users.find(
@@ -101,24 +98,22 @@ function Game(props: GamePropsType) {
         ) || emptyUser
       );
       // @ts-ignore
-      setTurnEndTime(data.turnEndTime);
-      // @ts-ignore
-      setColors(data.colors);
-      // @ts-ignore
-      setClicked(data.clicked);
+      // setTurnEndTime(data.turnEndTime);
 
       setMounted(true);
     });
 
     socket.on("updateFlipCard", (data: DataType) => {
       // @ts-ignore
-      // setClicked(data.clicked);
-      console.log("updateFlipCard", data);
-      updateGameData({ cards: data.cards });
+      const { cards, isRedTurn, blueScore, redScore, turnEndTime } = data;
+      if (turnEndTime) {
+        updateGameData({ cards, isRedTurn, blueScore, redScore, turnEndTime });
+      } else {
+        updateGameData({ cards, isRedTurn, blueScore, redScore });
+      }
     });
 
     socket.on("updateTeams", (data: DataType) => {
-      // setUsers(data.users);
       updateGameData({ users: data.users });
       setUser(
         data.users.find(
@@ -128,68 +123,22 @@ function Game(props: GamePropsType) {
     });
 
     socket.on("redTurn", (data: DataType) => {
-      setRedTurn(data.redTurn);
-      // @ts-ignore
-      setTurnEndTime(data.turnEndTime);
-    });
-
-    socket.on("updateRedScore", (data: DataType) => {
-      setRedScore(data.redScore);
-    });
-
-    socket.on("updateBlueScore", (data: DataType) => {
-      setBlueScore(data.blueScore);
+      updateGameData({
+        isRedTurn: data.redTurn,
+        turnEndTime: data.turnEndTime,
+      });
     });
 
     socket.on("updateGameOver", (data: DataType) => {
       setGameScore(data.totalGameScore);
-      setGameOver(data.gameOver);
-      setRedScore(data.redScore);
-      setBlueScore(data.blueScore);
-    });
-
-    socket.on("updateFlipCard", (data: DataType) => {
-      setRedTurn(data.isRedTurn);
+      updateGameData({ gameOver: data.gameOver, cards: data.cards });
     });
   }, []);
 
-  const handleRedScoreChange = (score: number) => {
-    socket.emit("redScoreChange", { roomID: gameData.roomId, redScore: score });
-    if (score === 0) {
-      socket.emit("gameOver", {
-        roomID: gameData.roomId,
-        gameScore: [gameScore[0] + 1, gameScore[1]],
-        gameOver: true,
-        redScore: score,
-        blueScore: blueScore,
-      });
-    }
-  };
-
-  const handleBlueScoreChange = (score: number) => {
-    socket.emit("blueScoreChange", {
-      roomID: gameData.roomId,
-      blueScore: score,
-    });
-    if (score === 0) {
-      socket.emit("gameOver", {
-        gameScore: [gameScore[0], gameScore[1] + 1],
-        gameOver: true,
-        redScore: redScore,
-        blueScore: score,
-      });
-    }
-  };
-
-  const handleEndTurn = (turn: boolean) => {
-    socket.emit("updateTurn", { roomID: gameData.roomId, redTurn: turn });
-    // socket.emit('startTimer', {roomID, currentTimer: timerID});
-  };
-
   const renderEndTurn = () => {
     if (
-      (user.team === "RED" && redTurn) ||
-      (user.team === "BLUE" && !redTurn)
+      (user.team === "RED" && isRedTurn) ||
+      (user.team === "BLUE" && !isRedTurn)
     ) {
       return (
         <button
@@ -204,7 +153,7 @@ function Game(props: GamePropsType) {
             cursor: "pointer",
             marginRight: "80px",
           }}
-          onClick={() => handleEndTurn(!redTurn)}
+          onClick={() => handleEndTurn()}
         >
           End Turn
         </button>
@@ -224,34 +173,26 @@ function Game(props: GamePropsType) {
           }}
         >
           <GameHeader
-            redScore={redScore}
-            blueScore={blueScore}
-            turnEndTime={turnEndTime}
             handleEndTurn={handleEndTurn}
-            redTurn={redTurn}
+            redTurn={isRedTurn}
             user={user}
           />
           <div style={style.container}>
             <Grid
               gameOver={gameOver}
-              redTurn={redTurn}
               handleEndTurn={handleEndTurn}
-              // roomID={roomID}
-              redScore={redScore}
-              blueScore={blueScore}
               user={user}
-              handleRedScoreChange={handleRedScoreChange}
-              handleBlueScoreChange={handleBlueScoreChange}
               gameScore={gameScore}
-              // words={words}
-              colors={colors}
-              clicked={clicked}
             />
             <HintDisplay />
           </div>
           <div style={{ height: "100%" }}>
             {user.role === "MASTER" ? (
-              <Hint roomID={gameData.roomId} isRedTurn={redTurn} user={user} />
+              <Hint
+                roomID={gameData.roomId}
+                isRedTurn={isRedTurn}
+                user={user}
+              />
             ) : null}
             <div style={{ float: "right", marginTop: "40px" }}>
               {renderEndTurn()}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useHistory } from "react-router-dom";
 import socket from "../../socket";
 import User from "./User";
@@ -8,6 +8,7 @@ import Button from "../shared/Button";
 import { DataType, UserType } from "../../types";
 import { MUD_BROWN, MAIZE, BLUE_CARD, RED_CARD } from "../../constants";
 import { useCookies } from "react-cookie";
+import { GameContext } from "../../context/GameContext";
 
 type RoomPropType = {
   location: {
@@ -33,9 +34,10 @@ function Room(props: RoomPropType) {
     isHost: false,
     socketId: "",
   };
-
+  const { gameData, updateGameData } = useContext(GameContext);
+  const { user } = gameData;
   const [roomID, setRoomID] = useState<String>("");
-  const [user, setUser] = useState<UserType>(emptyUser);
+  // const [user, setUser] = useState<UserType>(emptyUser);
   const [redTeam, setRedTeam] = useState<UserType[]>([]);
   const [blueTeam, setBlueTeam] = useState<UserType[]>([]);
   const [nullTeam, setNullTeam] = useState<UserType[]>([]);
@@ -200,17 +202,23 @@ function Room(props: RoomPropType) {
       setRedTeam(redTeam);
       setBlueTeam(blueTeam);
       setNullTeam(nullTeam);
-      setUser(
-        data.users.find(
-          (user) => user.userID === props.location.state.userID
-        ) || emptyUser
-      );
+      updateGameData({
+        user:
+          data.users.find(
+            (user) => user.userID === props.location.state.userID
+          ) || emptyUser,
+      });
+      // setUser(
+      //   data.users.find(
+      //     (user) => user.userID === props.location.state.userID
+      //   ) || emptyUser
+      // );
       setRoomData(data);
     });
   }, []);
 
   const showClaimSpyMaster = () => {
-    if (roomData) {
+    if (roomData && user) {
       if (user.team === "RED" && roomData.redSpy) {
         return false;
       } else if (user.team === "BLUE" && roomData.blueSpy) {
@@ -279,7 +287,7 @@ function Room(props: RoomPropType) {
             onClick={handleSetRedTeamClick}
             text={"JOIN"}
           />
-          {user.isHost ? (
+          {user?.isHost ? (
             <Button
               style={{ ...style.button, backgroundColor: "#496F5D" }}
               onClick={startGame}

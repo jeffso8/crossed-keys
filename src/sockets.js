@@ -166,37 +166,14 @@ export function loadSockets(server) {
       );
     });
 
-    socket.on("redScoreChange", (data) => {
-      Rooms.findOne({ roomID: data.roomID }, function (err, res) {
-        if (err) return;
-        res.redScore = data.redScore;
-        res.markModified("redScore");
-        res.save();
-        socket.nsp
-          .in(data.roomID)
-          .emit("updateRedScore", { redScore: res.redScore });
-      });
-    });
-
-    socket.on("blueScoreChange", (data) => {
-      Rooms.findOne({ roomID: data.roomID }, function (err, res) {
-        if (err) return;
-        res.blueScore = data.blueScore;
-        res.markModified("blueScore");
-        res.save();
-        socket.nsp
-          .in(data.roomID)
-          .emit("updateBlueScore", { blueScore: res.blueScore });
-      });
-    });
-
     socket.on("updateTurn", (data) => {
       Rooms.findOne({ roomID: data.roomID }, function (err, res) {
         if (err) return;
-        res.isRedTurn = data.redTurn;
+        res.isRedTurn = !res.isRedTurn;
         res.turnEndTime = new Date().getTime() + 10000 + 1000;
         res.markModified("isRedTurn", "turnEndTime");
         res.save();
+        console.log("updateTurn endtiem", res.turnEndTime);
         socket.nsp.in(data.roomID).emit("redTurn", {
           redTurn: res.isRedTurn,
           turnEndTime: res.turnEndTime,
@@ -253,34 +230,88 @@ export function loadSockets(server) {
     });
 
     socket.on("flipCard", async (data) => {
-      console.log("flipCard", data);
-      const { cards } = await Rooms.findOne({ roomID: data.roomID }, "cards")
-        .lean()
-        .exec();
+      const { roomID, user, index } = data;
+      if (!user) {
+        return;
+      }
+      const roomData = await Rooms.findOne({ roomID }).lean().exec();
 
-      cards[data.index].isClicked = true;
-      await Rooms.updateOne({ roomID: data.roomID }, { $set: { cards } });
+      let { cards, isRedTurn, blueScore, redScore, totalGameScore } = roomData;
+      let { team: userTeam } = user;
+      const selectedCard = cards[index];
+      let switchTurn = false;
+      let gameOver = false;
 
-      socket.nsp.in(data.roomID).emit("updateFlipCard", {
-        isRedTurn: data.isRedTurn,
-        // clicked: res.clicked,
-        cards,
-      });
+      switch (selectedCard.color) {
+        case "red":
+          if (userTeam == "BLUE") {
+            isRedTurn = true;
+            switchTurn = true;
+          }
+          redScore -= 1;
+          break;
+        case "blue":
+          if (userTeam === "RED") {
+            isRedTurn = false;
+            switchTurn = true;
+          }
+          blueScore -= 1;
+          break;
 
-      // Rooms.findOne({ roomID: data.roomID }, function (err, res) {
-      //   if (err) return;
-      //   console.log("res", res.cards, res.cards[0]);
-      //   res.cards[data.index].isClicked = true;
-      //   // res.clicked[data.index] = true;
-      //   res.isRedTurn = data.isRedTurn;
-      //   res.markModified("cards", "isRedTurn");
-      //   res.save();
-      //   socket.nsp.in(data.roomID).emit("updateFlipCard", {
-      //     isRedTurn: res.isRedTurn,
-      //     clicked: res.clicked,
-      //     cards: res.cards,
-      //   });
-      // });
+        case "black":
+          if (userTeam === "RED") {
+            totalGameScore[0] += 1;
+          } else {
+            totalGameScore[1] += 1;
+          }
+          gameOver = true;
+          break;
+      }
+
+      cards[index].isClicked = true;
+
+      if (gameOver) {
+        await Rooms.updateOne(
+          { roomID },
+          { $set: { totalGameScore, gameOver, cards } }
+        );
+        socket.nsp.in(roomID).emit("updateGameOver", {
+          cards,
+          totalGameScore,
+          gameOver,
+        });
+
+        return;
+      }
+
+      if (switchTurn) {
+        const turnEndTime = new Date().getTime() + 10000 + 1000;
+
+        await Rooms.updateOne(
+          { roomID },
+          { $set: { cards, blueScore, redScore, isRedTurn, turnEndTime } }
+        );
+
+        socket.nsp.in(roomID).emit("updateFlipCard", {
+          isRedTurn,
+          cards,
+          blueScore,
+          redScore,
+          turnEndTime,
+        });
+      } else {
+        await Rooms.updateOne(
+          { roomID },
+          { $set: { cards, blueScore, redScore, isRedTurn } }
+        );
+
+        socket.nsp.in(roomID).emit("updateFlipCard", {
+          isRedTurn,
+          cards,
+          blueScore,
+          redScore,
+        });
+      }
     });
 
     socket.on("getWords", (data) => {

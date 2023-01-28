@@ -5,13 +5,18 @@ import socket from "../socket";
 const useGameMaster = () => {
   const { gameData, updateGameData } = useContext(GameContext);
 
-  const { roomId } = gameData;
-  const handleCardClick = (index: any, turn: any) => {
-    socket.emit("flipCard", { roomID: roomId, index, isRedTurn: turn });
+  const { roomId, user } = gameData;
+  const handleCardClick = ({ index }: { index: number }) => {
+    socket.emit("flipCard", { roomID: roomId, user, index });
+  };
+
+  const handleEndTurn = () => {
+    socket.emit("updateTurn", { roomID: roomId });
   };
 
   return {
     handleCardClick,
+    handleEndTurn,
   };
 };
 
