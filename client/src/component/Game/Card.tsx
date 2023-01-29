@@ -5,7 +5,6 @@ import { GameContext } from "../../context/GameContext";
 
 import { NEUTRAL_CARD, BLUE_CARD, RED_CARD, BOMB_CARD } from "../../constants";
 import useGameMaster from "../../hooks/useGameMaster";
-import { isRedirect } from "node-fetch";
 type CardPropsType = {
   word: string;
   color: string;

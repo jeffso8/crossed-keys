@@ -4,7 +4,7 @@ import ScoreBanner from "./ScoreBanner";
 import { GameContext } from "../../context/GameContext";
 
 export default function GameHeader(props) {
-  const { gameData, updateGameData } = useContext(GameContext);
+  const { gameData } = useContext(GameContext);
   const { blueScore, redScore, isRedTurn, turnEndTime } = gameData;
   const { user } = props;
   return (

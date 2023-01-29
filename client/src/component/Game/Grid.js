@@ -1,18 +1,10 @@
 import React, { useContext, useState, useEffect } from "react";
-import { NEUTRAL_CARD, BLUE_CARD, RED_CARD, BOMB_CARD } from "../../constants";
 import Card from "./Card";
 import { Responsive } from "../shared/responsive";
-import socket from "../../socket";
 import { GameContext } from "../../context/GameContext";
 
 export default function Grid(props) {
-  const {
-    gameOver,
-    user,
-    // roomID,
-    timerID,
-    gameScore,
-  } = props;
+  const { gameOver, user, timerID, gameScore } = props;
 
   const { gameData, updateGameData } = useContext(GameContext);
 
@@ -53,27 +45,27 @@ export default function Grid(props) {
 
   const style = isMobile ? mobileCardStyle : cardStyle;
 
-  const handleBombClick = (team) => {
-    if (team === "RED") {
-      socket.emit("gameOver", {
-        roomID: gameData.roomId,
-        gameScore: [gameScore[0], gameScore[1] + 1],
-        gameOver: true,
-        redScore: redScore,
-        blueScore: blueScore,
-        timerID,
-      });
-    } else {
-      socket.emit("gameOver", {
-        roomID: gameData.roomId,
-        gameScore: [gameScore[0] + 1, gameScore[1]],
-        gameOver: true,
-        redScore: redScore,
-        blueScore: blueScore,
-        timerID,
-      });
-    }
-  };
+  // const handleBombClick = (team) => {
+  //   if (team === "RED") {
+  //     socket.emit("gameOver", {
+  //       roomID: gameData.roomId,
+  //       gameScore: [gameScore[0], gameScore[1] + 1],
+  //       gameOver: true,
+  //       redScore: redScore,
+  //       blueScore: blueScore,
+  //       timerID,
+  //     });
+  //   } else {
+  //     socket.emit("gameOver", {
+  //       roomID: gameData.roomId,
+  //       gameScore: [gameScore[0] + 1, gameScore[1]],
+  //       gameOver: true,
+  //       redScore: redScore,
+  //       blueScore: blueScore,
+  //       timerID,
+  //     });
+  //   }
+  // };
 
   const renderCardColumns = (cardColumn, clickedColumn) => {
     return (
