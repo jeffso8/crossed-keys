@@ -6,10 +6,19 @@ import { organizeUsers } from "../shared/utils";
 import { Responsive } from "../shared/responsive";
 import Button from "../shared/Button";
 import { DataType, UserType } from "../../types";
-import { MUD_BROWN, MAIZE, BLUE_CARD, RED_CARD } from "../../constants";
+import {
+  MUD_BROWN,
+  MAIZE,
+  BLUE_CARD,
+  RED_CARD,
+  RED,
+  BLUE,
+  GREEN,
+} from "../../constants";
 import { useCookies } from "react-cookie";
 import { GameContext } from "../../context/GameContext";
 import Grid from "../shared/Grid";
+import { TextButton } from "../shared/TextButton";
 
 type RoomPropType = {
   location: {
@@ -78,16 +87,17 @@ function Room(props: RoomPropType) {
     title: {
       fontSize: 52,
       // letterSpacing: 3,
-      color: MUD_BROWN,
+      color: GREEN,
       width: "100%",
       textAlign: "center" as "center",
       marginTop: 80,
-      fontFamily: "Cleanface",
+      fontFamily: "Clearface",
     },
     roomName: {
       fontSize: 50,
       fontWeight: 900,
-      fontFamily: "Cleanface",
+      fontFamily: "Clearface",
+      letterSpacing: 2,
     },
     welcome: {
       fontSize: 34,
@@ -107,6 +117,7 @@ function Room(props: RoomPropType) {
       fontSize: 24,
       fontFamily: "Cleanface",
       textAlign: "center" as "center",
+      color: BLUE,
     },
     containerStyle: {
       display: "grid",
@@ -229,7 +240,7 @@ function Room(props: RoomPropType) {
     }
   };
 
-  const style = isMobile ? mobileStyle : webStyle;
+  const style = webStyle;
 
   return (
     <Grid
@@ -253,10 +264,16 @@ function Room(props: RoomPropType) {
           alignItems="center"
           justifyContent="space-between"
         >
-          <Grid>
-            <div style={style.columnTitle}>Red Team</div>
-          </Grid>
-          <Grid justifyContent="flex-start">
+          <div
+            style={{
+              ...style.columnTitle,
+              color: RED,
+              borderBottom: `1px solid ${RED}`,
+            }}
+          >
+            Red Team
+          </div>
+          <Grid direction="column" justifyContent="flex-start">
             {redTeam.map((user, i) => {
               return (
                 <User
@@ -270,7 +287,11 @@ function Room(props: RoomPropType) {
             })}
           </Grid>
           <Grid>
-            <Button onClick={handleSetRedTeamClick} text={"JOIN"} />
+            <TextButton
+              text="Join"
+              style={{ color: RED, fontSize: 24, fontFamily: "Cleanface" }}
+              onClick={handleSetRedTeamClick}
+            />
           </Grid>
         </Grid>
         <Grid
@@ -280,7 +301,12 @@ function Room(props: RoomPropType) {
           alignItems="center"
           justifyContent="space-between"
         >
-          <Grid style={{ width: "100%", border: "1px solid black" }}>
+          <Grid
+            style={{
+              width: "70%",
+              border: `1px solid #d6cabc`,
+            }}
+          >
             {nullTeam.map((user, i) => {
               return <User i={i} name={user.userID} />;
             })}
@@ -294,7 +320,7 @@ function Room(props: RoomPropType) {
               }}
             ></div>
           ) : null}
-          <Button
+          {/* <Button
             style={{
               ...style.button,
               backgroundColor: "BLACK",
@@ -302,11 +328,20 @@ function Room(props: RoomPropType) {
             }}
             onClick={handleClaimSpyMasterClick}
             text={"CLAIM SPY"}
+          /> */}
+          <TextButton
+            text="Claim Spy"
+            style={{ color: "BLACK", fontSize: 24, fontFamily: "Cleanface" }}
+            onClick={handleClaimSpyMasterClick}
           />
 
           {user?.isHost ? (
             <Button
-              style={{ ...style.button, backgroundColor: "#496F5D" }}
+              style={{
+                ...style.button,
+                margin: "16px 0",
+                backgroundColor: "#496F5D",
+              }}
               onClick={startGame}
               text={"START GAME"}
             />
@@ -319,7 +354,15 @@ function Room(props: RoomPropType) {
           alignItems="center"
           justifyContent="space-between"
         >
-          <div style={style.columnTitle}>Blue Team</div>
+          <div
+            style={{
+              ...style.columnTitle,
+              color: BLUE,
+              borderBottom: `1px solid ${BLUE}`,
+            }}
+          >
+            Blue Team
+          </div>
           <Grid direction="column" justifyContent="flex-start">
             {blueTeam.map((user, i) => {
               return (
@@ -334,17 +377,15 @@ function Room(props: RoomPropType) {
             })}
           </Grid>
           <Grid>
-            <Button
-              style={{
-                backgroundColor: BLUE_CARD,
-              }}
+            <TextButton
+              text="Join"
+              style={{ color: BLUE, fontSize: 24, fontFamily: "Cleanface" }}
               onClick={handleSetBlueTeamClick}
-              text={"JOIN"}
             />
           </Grid>
         </Grid>
       </Grid>
-      <Grid>
+      <Grid item container justifyContent={"center"} alignItems={"center"}>
         <div
           style={{
             display: "flex",

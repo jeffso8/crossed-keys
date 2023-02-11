@@ -17,6 +17,7 @@ export const GameContext = React.createContext<{
     isRedTurn: false,
     turnEndTime: new Date().getTime(),
     gameOver: false,
+    hints: [],
   },
   updateGameData: () => {},
 });
@@ -33,6 +34,7 @@ export const GameContextProvider: React.FC = ({ children }) => {
     isRedTurn: false,
     turnEndTime: new Date().getTime(),
     gameOver: false,
+    hints: [],
   });
 
   return (

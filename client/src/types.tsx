@@ -1,8 +1,8 @@
-export type HintsType = {
+export type HintType = {
   hint: string;
   hintCount: number;
   isRedTurn: boolean;
-}[];
+};
 
 export type UserType = {
   userID: string;
@@ -26,7 +26,7 @@ export type DataType = {
   isRedTurn: boolean;
   redTurn: boolean;
   gameOver: boolean;
-  hints: HintsType;
+  hints: HintType[];
   totalGameScore: [number, number];
   redScore: number;
   roomID: string;

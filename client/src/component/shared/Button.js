@@ -12,6 +12,7 @@ export default function Button(props) {
     marginTop: 20,
     margin: 5,
     backgroundColor: BROWNISH,
+    borderRadius: "2px",
     color: MUD_BROWN,
     cursor: "pointer",
     ...props.style,

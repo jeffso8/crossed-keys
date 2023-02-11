@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import Grid from "./Grid";
+import GameGrid from "./GameGrid";
 import socket from "../../socket";
 import GameInfoModal from "./GameInfoModal";
 import GameOverModal from "./GameOverModal";
@@ -10,6 +10,7 @@ import { DataType, UserType } from "../../types";
 import { Responsive } from "../shared/responsive";
 import { GameContext } from "../../context/GameContext";
 import useGameMaster from "../../hooks/useGameMaster";
+import { TextButton } from "../shared/TextButton";
 
 type GamePropsType = {
   location: {
@@ -23,7 +24,7 @@ type GamePropsType = {
 function Game(props: GamePropsType) {
   const { gameData, updateGameData } = useContext(GameContext);
   const { handleEndTurn } = useGameMaster();
-  const { roomId, isRedTurn, gameOver } = gameData;
+  const { roomId, isRedTurn, gameOver, user } = gameData;
   const emptyUser = {
     userID: "",
     team: "",
@@ -33,7 +34,6 @@ function Game(props: GamePropsType) {
   };
   // const [roomID, setRoomID] = useState(props.location.state.data.roomID);
   // const [users, setUsers] = useState<UserType[]>([]);
-  const [user, setUser] = useState<UserType>(emptyUser);
   // const [redTurn, setRedTurn] = useState(props.location.state.data.isRedTurn);
   const [showModal, setShowModal] = useState(false);
   const [gameScore, setGameScore] = useState(
@@ -46,10 +46,8 @@ function Game(props: GamePropsType) {
 
   const webStyle = {
     container: {
-      display: "flex",
       justifyContent: "center",
       position: "relative" as "relative",
-      marginBottom: "20px",
     },
   };
 
@@ -59,8 +57,6 @@ function Game(props: GamePropsType) {
       justifyContent: "center",
       flexDirection: "column" as "column",
       position: "relative" as "relative",
-      marginTop: 50,
-      marginBottom: 50,
     },
   };
 
@@ -80,23 +76,26 @@ function Game(props: GamePropsType) {
     });
 
     socket.on("refreshGame", (data: DataType) => {
-      console.log("refreshGame", data);
+      console.log("refreshGame", data, props.location);
       setGameScore(data.totalGameScore);
       // setGameOver(data.gameOver);
+      const user =
+        data.users.find(
+          (user) => user.userID === props.location.state.userID
+        ) || emptyUser;
+
       updateGameData({
         cards: data.cards,
         users: data.users,
+        user,
         words: data.words,
         redScore: data.redScore,
         blueScore: data.blueScore,
         isRedTurn: data.isRedTurn,
         turnEndTime: data.turnEndTime,
+        hints: data.hints,
       });
-      setUser(
-        data.users.find(
-          (user) => user.userID === props.location.state.userID
-        ) || emptyUser
-      );
+
       // @ts-ignore
       // setTurnEndTime(data.turnEndTime);
 
@@ -114,12 +113,11 @@ function Game(props: GamePropsType) {
     });
 
     socket.on("updateTeams", (data: DataType) => {
-      updateGameData({ users: data.users });
-      setUser(
+      const user =
         data.users.find(
           (user) => user.userID === props.location.state.userID
-        ) || emptyUser
-      );
+        ) || emptyUser;
+      updateGameData({ users: data.users, user });
     });
 
     socket.on("redTurn", (data: DataType) => {
@@ -137,8 +135,8 @@ function Game(props: GamePropsType) {
 
   const renderEndTurn = () => {
     if (
-      (user.team === "RED" && isRedTurn) ||
-      (user.team === "BLUE" && !isRedTurn)
+      (user?.team === "RED" && isRedTurn) ||
+      (user?.team === "BLUE" && !isRedTurn)
     ) {
       return (
         <button
@@ -151,7 +149,6 @@ function Game(props: GamePropsType) {
             fontStyle: "italic",
             fontSize: "20px",
             cursor: "pointer",
-            marginRight: "80px",
           }}
           onClick={() => handleEndTurn()}
         >
@@ -178,32 +175,40 @@ function Game(props: GamePropsType) {
             user={user}
           />
           <div style={style.container}>
-            <Grid
+            <GameGrid
               gameOver={gameOver}
               handleEndTurn={handleEndTurn}
               user={user}
               gameScore={gameScore}
             />
-            <HintDisplay />
           </div>
-          <div style={{ height: "100%" }}>
-            {user.role === "MASTER" ? (
-              <Hint
-                roomID={gameData.roomId}
-                isRedTurn={isRedTurn}
-                user={user}
-              />
-            ) : null}
-            <div style={{ float: "right", marginTop: "40px" }}>
-              {renderEndTurn()}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              height: "100%",
+            }}
+          >
+            <div>
+              <HintDisplay />
+              {user?.role === "MASTER" ? (
+                <Hint
+                  roomID={gameData.roomId}
+                  isRedTurn={isRedTurn}
+                  user={user}
+                />
+              ) : null}
             </div>
-            {/* <button
-              style={{ position: "absolute", top: "93%", right: "20px" }}
-              onMouseEnter={() => setShowModal(true)}
-              onMouseLeave={() => setShowModal(false)}
-            >
-              Show Modal
-            </button> */}
+            <div>
+              <div style={{}}>{renderEndTurn()}</div>
+              <TextButton
+                text={"Show Modal"}
+                onMouseEnter={() => setShowModal(true)}
+                onMouseLeave={() => setShowModal(false)}
+                onClick={() => {}}
+                style={{}}
+              />
+            </div>
           </div>
           {showModal ? (
             <GameInfoModal show={showModal} gameScore={gameScore} />

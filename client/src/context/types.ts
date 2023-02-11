@@ -1,4 +1,4 @@
-import { CardType, UserType } from "../types";
+import { CardType, HintType, UserType } from "../types";
 
 export type GameData = {
     roomId: string;
@@ -11,4 +11,5 @@ export type GameData = {
     isRedTurn: Boolean;
     turnEndTime: number;
     gameOver: boolean;
+    hints: HintType[] ;
 };

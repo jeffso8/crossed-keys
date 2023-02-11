@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
-import { BEIGE, BROWNISH, MUD_BROWN } from "../constants";
+import { BEIGE, BROWNISH, GREEN, MUD_BROWN } from "../constants";
 import TextInput from "./shared/TextInput";
 import { Responsive } from "./shared/responsive";
 import Button from "./shared/Button";
 import { useCookies } from "react-cookie";
 import useTextField from "../hooks/useTextField";
+import { TextButton } from "./shared/TextButton";
 
 function Home() {
   const style = {
@@ -22,7 +23,7 @@ function Home() {
       textAlign: "center",
     },
     by: {
-      color: MUD_BROWN,
+      color: GREEN,
       fontSize: 20,
       fontWeight: 500,
       textAlign: "center",
@@ -30,7 +31,7 @@ function Home() {
       letterSpacing: 2,
     },
     title: {
-      color: MUD_BROWN,
+      color: GREEN,
       fontFamily: "Clearface",
       fontSize: 62,
       fontWeight: 500,
@@ -139,9 +140,7 @@ function Home() {
             errorText={"Room name can't be empty"}
           />
         </div>
-        <div>
-          <Button style={style.button} onClick={createRoom} text={"SUBMIT"} />
-        </div>
+        <TextButton text="Submit" onClick={() => createRoom()} />
       </div>
     </div>
   );

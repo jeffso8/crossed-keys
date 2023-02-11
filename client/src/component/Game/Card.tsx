@@ -3,7 +3,7 @@ import { CAMEL, MAIZE } from "../../constants";
 import { Responsive } from "../shared/responsive";
 import { GameContext } from "../../context/GameContext";
 
-import { NEUTRAL_CARD, BLUE_CARD, RED_CARD, BOMB_CARD } from "../../constants";
+import { BOMB_CARD } from "../../constants";
 import useGameMaster from "../../hooks/useGameMaster";
 type CardPropsType = {
   word: string;
@@ -26,13 +26,14 @@ function Card(props: CardPropsType) {
   const webStyle = {
     container: {
       backgroundColor: isClicked || isMaster ? color : CAMEL,
-      width: 165,
+      width: "100%",
       height: 80,
       marginTop: 12,
       marginBottom: 12,
       display: "flex",
       justifyContent: "center",
       boxShadow: "0 2px 4px 0 rgba(0,0,0,0.2)",
+      borderRadius: "2px",
     },
     word: {
       fontSize: 14,
@@ -42,13 +43,15 @@ function Card(props: CardPropsType) {
       textAlign: "center",
       alignSelf: "center",
       color: MAIZE,
+      borderRadius: "2px",
     },
   };
 
   const mobileStyle = {
     container: {
       backgroundColor: isClicked || isMaster ? color : CAMEL,
-      width: 68,
+      // width: 68,
+      width: "100%",
       height: 42,
       marginTop: 6,
       marginBottom: 6,

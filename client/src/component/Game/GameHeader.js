@@ -8,7 +8,7 @@ export default function GameHeader(props) {
   const { blueScore, redScore, isRedTurn, turnEndTime } = gameData;
   const { user } = props;
   return (
-    <div style={{ height: "100%" }}>
+    <div style={{ position: "relative" }}>
       <ScoreBanner isRedTeam={true} score={redScore} />
       <div style={{ textAlign: "center" }}>
         {turnEndTime && <Timer turnEndTime={turnEndTime} redTurn={isRedTurn} />}

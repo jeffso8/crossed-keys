@@ -1,14 +1,14 @@
 import React from "react";
-import { MUD_BROWN } from "../../constants";
+import { GREEN } from "../../constants";
 
 export default function TextInput(props) {
   const style = {
     input: {
       background: "transparent",
       border: "none",
-      borderBottom: `1px solid ${MUD_BROWN}`,
+      borderBottom: `1px solid ${GREEN}`,
       height: 30,
-      color: `${MUD_BROWN}`,
+      color: GREEN,
       fontSize: "16px",
       textTransform: "uppercase",
       ...props.style,
@@ -34,7 +34,7 @@ export default function TextInput(props) {
             marginTop: "2px",
             fontSize: "14px",
             fontStyle: "italic",
-            color: `${MUD_BROWN}`,
+            color: `${GREEN}`,
           }}
         >
           {props.errorText}

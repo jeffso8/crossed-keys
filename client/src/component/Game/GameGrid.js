@@ -1,14 +1,16 @@
 import React, { useContext, useState, useEffect } from "react";
+import Grid from "../shared/Grid";
 import Card from "./Card";
 import { Responsive } from "../shared/responsive";
 import { GameContext } from "../../context/GameContext";
 
-export default function Grid(props) {
+export default function GameGrid(props) {
   const { gameOver, user, timerID, gameScore } = props;
 
   const { gameData, updateGameData } = useContext(GameContext);
 
   const { cards, redScore, blueScore } = gameData;
+  console.log("cards", cards);
   const { isMobile } = Responsive();
 
   const cards1 = cards.slice(0, 5);
@@ -69,7 +71,7 @@ export default function Grid(props) {
 
   const renderCardColumns = (cardColumn, clickedColumn) => {
     return (
-      <div style={style.columns}>
+      <Grid container direction={"column"} alignItems={"center"}>
         {cardColumn.map((card, index) => {
           const { isClicked, color, word } = card;
           return (
@@ -83,16 +85,33 @@ export default function Grid(props) {
             />
           );
         })}
-      </div>
+      </Grid>
     );
   };
+  console.log('huh"');
+
   return (
-    <div style={style.container}>
-      {renderCardColumns(cards1, 0)}
-      {renderCardColumns(cards2, 1)}
-      {renderCardColumns(cards3, 2)}
-      {renderCardColumns(cards4, 3)}
-      {renderCardColumns(cards5, 4)}
+    <div style={{ width: "70%", margin: "auto" }}>
+      <Grid
+        container
+        // mx={{ xs: 2, sm: 10, md: 10, lg: 20 }}
+        columnGap={{ xs: 1, sm: 1, md: 1, lg: 2, xl: 3 }}
+      >
+        {renderCardColumns(cards1, 0)}
+        {renderCardColumns(cards2, 1)}
+        {renderCardColumns(cards3, 2)}
+        {renderCardColumns(cards4, 3)}
+        {renderCardColumns(cards5, 4)}
+      </Grid>
     </div>
   );
+  // return (
+  //   <div style={style.container}>
+  //     {renderCardColumns(cards1, 0)}
+  //     {renderCardColumns(cards2, 1)}
+  //     {renderCardColumns(cards3, 2)}
+  //     {renderCardColumns(cards4, 3)}
+  //     {renderCardColumns(cards5, 4)}
+  //   </div>
+  // );
 }

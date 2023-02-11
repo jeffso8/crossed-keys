@@ -9,8 +9,8 @@ export default function ScoreBanner(props) {
     container: {
       position: "absolute",
       top: 0,
-      left: props.isRedTeam ? "90px" : "initial",
-      right: !props.isRedTeam ? "90px" : "initial",
+      left: props.isRedTeam ? "0" : "initial",
+      right: !props.isRedTeam ? "0" : "initial",
       zIndex: 1,
       backgroundColor: props.isRedTeam ? RED_CARD : BLUE_CARD,
       width: "75px",
@@ -30,8 +30,8 @@ export default function ScoreBanner(props) {
     container: {
       position: "absolute",
       top: 0,
-      left: props.isRedTeam ? "20px" : "initial",
-      right: !props.isRedTeam ? "20px" : "initial",
+      left: props.isRedTeam ? "0px" : "initial",
+      right: !props.isRedTeam ? "0px" : "initial",
       zIndex: 1,
       backgroundColor: props.isRedTeam ? RED_CARD : BLUE_CARD,
       width: "55px",

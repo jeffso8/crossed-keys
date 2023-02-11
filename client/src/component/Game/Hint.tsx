@@ -1,29 +1,35 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import TextInput from "../shared/TextInput";
 import Button from "../shared/Button";
 import socket from "../../socket";
+import { GameContext } from "../../context/GameContext";
+import useGameMaster from "../../hooks/useGameMaster";
 
-export default function Hint(props) {
+export default function Hint(props: any) {
   const [hint, setHint] = useState("");
   const [hintCount, setHintCount] = useState(1);
-
-  const handleHintChange = (event) => setHint(event.target.value.toUpperCase());
-  const handleHintCountChange = (event) => {
+  const { gameData, updateGameData } = useContext(GameContext);
+  const { submitHint } = useGameMaster();
+  const handleHintChange = (event: any) =>
+    setHint(event.target.value.toUpperCase());
+  const handleHintCountChange = (event: any) => {
     setHintCount(event.target.value);
   };
 
-  const handleSubmit = () => {
-    socket.emit("newHint", {
-      roomID: props.roomID,
-      hint,
-      hintCount,
-      isRedTurn: props.isRedTurn,
-    });
-  };
+  const { isRedTurn, user } = gameData;
+
+  // const handleSubmit = () => {
+  //   socket.emit("newHint", {
+  //     roomID: props.roomID,
+  //     hint,
+  //     hintCount,
+  //     isRedTurn: props.isRedTurn,
+  //   });
+  // };
 
   const isSubmitDisabled = !(
-    (props.isRedTurn && props.user.team === "RED") ||
-    (!props.isRedTurn && props.user.team === "BLUE")
+    (isRedTurn && user?.team === "RED") ||
+    (!isRedTurn && user?.team === "BLUE")
   );
 
   return (
@@ -41,7 +47,7 @@ export default function Hint(props) {
       </select>
       <Button
         disabled={isSubmitDisabled}
-        onClick={handleSubmit}
+        onClick={() => submitHint({ hint, hintCount })}
         text={"SEND"}
         style={{ width: 100 }}
       />

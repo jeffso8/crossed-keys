@@ -5,7 +5,7 @@ import socket from "../socket";
 const useGameMaster = () => {
   const { gameData, updateGameData } = useContext(GameContext);
 
-  const { roomId, user } = gameData;
+  const { roomId, user, isRedTurn } = gameData;
   const handleCardClick = ({ index }: { index: number }) => {
     socket.emit("flipCard", { roomID: roomId, user, index });
   };
@@ -14,9 +14,25 @@ const useGameMaster = () => {
     socket.emit("updateTurn", { roomID: roomId });
   };
 
+  const submitHint = ({
+    hint,
+    hintCount,
+  }: {
+    hint: string;
+    hintCount: number;
+  }) => {
+    socket.emit("newHint", {
+      roomID: roomId,
+      hint,
+      hintCount,
+      isRedTurn,
+    });
+  };
+
   return {
     handleCardClick,
     handleEndTurn,
+    submitHint,
   };
 };
 
